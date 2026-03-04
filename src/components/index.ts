@@ -1,4 +1,3 @@
-export * from "./App";
 export * from "./CreateRoomModal";
 export * from "./Header";
 export * from "./Message";

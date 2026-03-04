@@ -1,0 +1,22 @@
+#landingPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+
+    & .landing-text {
+        font-family: "LINE Seed JP", sans-serif;
+        font-size: 1.3rem;
+    }
+
+    & #username-connection {
+        display: flex;
+        gap: 1rem;
+
+        & button {
+            width: fit-content;
+        }
+    }
+}
