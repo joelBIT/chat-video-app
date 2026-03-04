@@ -11,6 +11,8 @@ import {initializeMainNamespaceEvents} from "./socketApplication/events/mainEven
 
 const app = express();
 app.use(express.static(import.meta.dirname + "/dist/"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true}));
 
 const key = readFileSync('cert.key');
 const cert = readFileSync('cert.crt');
