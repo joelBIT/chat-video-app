@@ -2,6 +2,12 @@ import { createServer } from 'node:https';
 import fs from "node:fs";
 import express from 'express';
 import { Server } from 'socket.io';
+import {checkUsername} from "./socketApplication/auth/auth.ts";
+import {initializeHomeEvents} from "./socketApplication/events/homeEvents.ts";
+import {initializeDmEvents} from "./socketApplication/events/dmEvents.ts";
+import {initializeGamesEvents} from "./socketApplication/events/gamesEvents.ts";
+import {initializeCommonEvents} from "./socketApplication/events/commonEvents.ts";
+import {initializeMainNamespaceEvents} from "./socketApplication/events/mainEvents.ts";
 
 const app = express();
 app.use(express.static(import.meta.dirname + "/dist/"));
@@ -20,6 +26,13 @@ const io = new Server(expressServer, {
         methods: ["GET", "POST"]
     }
 });
+
+checkUsername(io);
+initializeMainNamespaceEvents(io);
+initializeCommonEvents(io);
+initializeHomeEvents(io);
+initializeDmEvents(io);
+initializeGamesEvents(io);
 
 expressServer.listen(8181, () => {
     console.log(`Server listening on port ${8181}`);
