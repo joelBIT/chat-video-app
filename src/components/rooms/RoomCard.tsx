@@ -1,10 +1,10 @@
 'use client';
 
-import { ReactElement } from "react";
-import { useRoom, useUser } from "../../_hooks";
-import { isMember, isSelectedRoom } from "../../_clientApplication/services/roomService";
-import { Room } from "../../_types/types";
-import { isCommonRoom, NamespaceID } from "@/socketApplication/enums";
+import { type ReactElement } from "react";
+import { useRoom, useUser } from "../../hooks";
+import { isMember, isSelectedRoom } from "../../clientApplication/services/roomService";
+import type { Room } from "../../../types";
+import { isCommonRoom, NAMESPACE_ID_GAMES } from "../../../socketApplication/utils";
 
 import "./RoomCard.css";
 
@@ -27,7 +27,7 @@ export function RoomCard({room}: {room: Room}): ReactElement {
      * Return true if this room is a custom game room that the client is a member of.
      */
     function isRoomMember(): boolean {
-        return !isCommonRoom(room.id) && room.namespaceId === NamespaceID.GAMES && isMember(user.id, room.id);
+        return !isCommonRoom(room.id) && room.namespaceId === NAMESPACE_ID_GAMES && isMember(user.id, room.id);
     }
 
     return (

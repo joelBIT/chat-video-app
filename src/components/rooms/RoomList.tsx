@@ -1,12 +1,12 @@
 'use client';
 
-import { ReactElement } from "react";
-import { useUser } from "@/app/_hooks";
-import { isSelectedNamespace } from "@/app/_clientApplication/services/namespaceService";
-import { getSelectedNamespaceRooms, memberGameRooms, nonMemberGameRooms } from "@/app/_clientApplication/services/roomService";
+import { type ReactElement } from "react";
+import { useUser } from "../../hooks";
+import { isSelectedNamespace } from "../../clientApplication/services/namespaceService";
+import { getSelectedNamespaceRooms, memberGameRooms, nonMemberGameRooms } from "../../clientApplication/services/roomService";
 import { RoomCard } from "..";
-import { Room } from "@/app/_types/types";
-import { NamespaceID } from "@/socketApplication/enums";
+import type { Room } from "../../../types";
+import { NAMESPACE_ID_GAMES } from "../../../socketApplication/utils";
 
 import "./RoomList.css";
 
@@ -16,7 +16,7 @@ import "./RoomList.css";
 export function RoomList(): ReactElement {
     const { user } = useUser();
 
-    if (isSelectedNamespace(NamespaceID.GAMES)) {
+    if (isSelectedNamespace(NAMESPACE_ID_GAMES)) {
         return (
             <section id="roomList">
                 <h1 className="rooms-title">Rooms</h1>

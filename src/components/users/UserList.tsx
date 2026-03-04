@@ -1,9 +1,9 @@
 'use client';
 
-import { ReactElement } from "react";
-import { useRoom } from "@/app/_hooks";
+import { type ReactElement } from "react";
+import { useRoom } from "../../hooks";
 import { UserCard } from "..";
-import { TriviaUser } from "@/app/_types/types";
+import type { TriviaUser } from "../../../types";
 
 import "./UserList.css";
 

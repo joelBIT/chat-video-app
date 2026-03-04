@@ -1,9 +1,9 @@
 'use client';
 
-import { ReactElement, useRef } from "react";
-import { useRoom } from "../../_hooks";
+import { type ReactElement, useRef } from "react";
+import { useRoom } from "../../hooks";
 import { Message } from "..";
-import { Message as MessageType } from "@/app/_types/types";
+import type { Message as MessageType } from "../../../types";
 
 import "./RoomChat.css";
 

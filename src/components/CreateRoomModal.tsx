@@ -1,7 +1,7 @@
 'use client';
 
-import { ReactElement, useEffect, useRef, useState } from 'react';
-import { useRoom } from '../_hooks';
+import { type ReactElement, useEffect, useRef, useState } from 'react';
+import { useRoom } from '../hooks';
 
 import "./CreateRoomModal.css";
 

@@ -1,10 +1,10 @@
 'use client';
 
-import { ReactElement } from "react";
-import { useRoom, useUser } from "../../_hooks";
-import { setSelectedNamespaceId } from "@/app/_clientApplication/services/namespaceService";
-import { NamespaceID } from "@/socketApplication/enums";
-import { TriviaUser } from "../../_types/types";
+import { type ReactElement } from "react";
+import { useRoom, useUser } from "../../hooks";
+import { setSelectedNamespaceId } from "../../clientApplication/services/namespaceService";
+import type { TriviaUser } from "../../../types";
+import { NAMESPACE_ID_DM } from "../../../socketApplication/utils";
 
 import "./UserCard.css";
 
@@ -21,7 +21,7 @@ export function UserCard({member}: {member: TriviaUser}): ReactElement {
      */
     function toPrivateRoom(): void {
         if (member.id.localeCompare(user.id) !== 0) {
-            setSelectedNamespaceId(NamespaceID.DM);
+            setSelectedNamespaceId(NAMESPACE_ID_DM);
             createPrivateRoom(member);
         }
     }

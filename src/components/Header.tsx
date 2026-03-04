@@ -1,7 +1,7 @@
 'use client';
 
-import { ReactElement } from "react";
-import { useSocket } from "../_hooks";
+import { type ReactElement } from "react";
+import { useSocket } from "../hooks";
 
 import "./Header.css";
 
