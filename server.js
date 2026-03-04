@@ -4,8 +4,7 @@ import express from 'express';
 import { Server } from 'socket.io';
 
 const app = express();
-console.log(import.meta.dirname)
-app.use(express.static(import.meta.dirname));
+app.use(express.static(import.meta.dirname + "/dist/"));
 
 const key = fs.readFileSync('cert.key');
 const cert = fs.readFileSync('cert.crt');
@@ -21,21 +20,7 @@ const io = new Server(expressServer, {
         methods: ["GET", "POST"]
     }
 });
-expressServer.listen(8181);
 
-//offers will contain {}
-const offers = [
-    // offererUserName
-    // offer
-    // offerIceCandidates
-    // answererUserName
-    // answer
-    // answererIceCandidates
-];
-const connectedSockets = [
-    //username, socketId
-]
-
-io.on('connection',(socket)=>{
-    console.log("Someone has connected");
+expressServer.listen(8181, () => {
+    console.log(`Server listening on port ${8181}`);
 });
