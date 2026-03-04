@@ -36,3 +36,5 @@ export function isCommonRoom(roomID: string): boolean {
 export function isValidNamespace(namespaceID: number): boolean {
     return [0, 1, 2].includes(namespaceID);
 }
+
+export const HOME_URL = "/";
