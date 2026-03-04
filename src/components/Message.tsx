@@ -1,8 +1,8 @@
 'use client';
 
-import { ReactElement } from "react";
+import { type ReactElement } from "react";
 import Textarea from 'rc-textarea';
-import { type Message } from "../_types/types";
+import type { Message } from "../../types";
 
 import "./Message.css";
 

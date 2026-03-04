@@ -2,7 +2,7 @@
 
 import { createContext, ReactElement, ReactNode, useState } from "react";
 import { Message, Room, TriviaUser } from "../_types/types";
-import { multiplexSockets } from "../socket";
+import { multiplexSockets } from "../socket-client";
 import { useUser } from "../_hooks";
 import { getUsersInRoom } from "../_clientApplication/services/userService";
 import { isSelectedNamespace, setSelectedNamespaceId } from "../_clientApplication/services/namespaceService";

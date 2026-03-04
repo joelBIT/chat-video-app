@@ -1,8 +1,8 @@
 'use client';
 
-import { createContext, ReactElement, ReactNode, useState } from "react";
-import { getSignedOutUser } from "../_clientApplication/services/userService";
-import { TriviaUser } from "../_types/types";
+import { createContext, type ReactElement, type ReactNode, useState } from "react";
+import { getSignedOutUser } from "../clientApplication/services/userService";
+import type { TriviaUser } from "../../types";
 
 export interface UserContextProvider {
     user: TriviaUser;

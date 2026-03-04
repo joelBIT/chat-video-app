@@ -1,12 +1,11 @@
 'use client';
 
-import { ReactElement, useState } from "react";
-import { redirect, usePathname } from "next/navigation";
-import { useRoom, useSocket } from "../_hooks";
+import { type ReactElement, useState } from "react";
+import { useRoom, useSocket } from "../hooks";
 import { CreateRoomModal } from ".";
-import { getNamespaces, isSelectedNamespace } from "../_clientApplication/services/namespaceService";
-import { NamespaceID } from "@/socketApplication/enums";
-import { Namespace } from "../_types/types";
+import { getNamespaces, isSelectedNamespace } from "../clientApplication/services/namespaceService";
+import type { Namespace } from "../../types";
+import { NAMESPACE_ID_GAMES } from "../../socketApplication/utils";
 
 import "./NamespaceMenu.css";
 
@@ -23,7 +22,7 @@ export function NamespaceMenu(): ReactElement {
      * Create a new room within the Games namespace (id 2). If selected namespace is not 2, do nothing.
      */
     function createRoom(): void {
-        if (isSelectedNamespace(NamespaceID.GAMES)) {
+        if (isSelectedNamespace(NAMESPACE_ID_GAMES)) {
             setOpenModal(true);
         }
     }
@@ -68,7 +67,7 @@ export function NamespaceMenu(): ReactElement {
                     src="/create_room.svg" 
                     alt="Create Room icon" 
                     title="Create Room" 
-                    className={isSelectedNamespace(NamespaceID.GAMES) && pathname === "/rooms" ? "createRoom-button" : "disabled-button"} 
+                    className={isSelectedNamespace(NAMESPACE_ID_GAMES) && pathname === "/rooms" ? "createRoom-button" : "disabled-button"} 
                     onClick={createRoom}
                 />
             </section>

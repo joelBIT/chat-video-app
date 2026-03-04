@@ -2,7 +2,7 @@
 
 import { createContext, ReactElement, ReactNode } from "react";
 import { io, Socket } from "socket.io-client";
-import { multiplexSockets } from "../socket";
+import { multiplexSockets } from "../socket-client";
 import { useRoom } from "../_hooks";
 import { getSelectedRoom, isSelectedRoom, removeRoom, saveRoom } from "../_clientApplication/services/roomService";
 import { addUserToRoom, getUsersInSelectedRoom, removeUserFromRoom } from "../_clientApplication/services/userService";

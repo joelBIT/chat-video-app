@@ -1,14 +1,13 @@
 'use client';
 
-import { createContext, ReactElement, ReactNode, useEffect, useState } from "react";
-import { socket } from "../socket";
-import { useMultiplex, useRoom, useUser } from "../_hooks";
-import { clearSelectedRoom, getSelectedRoom, isSelectedRoom } from "../_clientApplication/services/roomService";
-import { addAllUsers, getSignedOutUser, getUsersInSelectedRoom, saveUser } from "../_clientApplication/services/userService";
-import { addNamespaces } from "../_clientApplication/services/namespaceService";
-import { ActionState, Namespace, TriviaUser } from "../_types/types";
-import { NamespaceID, RoomID } from "@/socketApplication/enums";
-import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "@/socketApplication/utils";
+import { createContext, type ReactElement, type ReactNode, useEffect, useState } from "react";
+import { socket } from "../socket-client";
+import { useMultiplex, useRoom, useUser } from "../hooks";
+import { clearSelectedRoom, getSelectedRoom, isSelectedRoom } from "../clientApplication/services/roomService";
+import { addAllUsers, getSignedOutUser, getUsersInSelectedRoom, saveUser } from "../clientApplication/services/userService";
+import { addNamespaces } from "../clientApplication/services/namespaceService";
+import type { ActionState, Namespace, TriviaUser } from "../../types";
+import { NAMESPACE_ID_HOME, NAMESPACES, ROOM_ID_NONE, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../../socketApplication/utils";
 
 export interface SocketContextProvider {
     isConnected: boolean;
@@ -76,7 +75,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
         addNamespaces(namespaces);
 
         connectMultiplexSockets(namespaces);
-        changeNamespace(NamespaceID.HOME);              // Set namespace Home (id 0) as default so that these rooms get listed for the client
+        changeNamespace(NAMESPACE_ID_HOME);              // Set namespace Home (id 0) as default so that these rooms get listed for the client
     }
 
     /**
@@ -119,7 +118,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
      */
     function onUserConnected(user: TriviaUser): void {
         saveUser(user);
-        if (!isSelectedRoom(RoomID.NONE)) {
+        if (!isSelectedRoom(ROOM_ID_NONE)) {
             setRoomParticipants(getUsersInSelectedRoom());
         }
     }
@@ -129,7 +128,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
      */
     function onUserDisconnected(user: TriviaUser): void {
         saveUser(user);
-        if (!isSelectedRoom(RoomID.NONE)) {
+        if (!isSelectedRoom(ROOM_ID_NONE)) {
             setRoomParticipants(getUsersInSelectedRoom());
         }
     }

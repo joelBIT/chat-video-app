@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { MultiplexContext, MultiplexContextProvider } from "../_contexts";
+import { MultiplexContext, type MultiplexContextProvider } from "../contexts";
 
 export function useMultiplex(): MultiplexContextProvider {
     const context: MultiplexContextProvider = useContext<MultiplexContextProvider>(MultiplexContext);
