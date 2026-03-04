@@ -1,4 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=LINE+Seed+JP');
+
 :root {
   --color-black: #000000;
   --color-white: #FFFFFF;
+  --color-warning: red;
+}
+
+html,
+body {
+    max-width: 100vw;
+    overflow-x: hidden;
+    height: 100vh;
+}
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    height: 100%;
+}
+
+
+
+
+/*********
+* Modals *
+*********/
+
+::backdrop {
+    background-image: linear-gradient(
+        45deg,
+        var(--color-white),
+        var(--color-black),
+        var(--color-black),
+        var(--color-white)
+    );
+    opacity: 0.75;
+}
+
+
+
+
+.message {
+    font-family: "LINE Seed JP", sans-serif;
+    font-size: 1rem;
+}
+
+.error-message {
+    color: var(--color-warning);
 }
