@@ -13,7 +13,7 @@ export function Header(): ReactElement {
                 <p className="status-text"> {isConnected ? "Connected" : "Disconnected"} </p>
             </section>
             
-            <h1 className="app-title"> Trivia App </h1>
+            <h1 className="app-title"> Chat App </h1>
             <div />
         </header>
     )

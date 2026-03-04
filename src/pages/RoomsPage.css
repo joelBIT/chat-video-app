@@ -1,0 +1,6 @@
+#roomsPage {
+    display: flex;
+    background-color: darkslategrey;
+    padding-bottom: 0.3rem;
+    padding-right: 0.3rem;
+}
