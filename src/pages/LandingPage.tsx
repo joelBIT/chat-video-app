@@ -1,5 +1,5 @@
 import { type ReactElement, useState } from "react";
-import { redirect } from "react-router";
+import { useNavigate } from "react-router";
 import { useSocket } from "../hooks";
 import { ROOMS_URL } from "../../socketApplication/utils";
 
@@ -10,10 +10,11 @@ import "./LandingPage.css";
  */
 export default function LandingPage(): ReactElement {
     const [username, setUsername] = useState<string>('');
+    const navigate = useNavigate();
     const { isConnected, connect, errorMessage } = useSocket();
 
     if (isConnected) {
-        redirect(ROOMS_URL);
+        navigate(ROOMS_URL);
     }
     
     return (

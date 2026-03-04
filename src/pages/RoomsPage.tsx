@@ -5,7 +5,7 @@ import { isSelectedNamespace } from "../clientApplication/services/namespaceServ
 import { NamespaceMenu, RoomChat, RoomList, UserList } from "../components";
 import { HOME_URL, NAMESPACE_ID_DM } from "../../socketApplication/utils";
 
-import "./page.css";
+import "./RoomsPage.css";
 
 /**
  * Page containing the namespace menu and list of rooms (including the chat of the selected room).

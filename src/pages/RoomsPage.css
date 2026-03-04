@@ -1,5 +1,6 @@
 #roomsPage {
     display: flex;
+    flex-direction: row;
     background-color: darkslategrey;
     padding-bottom: 0.3rem;
     padding-right: 0.3rem;

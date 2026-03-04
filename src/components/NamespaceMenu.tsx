@@ -1,10 +1,10 @@
 import { type ReactElement, useState } from "react";
-import { redirect, useLocation } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { useRoom, useSocket } from "../hooks";
 import { CreateRoomModal } from ".";
 import { getNamespaces, isSelectedNamespace } from "../clientApplication/services/namespaceService";
 import type { Namespace } from "../../types";
-import { NAMESPACE_ID_GAMES, ROOMS_URL } from "../../socketApplication/utils";
+import { NAMESPACE_ID_GAMES, PROFILE_URL, ROOMS_URL } from "../../socketApplication/utils";
 
 import "./NamespaceMenu.css";
 
@@ -13,6 +13,7 @@ import "./NamespaceMenu.css";
  */
 export function NamespaceMenu(): ReactElement {
     const [openModal, setOpenModal] = useState<boolean>(false);
+    const navigate = useNavigate();
     const location = useLocation();
     const { logout } = useSocket();
     const { changeNamespace } = useRoom();
@@ -34,7 +35,7 @@ export function NamespaceMenu(): ReactElement {
             changeNamespace(namespace.id);
         }
         if (location.pathname !== ROOMS_URL) {
-            redirect(ROOMS_URL);
+            navigate(ROOMS_URL);
         }
     }
 
@@ -76,8 +77,8 @@ export function NamespaceMenu(): ReactElement {
                     src="/profile.svg" 
                     alt="Profile icon" 
                     title="Profile" 
-                    className={location.pathname === "/profile" ? "active-profile-button" : "profile-button"} 
-                    onClick={() => redirect("/profile")}
+                    className={location.pathname === PROFILE_URL ? "active-profile-button" : "profile-button"} 
+                    onClick={() => navigate(PROFILE_URL)}
                 />
 
                 <img 

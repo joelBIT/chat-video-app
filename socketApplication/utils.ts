@@ -39,3 +39,4 @@ export function isValidNamespace(namespaceID: number): boolean {
 
 export const HOME_URL = "/";
 export const ROOMS_URL = "/rooms";
+export const PROFILE_URL = "/profile";

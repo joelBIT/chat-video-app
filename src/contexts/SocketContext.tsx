@@ -105,7 +105,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
     /**
      * Add username to the socket before connecting (usernames on the server should be unique).
      */
-    async function connect(username: string): Promise<void> {
+    function connect(username: string): void {
         socket.auth = { username };
         socket.io.opts.query = { username };
 
