@@ -4,7 +4,7 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "node --loader ts-node/esm server.js",
+        "dev": "NODE_OPTIONS='--import=./register.js' node server.js",
         "build": "tsc -b && vite build",
         "lint": "eslint .",
         "preview": "vite preview"

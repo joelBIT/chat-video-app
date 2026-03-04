@@ -1,5 +1,5 @@
 import { createServer } from 'node:https';
-import fs from "node:fs";
+import { readFileSync } from 'node:fs';
 import express from 'express';
 import { Server } from 'socket.io';
 import {checkUsername} from "./socketApplication/auth/auth.ts";
@@ -12,8 +12,8 @@ import {initializeMainNamespaceEvents} from "./socketApplication/events/mainEven
 const app = express();
 app.use(express.static(import.meta.dirname + "/dist/"));
 
-const key = fs.readFileSync('cert.key');
-const cert = fs.readFileSync('cert.crt');
+const key = readFileSync('cert.key');
+const cert = readFileSync('cert.crt');
 
 const expressServer = createServer({key, cert}, app);
 //create our socket.io server... it will listen to our express port
