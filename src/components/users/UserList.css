@@ -1,0 +1,16 @@
+#userList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    padding: 1rem;
+    background-color: #528b8b;
+    width: 350px;
+
+    & .userList-title {
+        font-family: "LINE Seed JP", sans-serif;
+        font-size: 1.3rem;
+        padding-bottom: 1rem;
+    }
+}
