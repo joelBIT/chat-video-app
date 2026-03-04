@@ -1,0 +1,46 @@
+.userCard {
+    display: flex;
+    align-items: center;
+    padding: 0.2rem;
+
+    & .user-image {
+        position: relative;
+
+        & .online-status {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 100%;
+            top: 50%;
+            right: 0;
+            background-color: red;
+        }
+
+        & .user-avatar {
+            width: 30px;
+            border-radius: 100%;
+        }
+
+        & .online {
+            background-color: green;
+        }
+    }
+
+    & .user-username {
+        font-family: "LINE Seed JP", sans-serif;
+        font-size: 1rem;
+    }
+
+    &:hover {
+        cursor: pointer;
+        background-color: lightsteelblue;
+        border-radius: 4px;
+    }
+}
+
+.userCard-client {
+    &:hover {
+        cursor: default;
+        background-color: transparent;
+    }
+}

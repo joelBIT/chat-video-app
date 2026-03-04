@@ -1,0 +1,52 @@
+.message {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.2rem;
+    padding-top: 0.5rem;
+    font-family: Arial, Helvetica, sans-serif;
+
+    & .message-avatar {
+        width: 40px;
+        background-color: burlywood;
+        padding: 0.1rem;
+        border-radius: 9px;
+    }
+
+    & .message-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        width: 100%;
+
+        & textarea {
+            background: transparent;
+            color: white;
+        }
+
+        & .message-metadata {
+            display: flex;
+            gap: 1rem;
+        }
+
+        & .message-date,
+        & .message-text,
+        & .message-sender {
+            font-size: 0.9rem;
+        }
+
+        & .message-date {
+            color: darkgrey;
+        }
+
+        & .message-text {
+            resize: none;
+            border: none;
+            outline: none;
+        }
+
+        & .message-sender {
+            font-weight: 900;
+        }
+    }
+}
