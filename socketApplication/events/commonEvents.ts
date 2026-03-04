@@ -1,0 +1,35 @@
+import { Server } from "socket.io";
+import { getAllNamespaces } from "../services/namespaceService";
+import { getUserByUsername } from "../services/userService";
+import type { Namespace, Room } from "../../types";
+import type { ISocket } from "../interfaces";
+import { isCommonRoom, USER_JOINED } from "../utils";
+
+/**
+ * Initializes common events for the namespaces (not the main namespace '/'). These custom namespaces are "Home", "DMs", and "Games".
+ * Common rooms that all clients are members of are "General", "Support", "Lobby", and "Announcements".
+ */
+export function initializeCommonEvents(io: Server): void {
+    getAllNamespaces().forEach((namespace: Namespace) => {
+        io.of(namespace.endpoint).on("connection", async (socket: ISocket) => {
+            const username = socket.handshake.query.username;
+            console.log(`connected username ${username}`);
+
+            if (typeof username === "string") {
+                const user = getUserByUsername(username);
+                if (user) {
+                    namespace.rooms.forEach((room: Room) => {
+                        if (isCommonRoom(room.id) || room.members.includes(user.id)) {      // Join rooms where the user is a member
+                            socket.join(room.id);
+
+                            // inform clients about the connected user
+                            io.of(namespace.endpoint).to(room.id).emit(USER_JOINED, room.id, user.id, room.namespaceId);
+                        }
+                    });
+                }
+            } else {
+                console.log(`Could not inform clients about connecting ${username}`);
+            }
+        });
+    });
+}
