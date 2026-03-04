@@ -1,24 +1,14 @@
-'use client';
-
-import { TriviaUser } from "@/app/_types/types";
-
-/* abstract */ class UserStore {
-    saveUser(user: TriviaUser) {};
-    getUserById(userID: string) {};
-    addAllUsers(users: TriviaUser[]) {};
-    getSignedOutUser() {};
-}
+import type { TriviaUser } from "../../../types";
 
 /**
  * Keeps track of application users. Update user information (e.g., online status or username/avatar changes).
  * Instead of retrieving information all the time from the server, data sent from the server is stored on the client. 
  * The server sends updates when something of importance happens. Then the client updates this data.
  */
-class InMemoryUserStore extends UserStore {
+class InMemoryUserStore {
     users: Map<string, TriviaUser>;                       // <userID, TriviaUser>
 
     constructor() {
-        super();
         this.users = new Map();
     }
 

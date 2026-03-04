@@ -1,5 +1,7 @@
 import { type ReactElement, useState } from "react";
+import { redirect } from "react-router";
 import { useSocket } from "../hooks";
+import { ROOMS_URL } from "../../socketApplication/utils";
 
 import './App.css';
 
@@ -11,7 +13,7 @@ export function App(): ReactElement {
     const { isConnected, connect, errorMessage } = useSocket();
 
     if (isConnected) {
-        // Redirect to rooms
+        redirect(ROOMS_URL);
     }
 
     return (

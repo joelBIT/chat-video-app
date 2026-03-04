@@ -1,16 +1,13 @@
-'use client';
-
-import { createContext, ReactElement, ReactNode } from "react";
+import { createContext, type ReactElement, type ReactNode } from "react";
 import { io, Socket } from "socket.io-client";
 import { multiplexSockets } from "../socket-client";
-import { useRoom } from "../_hooks";
-import { getSelectedRoom, isSelectedRoom, removeRoom, saveRoom } from "../_clientApplication/services/roomService";
-import { addUserToRoom, getUsersInSelectedRoom, removeUserFromRoom } from "../_clientApplication/services/userService";
-import { saveConversationMessage, saveMessage } from "../_clientApplication/services/messageService";
-import { isSelectedNamespace } from "../_clientApplication/services/namespaceService";
-import { Message, Namespace, Room } from "../_types/types";
-import { NamespaceID, RoomID } from "@/socketApplication/enums";
-import { CHAT_MESSAGE, PRIVATE_MESSAGE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "@/socketApplication/utils";
+import { useRoom } from "../hooks";
+import { getSelectedRoom, isSelectedRoom, removeRoom, saveRoom } from "../clientApplication/services/roomService";
+import { addUserToRoom, getUsersInSelectedRoom, removeUserFromRoom } from "../clientApplication/services/userService";
+import { saveConversationMessage, saveMessage } from "../clientApplication/services/messageService";
+import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
+import type { Message, Namespace, Room } from "../../types";
+import { CHAT_MESSAGE, PRIVATE_MESSAGE, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../socketApplication/utils";
 
 export interface MultiplexContextProvider {
     connectMultiplexSockets: (namespaces: Namespace[]) => void;
@@ -63,7 +60,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     /**
      * Add the user as a member of the joined room. Update participants if joined room is the client's selected room.
      */
-    function onUserJoined(roomID: string, userID: string, namespaceID: NamespaceID): void {
+    function onUserJoined(roomID: string, userID: string, namespaceID: number): void {
         addUserToRoom(roomID, userID, namespaceID);
         if (isSelectedRoom(roomID)) {
             setRoomParticipants(getUsersInSelectedRoom());
@@ -73,7 +70,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     /**
      * Update participants in room when a user leaves.
      */
-    function onUserLeft(roomID: string, userID: string, namespaceID: NamespaceID): void {
+    function onUserLeft(roomID: string, userID: string, namespaceID: number): void {
         removeUserFromRoom(roomID, userID, namespaceID);
         updateUI(namespaceID);
     }
@@ -90,10 +87,10 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     /**
      * Updates the UI with new data when an event occurs.
      */
-    function updateUI(namespaceID: NamespaceID): void {
+    function updateUI(namespaceID: number): void {
         if (isSelectedNamespace(namespaceID)) {
             changeNamespace(namespaceID);                          // Update the list of rooms in the UI
-            if (!isSelectedRoom(RoomID.NONE)) {
+            if (!isSelectedRoom(ROOM_ID_NONE)) {
                 setRoomParticipants(getUsersInSelectedRoom());      // Update list of room members in the UI since a room is selected
             }
         }

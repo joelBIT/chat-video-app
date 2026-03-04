@@ -1,11 +1,10 @@
-'use client';
-
 import { type ReactElement, useState } from "react";
+import { redirect, useLocation } from "react-router";
 import { useRoom, useSocket } from "../hooks";
 import { CreateRoomModal } from ".";
 import { getNamespaces, isSelectedNamespace } from "../clientApplication/services/namespaceService";
 import type { Namespace } from "../../types";
-import { NAMESPACE_ID_GAMES } from "../../socketApplication/utils";
+import { NAMESPACE_ID_GAMES, ROOMS_URL } from "../../socketApplication/utils";
 
 import "./NamespaceMenu.css";
 
@@ -14,7 +13,7 @@ import "./NamespaceMenu.css";
  */
 export function NamespaceMenu(): ReactElement {
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const pathname = usePathname();
+    const location = useLocation();
     const { logout } = useSocket();
     const { changeNamespace } = useRoom();
 
@@ -34,8 +33,8 @@ export function NamespaceMenu(): ReactElement {
         if (!isSelectedNamespace(namespace.id)) {
             changeNamespace(namespace.id);
         }
-        if (pathname !== "/rooms") {
-            redirect("/rooms");
+        if (location.pathname !== ROOMS_URL) {
+            redirect(ROOMS_URL);
         }
     }
 
@@ -46,7 +45,7 @@ export function NamespaceMenu(): ReactElement {
                     getNamespaces().map(namespace => 
                         <section 
                             key={namespace.id} 
-                            className={isSelectedNamespace(namespace.id) && pathname === "/rooms" ? "active-namespace" : "namespace"} 
+                            className={isSelectedNamespace(namespace.id) && location.pathname === ROOMS_URL ? "active-namespace" : "namespace"} 
                             onClick={() => changeActiveNamespace(namespace)}
                         >
                             <img 
@@ -67,7 +66,7 @@ export function NamespaceMenu(): ReactElement {
                     src="/create_room.svg" 
                     alt="Create Room icon" 
                     title="Create Room" 
-                    className={isSelectedNamespace(NAMESPACE_ID_GAMES) && pathname === "/rooms" ? "createRoom-button" : "disabled-button"} 
+                    className={isSelectedNamespace(NAMESPACE_ID_GAMES) && location.pathname === ROOMS_URL ? "createRoom-button" : "disabled-button"} 
                     onClick={createRoom}
                 />
             </section>
@@ -77,7 +76,7 @@ export function NamespaceMenu(): ReactElement {
                     src="/profile.svg" 
                     alt="Profile icon" 
                     title="Profile" 
-                    className={pathname === "/profile" ? "active-profile-button" : "profile-button"} 
+                    className={location.pathname === "/profile" ? "active-profile-button" : "profile-button"} 
                     onClick={() => redirect("/profile")}
                 />
 

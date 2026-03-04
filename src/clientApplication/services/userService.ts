@@ -1,9 +1,8 @@
-import { Namespace, Room, TriviaUser } from "@/app/_types/types";
-import { NamespaceID } from "@/socketApplication/enums";
+import type { Namespace, Room, TriviaUser } from "@/../../types";
 import namespaceStore from "../stores/namespaceStore";
 import userStore from "../stores/userStore";
 
-export function getUsersInRoom(roomID: string, namespaceID: NamespaceID): TriviaUser[] {
+export function getUsersInRoom(roomID: string, namespaceID: number): TriviaUser[] {
     const memberList: TriviaUser[] = [];
     const matchingRoom: Room | undefined = namespaceStore.getNamespace(namespaceID).rooms.find((room: Room) => room.id === roomID);
     if (matchingRoom) {
@@ -27,7 +26,7 @@ export function getUsersInSelectedRoom(): TriviaUser[] {
     return memberList;
 }
 
-export function addUserToRoom(roomID: string, userID: string, namespaceID: NamespaceID): void {
+export function addUserToRoom(roomID: string, userID: string, namespaceID: number): void {
     const namespace: Namespace = namespaceStore.getNamespace(namespaceID);
     const matchingRoom: Room | undefined = namespace.rooms.find((room: Room) => room.id === roomID);
     if (matchingRoom && !matchingRoom.members.includes(userID)) {
@@ -40,7 +39,7 @@ export function addUserToRoom(roomID: string, userID: string, namespaceID: Names
     }
 }
 
-export function removeUserFromRoom(roomID: string, userID: string, namespaceID: NamespaceID): void {
+export function removeUserFromRoom(roomID: string, userID: string, namespaceID: number): void {
     const namespace: Namespace = namespaceStore.getNamespace(namespaceID);
     const matchingRoom: Room | undefined = namespace.rooms.find((room: Room) => room.id === roomID);
     if (matchingRoom && matchingRoom.members.includes(userID)) {

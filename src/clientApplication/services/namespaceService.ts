@@ -1,6 +1,5 @@
-import { Namespace } from "@/app/_types/types";
+import type { Namespace } from "@/../../types";
 import namespaceStore from "../stores/namespaceStore";
-import { NamespaceID } from "@/socketApplication/enums";
 
 /**
  * Add namespaces received from the server when the client connects. 
@@ -16,10 +15,10 @@ export function getNamespaces(): Namespace[] {
     return namespaceStore.getNamespaces();
 }
 
-export function isSelectedNamespace(namespaceID: NamespaceID): boolean {
+export function isSelectedNamespace(namespaceID: number): boolean {
     return namespaceStore.isSelectedNamespace(namespaceID);
 }
 
-export function setSelectedNamespaceId(namespaceID: NamespaceID): void {
+export function setSelectedNamespaceId(namespaceID: number): void {
     namespaceStore.setSelectedNamespaceId(namespaceID);
 }

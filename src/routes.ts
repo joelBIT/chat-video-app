@@ -5,6 +5,7 @@ import { HOME_URL } from "../socketApplication/utils";
 export const  routes = createBrowserRouter([
     {
         path: HOME_URL,
+        index: true,
         Component: App
     },
 ]);

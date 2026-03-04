@@ -1,6 +1,6 @@
+import { NAMESPACE_ID_GAMES, ROOM_ID_NONE } from "../../../socketApplication/utils";
 import namespaceStore from "../stores/namespaceStore";
-import { Namespace, Room } from "@/app/_types/types";
-import { NamespaceID, RoomID } from "@/socketApplication/enums";
+import type { Namespace, Room } from "@/../../types";
 
 /**
  * A room may be "undefined" if the user is not active in a specific room at any given point in time.
@@ -38,7 +38,7 @@ export function saveRoom(newRoom: Room): void {
  * their own rooms in that namespace.
  */
 export function isMember(userID: string, roomID: string): boolean {
-    const namespace: Namespace = namespaceStore.getNamespace(NamespaceID.GAMES);
+    const namespace: Namespace = namespaceStore.getNamespace(NAMESPACE_ID_GAMES);
     if (namespace) {
         const matchingRoom: Room | undefined = namespace.rooms.find((room: Room) => room.id === roomID);
         if (matchingRoom && matchingRoom.members.includes(userID)) {
@@ -48,7 +48,7 @@ export function isMember(userID: string, roomID: string): boolean {
     return false;
 }
 
-export function getRoom(roomID: string, namespaceID: NamespaceID): Room {
+export function getRoom(roomID: string, namespaceID: number): Room {
     const matchingRoom: Room | undefined = namespaceStore.getNamespace(namespaceID).rooms.find((room: Room) => room.id === roomID);
     if (matchingRoom) {
         return matchingRoom;
@@ -63,7 +63,7 @@ export function getSelectedNamespaceRooms(): Room[] {
 /**
  * Removes a room for the user when the user leaves the room.
  */
-export function removeRoom(roomID: string, namespaceID: NamespaceID): void {
+export function removeRoom(roomID: string, namespaceID: number): void {
     const namespace: Namespace = namespaceStore.getNamespace(namespaceID);
     if (namespace && namespace.rooms.find((room: Room) => room.id === roomID)) {
         const remainingRooms: Room[] = namespace.rooms.filter((room: Room) => room.id !== roomID);
@@ -82,7 +82,7 @@ export function setSelectedRoomId(roomID: string): void {
 }
 
 export function clearSelectedRoom(): void {
-    namespaceStore.selectedRoomId = RoomID.NONE;
+    namespaceStore.selectedRoomId = ROOM_ID_NONE;
 }
 
 /**
@@ -90,7 +90,7 @@ export function clearSelectedRoom(): void {
  */
 export function nonMemberGameRooms(userID: string): Room[] {
     const nonMemberRooms: Room[] = [];
-    const AllGameRooms: Room[] | undefined = namespaceStore.getNamespace(NamespaceID.GAMES).rooms;
+    const AllGameRooms: Room[] | undefined = namespaceStore.getNamespace(NAMESPACE_ID_GAMES).rooms;
     AllGameRooms?.forEach((room: Room) => {
         if (!room.members.includes(userID)) {
             nonMemberRooms.push(room);
@@ -105,7 +105,7 @@ export function nonMemberGameRooms(userID: string): Room[] {
  */
 export function memberGameRooms(userID: string): Room[] {
     const memberRooms: Room[] = [];
-    const AllGameRooms: Room[] | undefined = namespaceStore.getNamespace(NamespaceID.GAMES).rooms;
+    const AllGameRooms: Room[] | undefined = namespaceStore.getNamespace(NAMESPACE_ID_GAMES).rooms;
     AllGameRooms?.forEach((room: Room) => {
         if (room.members.includes(userID)) {
             memberRooms.push(room);

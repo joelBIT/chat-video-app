@@ -1,5 +1,3 @@
-'use client';
-
 import { type ReactElement } from "react";
 import { useUser } from "../../hooks";
 import { isSelectedNamespace } from "../../clientApplication/services/namespaceService";

@@ -1,6 +1,6 @@
-import { NamespaceID } from "@/socketApplication/enums";
+import { NAMESPACE_ID_DM } from "../../../socketApplication/utils";
 import namespaceStore from "../stores/namespaceStore";
-import { Message, Namespace, Room } from "@/app/_types/types";
+import type { Message, Namespace, Room } from "@/../../types";
 
 /**
  * Public rooms have their own unique IDs and members of a room always send messages to that
@@ -22,7 +22,7 @@ export function saveMessage(message: Message): void {
  * both "message.from.id" and "message.to.id" is checked when trying to find the private room.
  */
 export function saveConversationMessage(message: Message): void {
-    const namespace: Namespace = namespaceStore.getNamespace(NamespaceID.DM);
+    const namespace: Namespace = namespaceStore.getNamespace(NAMESPACE_ID_DM);
     namespace.rooms.forEach((room: Room) => {
         if (room.id === message.from.id || room.id === message.to.id) {
             room.history.push(message);

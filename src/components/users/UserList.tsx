@@ -1,5 +1,3 @@
-'use client';
-
 import { type ReactElement } from "react";
 import { useRoom } from "../../hooks";
 import { UserCard } from "..";

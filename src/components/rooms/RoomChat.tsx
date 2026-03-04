@@ -1,5 +1,3 @@
-'use client';
-
 import { type ReactElement, useRef } from "react";
 import { useRoom } from "../../hooks";
 import { Message } from "..";

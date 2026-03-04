@@ -1,14 +1,11 @@
-'use client';
-
-import { createContext, ReactElement, ReactNode, useState } from "react";
-import { Message, Room, TriviaUser } from "../_types/types";
+import { createContext, type ReactElement, type ReactNode, useState } from "react";
+import type { Message, Room, TriviaUser } from "../../types";
 import { multiplexSockets } from "../socket-client";
-import { useUser } from "../_hooks";
-import { getUsersInRoom } from "../_clientApplication/services/userService";
-import { isSelectedNamespace, setSelectedNamespaceId } from "../_clientApplication/services/namespaceService";
-import { clearSelectedRoom, getRoom, getSelectedRoom, isSelectedRoom, saveRoom, setSelectedRoomId } from "../_clientApplication/services/roomService";
-import { NamespaceID, RoomID } from "@/socketApplication/enums";
-import { CHANGE_ROOM, CHAT_MESSAGE, CREATE_ROOM, LEAVE_ROOM, PRIVATE_MESSAGE } from "@/socketApplication/utils";
+import { useUser } from "../hooks";
+import { getUsersInRoom } from "../clientApplication/services/userService";
+import { isSelectedNamespace, setSelectedNamespaceId } from "../clientApplication/services/namespaceService";
+import { clearSelectedRoom, getRoom, getSelectedRoom, isSelectedRoom, saveRoom, setSelectedRoomId } from "../clientApplication/services/roomService";
+import { CHANGE_ROOM, CHAT_MESSAGE, CREATE_ROOM, LEAVE_ROOM, NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, PRIVATE_MESSAGE, ROOM_ID_NONE } from "../../socketApplication/utils";
 
 export interface RoomContextProvider {
     selectedRoom: Room | undefined;
@@ -17,7 +14,7 @@ export interface RoomContextProvider {
     changeRoom: (room: Room) => void;
     leaveRoom: (room: Room) => void;
     setRoomParticipants: (participants: TriviaUser[]) => void;
-    changeNamespace: (namespaceID: NamespaceID) => void;
+    changeNamespace: (namespaceID: number) => void;
     changeSelectedRoom: (room: Room | undefined) => void;
     createPrivateRoom: (recipient: TriviaUser) => void;
     createGameRoom: (roomName: string, privateRoom: boolean) => void;
@@ -38,15 +35,15 @@ export function RoomProvider({ children }: { children: ReactNode }): ReactElemen
      * Keep track of which room is currently selected. A room may be undefined if no room is selected.
      */
     function changeSelectedRoom(room: Room | undefined): void {
-        setSelectedRoomId(room ? room.id : RoomID.NONE);
-        setSelectedRoom(_oldRoom => room);
+        setSelectedRoomId(room ? room.id : ROOM_ID_NONE);
+        setSelectedRoom((_oldRoom: Room | undefined) => room);
     }
 
     /**
      * Change the selected namespace. The selected room is cleared and the user must choose a room in the new namespace. There are no room participants
      * when no room is selected.
      */
-    function changeNamespace(namespaceID: NamespaceID): void {
+    function changeNamespace(namespaceID: number): void {
         if (!isSelectedNamespace(namespaceID)) {   // Clear selected room if changing to a different namespace
             clearSelectedRoom();
             setSelectedRoom(getSelectedRoom());     // Set undefined as selected room meaning no room is selected
@@ -84,13 +81,13 @@ export function RoomProvider({ children }: { children: ReactNode }): ReactElemen
      * Create a new private room in the "DMs" namespace (id 1).
      */
     async function createPrivateRoom(recipient: TriviaUser): Promise<void> {
-        const response = await multiplexSockets[NamespaceID.DM].emitWithAck(CREATE_ROOM, user, recipient);
+        const response = await multiplexSockets[NAMESPACE_ID_DM].emitWithAck(CREATE_ROOM, user, recipient);
         saveRoom(response.room);
         setSelectedRoomId(response.room.id);
         changeSelectedRoom(response.room);
         setRoomParticipants([]);
-        if (isSelectedNamespace(NamespaceID.DM)) {
-            changeNamespace(NamespaceID.DM);        // Update UI
+        if (isSelectedNamespace(NAMESPACE_ID_DM)) {
+            changeNamespace(NAMESPACE_ID_DM);        // Update UI
         }
     }
 
@@ -98,8 +95,8 @@ export function RoomProvider({ children }: { children: ReactNode }): ReactElemen
      * Create a new room in the "Games" namespace (id 2). The room ID is not set because the room will get a unique ID on the server when persisted.
      */
     function createGameRoom(roomName: string, privateRoom: boolean): void {
-        const room: Room = {id: "", name: roomName, namespaceId: NamespaceID.GAMES, private: privateRoom, members: [], history: []};
-        multiplexSockets[NamespaceID.GAMES].emit(CREATE_ROOM, room, user.id);
+        const room: Room = {id: "", name: roomName, namespaceId: NAMESPACE_ID_GAMES, private: privateRoom, members: [], history: []};
+        multiplexSockets[NAMESPACE_ID_GAMES].emit(CREATE_ROOM, room, user.id);
     }
 
     /**
@@ -108,8 +105,8 @@ export function RoomProvider({ children }: { children: ReactNode }): ReactElemen
     function sendMessage(text: string): void {
         if (selectedRoom) {
             const message: Message = {text, from: user, to: selectedRoom, date: Date.now()};
-            if (isSelectedNamespace(NamespaceID.DM)) {
-                multiplexSockets[NamespaceID.DM].emit(PRIVATE_MESSAGE, message);
+            if (isSelectedNamespace(NAMESPACE_ID_DM)) {
+                multiplexSockets[NAMESPACE_ID_DM].emit(PRIVATE_MESSAGE, message);
             } else {
                 multiplexSockets[message.to.namespaceId].emit(CHAT_MESSAGE, message);
             }
