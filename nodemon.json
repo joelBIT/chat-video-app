@@ -1,0 +1,3 @@
+{
+  "watch": ["src"], "ext": "tsx ts js css", "exec": "tsc -b && vite build && tsx server.js"
+}
