@@ -37,18 +37,52 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             }
 
             const socketIdToAnswer = user.id;
-            const offerToUpdate = offers.find(offer => offer.offererUserName === offerObject.offererUserName);
-            if (!offerToUpdate) {
-                console.log("No OfferToUpdate");
+            const offer = offers.find(offer => offer.offererUserName === offerObject.offererUserName);
+            if (!offer) {
+                console.log("No offer to update");
                 return;
             }
 
             // Send back to the answerer all the iceCandidates we have already collected
-            ackFunction(offerToUpdate.offerIceCandidates);
+            ackFunction(offer.offerIceCandidates);
 
             // We find the offer to update so we can emit it
-            offerToUpdate.answer = offerObject.answer;
-            socket.to(socketIdToAnswer).emit(ANSWER_RESPONSE, offerToUpdate);
+            offer.answer = offerObject.answer;
+            socket.to(socketIdToAnswer).emit(ANSWER_RESPONSE, offer);
         });
+
+        socket.on('sendIceCandidateToSignalingServer', iceCandidateObject => {
+            const { didIOffer, iceUserName, iceCandidate } = iceCandidateObject;
+            console.log(iceCandidate);
+
+            if (didIOffer) {
+                // This ice candidate is coming from the offerer. Send to the answerer
+                const offer: Offer | undefined = offers.find(offer => offer.offererUserName === iceUserName);
+                if (offer) {
+                    offer.offerIceCandidates.push(iceCandidate);
+                    // 1. When the answerer answers, all existing ice candidates are sent
+                    // 2. Any candidates that come in after the offer has been answered, will be passed through
+                    if (offer.answererUserName) {
+                        const user = getUserByUsername(offer.answererUserName);
+                        if (user) {
+                            socket.to(user.id).emit('receivedIceCandidateFromServer', iceCandidate);
+                        } else {
+                            console.log("Ice candidate recieved but could not find answerer");
+                        }
+                    }
+                }
+            } else {
+                // This ice candidate is coming from the answerer. Send to the offerer.
+                const offer: Offer | undefined = offers.find(offer => offer.answererUserName === iceUserName);
+                if (offer) {
+                    const user = getUserByUsername(offer.offererUserName);
+                    if (user) {
+                        socket.to(user.id).emit('receivedIceCandidateFromServer', iceCandidate);
+                    } else {
+                        console.log("Ice candidate recieved but could not find offerer");
+                    }
+                }
+            }
+        })
     });
 }

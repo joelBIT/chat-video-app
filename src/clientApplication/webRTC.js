@@ -1,3 +1,4 @@
+import { NEW_ANSWER, NEW_OFFER } from "../../socketApplication/utils";
 import { socket } from "../socket-client";
 
 /**
@@ -128,7 +129,7 @@ async function answerOffer(offerObject) {
     
     // Emit the answer to the signaling server, so it can emit to CLIENT1
     // Expect a response from the server with the already existing ICE candidates
-    const offerIceCandidates = await socket.emitWithAck('newAnswer', offerObject);
+    const offerIceCandidates = await socket.emitWithAck(NEW_ANSWER, offerObject);
     offerIceCandidates.forEach( candidate => {
         peerConnection.addIceCandidate(candidate);
         console.log("======Added Ice Candidate======");
@@ -149,7 +150,7 @@ export async function call() {
         console.log(offer);
         peerConnection.setLocalDescription(offer);
         didIOffer = true;
-        socket.emit('newOffer', offer);             // Send offer to signalingServer
+        socket.emit(NEW_OFFER, offer);             // Send offer to signalingServer
     } catch (error) {
         console.log(error);
     }

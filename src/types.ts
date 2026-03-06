@@ -37,8 +37,8 @@ export type ActionState = {
 export type Offer = {
     offererUserName: string,
     offer: RTCSessionDescriptionInit,
-    offerIceCandidates: [],
+    offerIceCandidates: RTCIceCandidate[],
     answererUserName: string,
     answer: RTCSessionDescriptionInit | null,       // An answer may be null if the Offer is new
-    answererIceCandidates: []
+    answererIceCandidates: RTCIceCandidate[]
 }
