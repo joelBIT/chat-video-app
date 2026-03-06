@@ -1,7 +1,7 @@
 import namespaceStore from "../stores/namespaceStore";
 import { getConversationsByUserID, getPrivateConversation } from "./messageService";
 import { getUserByID } from "./userService";
-import type { Namespace, Room, TriviaUser } from "../../src/types";
+import type { Namespace, Room, ChatUser } from "../../src/types";
 import { NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME } from "../utils";
 
 export function getNamespaceByID(namespaceID: number): Namespace {
@@ -24,7 +24,7 @@ export function getDataForUser(userID: string): Namespace[] {
     dmNamespace.rooms = [];
     const conversations: string[] = getConversationsByUserID(userID);
     conversations.forEach((recipientID: string) => {
-        const user: TriviaUser = getUserByID(recipientID);
+        const user: ChatUser = getUserByID(recipientID);
         const room: Room = {id: recipientID, private: true, members: [userID, recipientID], history: [], name: user.username, namespaceId: NAMESPACE_ID_DM};
         room.history.push(...getPrivateConversation(userID, recipientID));
         dmNamespace.rooms.push(JSON.parse(JSON.stringify(room)));

@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import { Server } from "socket.io";
 import { getUserByUsername, saveUser, setOnlineStatusForUser } from "../services/userService.js";
 import type { ISocket } from "../interfaces.js";
-import type{ TriviaUser } from "../../src/types.js";
+import type{ ChatUser } from "../../src/types.js";
 
 const randomId = () => crypto.randomBytes(8).toString("hex");
 
@@ -16,7 +16,7 @@ export function checkUsername(io: Server): void {
         const username = socket.handshake.auth.username;
         socket.handshake.query.username = username;
 
-        const user: TriviaUser | undefined = getUserByUsername(username);
+        const user: ChatUser | undefined = getUserByUsername(username);
         if (user && user.online) {        // A user is already online with that username
             return next(new Error("Username is not available. Choose a different username."));
         }
@@ -30,7 +30,7 @@ export function checkUsername(io: Server): void {
 
         const userID: string = randomId();     // Generate unique ID for new user
         socket.userID = userID;
-        const newUser: TriviaUser = {username, id: userID, online: true, avatar: "businessman_avatar.svg"};
+        const newUser: ChatUser = {username, id: userID, online: true, avatar: "businessman_avatar.svg"};
         
         saveUser(newUser);
         next();

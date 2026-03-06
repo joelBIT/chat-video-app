@@ -2,14 +2,14 @@ import { useEffect, useRef, type ReactElement } from "react";
 import { useRoom } from "../../hooks";
 import { setSelectedNamespaceId } from "../../clientApplication/services/namespaceService";
 import { NAMESPACE_ID_DM } from "../../../socketApplication/utils";
-import type { TriviaUser } from "../../types";
+import type { ChatUser } from "../../types";
 
 import "./MenuModal.css";
 
 /**
  * This menu modal is opened when a member card is clicked.
  */
-export function MenuModal({member, isOpen, close}: {member: TriviaUser, isOpen: boolean, close: () => void}): ReactElement {
+export function MenuModal({member, isOpen, close}: {member: ChatUser, isOpen: boolean, close: () => void}): ReactElement {
     const modalRef = useRef<HTMLDivElement>(null);
     const { createPrivateRoom } = useRoom();
 

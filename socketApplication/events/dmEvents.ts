@@ -2,7 +2,7 @@ import { Server } from "socket.io";
 import { getNamespaceByID } from "../services/namespaceService";
 import { getUserByUsername } from "../services/userService";
 import { getPrivateConversation, hasConversationMessage, saveConversationForUser, saveMessage } from "../services/messageService";
-import type { Message, Namespace, Room, TriviaUser } from "../../src/types";
+import type { Message, Namespace, Room, ChatUser } from "../../src/types";
 import type { ISocket } from "../interfaces";
 import { CREATE_ROOM, NAMESPACE_ID_DM, PRIVATE_MESSAGE, UPDATE_ROOMS } from "../utils";
 
@@ -16,7 +16,7 @@ export async function initializeDmEvents(io: Server): Promise<void> {
     io.of(namespace.endpoint).on("connection", async (socket: ISocket) => {
         joinPersonalRoom(socket);
 
-        socket.on(CREATE_ROOM, (sender: TriviaUser, recipient: TriviaUser, ackCallback) => {
+        socket.on(CREATE_ROOM, (sender: ChatUser, recipient: ChatUser, ackCallback) => {
             saveConversationForUser(sender.id, recipient.id);
 
             const messages: Message[] = getPrivateConversation(sender.id, recipient.id);    // Get messages if conversation already exist
@@ -53,7 +53,7 @@ function joinPersonalRoom(socket: ISocket): void {
     const username = socket.handshake.query.username;
 
     if (username && (typeof username === "string")) {
-        const user: TriviaUser | undefined = getUserByUsername(username);
+        const user: ChatUser | undefined = getUserByUsername(username);
         if (user) {
             socket.join(user.id);
         }

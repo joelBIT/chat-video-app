@@ -1,14 +1,14 @@
 import { useState, type ReactElement } from "react";
 import { useUser } from "../../hooks";
 import { MenuModal } from "..";
-import type { TriviaUser } from "../../types";
+import type { ChatUser } from "../../types";
 
 import "./UserCard.css";
 
 /**
  * Represents a user in the user list. Initiate a private conversation by clicking on the user card.
  */
-export function UserCard({member}: {member: TriviaUser}): ReactElement {
+export function UserCard({member}: {member: ChatUser}): ReactElement {
     const [openModal, setOpenModal] = useState<boolean>(false);
     const { user } = useUser();
 

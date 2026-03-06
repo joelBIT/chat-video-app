@@ -16,13 +16,13 @@ export type Namespace = {
 }
 
 export type Message = {
-    from: TriviaUser,
+    from: ChatUser,
     to: Room;           // In public message it is a chat room, and in private message 
     text: string,
     date: number
 }
 
-export type TriviaUser = {
+export type ChatUser = {
     id: string,
     username: string,
     avatar: string,

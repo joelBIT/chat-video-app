@@ -1,7 +1,7 @@
 import type { Server } from "socket.io";
 import { getNamespaceByID } from "../services/namespaceService";
 import { ANSWER_RESPONSE, NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER, NEW_OFFER_AWAITING, RECEIVED_ICE_CANDIDATE_FROM_SERVER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER } from "../utils";
-import type { Namespace, Offer } from "../../src/types";
+import type { Namespace, Offer, ChatUser } from "../../src/types";
 import type { ISocket } from "../interfaces";
 import { getUserByUsername } from "../services/userService";
 
@@ -17,7 +17,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
         console.log(socket);
 
         socket.on(NEW_OFFER, (fromUsername: string, toUsername: string, newOffer: RTCSessionDescriptionInit) => {
-            const offer = {
+            const offer: Offer = {
                 offererUserName: fromUsername,
                 offer: newOffer,
                 offerIceCandidates: [],
@@ -27,7 +27,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             };
             offers.push(offer);
 
-            const user = getUserByUsername(toUsername);
+            const user: ChatUser | undefined = getUserByUsername(toUsername);
             if (!user) {
                 console.log(`No user found for username ${toUsername}`);
                 return;
@@ -36,7 +36,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             socket.to(user.id).emit(NEW_OFFER_AWAITING, offer);
         });
 
-        socket.on(NEW_ANSWER, (offerObject, ackFunction) => {
+        socket.on(NEW_ANSWER, (offerObject: Offer, ackFunction) => {
             console.log(offerObject);
             // Emit this answer (offerObj) back to CLIENT1. In order to do that, we need CLIENT1's socketid.
             const user = getUserByUsername(offerObject.offererUserName);
@@ -45,8 +45,8 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
                 return;
             }
 
-            const socketIdToAnswer = user.id;
-            const offer = offers.find(offer => offer.offererUserName === offerObject.offererUserName);
+            const socketIdToAnswer: string = user.id;
+            const offer: Offer | undefined = offers.find((offer: Offer) => offer.offererUserName === offerObject.offererUserName);
             if (!offer) {
                 console.log("No offer to update");
                 return;

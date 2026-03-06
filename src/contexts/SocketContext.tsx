@@ -7,7 +7,7 @@ import { clearSelectedRoom, getSelectedRoom, isSelectedRoom } from "../clientApp
 import { addAllUsers, getSignedOutUser, getUsersInSelectedRoom, saveUser } from "../clientApplication/services/userService";
 import { addNamespaces } from "../clientApplication/services/namespaceService";
 import { addAnswer, addNewIceCandidate } from "../clientApplication/webRTC";
-import type { ActionState, Namespace, Offer, TriviaUser } from "../types";
+import type { ActionState, Namespace, Offer, ChatUser } from "../types";
 import { ANSWER_RESPONSE, NAMESPACE_ID_HOME, NAMESPACES, NEW_OFFER_AWAITING, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../../socketApplication/utils";
 
 export interface SocketContextProvider {
@@ -15,7 +15,7 @@ export interface SocketContextProvider {
     errorMessage: string;
     logout: () => void;
     connect: (username: string) => void;
-    updateUser: (updatedUser: TriviaUser) => Promise<ActionState>;
+    updateUser: (updatedUser: ChatUser) => Promise<ActionState>;
 }
 
 export const SocketContext = createContext<SocketContextProvider>({} as SocketContextProvider);
@@ -76,7 +76,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
      * Get available namespaces from the server. This function is only invoked when the client
      * connects to the server. A multiplex socket is created for each namespace received from the server.
      */
-    async function onNamespaces(namespaces: Namespace[], user: TriviaUser, members: TriviaUser[]): Promise<void> {
+    async function onNamespaces(namespaces: Namespace[], user: ChatUser, members: ChatUser[]): Promise<void> {
         setUserInformation(user);
         addAllUsers(members);
         addNamespaces(namespaces);
@@ -123,7 +123,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
     /**
      * Updates users when a user connects to the application (e.g., to see updated online status).
      */
-    function onUserConnected(user: TriviaUser): void {
+    function onUserConnected(user: ChatUser): void {
         saveUser(user);
         if (!isSelectedRoom(ROOM_ID_NONE)) {
             setRoomParticipants(getUsersInSelectedRoom());
@@ -133,7 +133,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
     /**
      * Updates users when a user disconnects from the application (e.g., to see updated online status).
      */
-    function onUserDisconnected(user: TriviaUser): void {
+    function onUserDisconnected(user: ChatUser): void {
         saveUser(user);
         if (!isSelectedRoom(ROOM_ID_NONE)) {
             setRoomParticipants(getUsersInSelectedRoom());
@@ -143,7 +143,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
     /**
      * Update the stored information about the user. Update users in the user list to show new username or avatar (if changed).
      */
-    function onUserUpdated(updatedUser: TriviaUser): void {
+    function onUserUpdated(updatedUser: ChatUser): void {
         saveUser(updatedUser);
         setRoomParticipants(getUsersInSelectedRoom());
     }
@@ -152,6 +152,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
      * Receive an offer for a WebRTC call.
      */
     function onNewOfferAwaiting(offer: Offer): void {
+        console.log(offer);
         // TODO: Show in the UI that offer.offererUserName is calling.
         // TODO: Add button in UI that calls answerOffer(offer) in webRTC.js when clicked.
     }
@@ -168,7 +169,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
     /**
      * Send updated user information to other clients.
      */
-    async function updateUser(updatedUser: TriviaUser): Promise<ActionState> {
+    async function updateUser(updatedUser: ChatUser): Promise<ActionState> {
         return await socket.emitWithAck(USER_UPDATED, updatedUser);
     }
 
