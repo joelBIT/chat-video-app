@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useRoom, useSocket, useUser } from "../hooks";
 import { getUsersInSelectedRoom, saveUser } from "../clientApplication/services/userService";
 import { NamespaceMenu } from "../components";
-import type { TriviaUser } from "@/../../types";
+import type { TriviaUser } from "../types";
 import { HOME_URL } from "../../socketApplication/utils";
 
 import "./ProfilePage.css";

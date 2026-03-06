@@ -1,4 +1,4 @@
-import type { TriviaUser } from "../../types";
+import type { TriviaUser } from "../../src/types";
 import { addUserToRoom } from "../services/roomService";
 import userStore from "../stores/userStore";
 import { NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME, ROOM_ID_ANNOUNCEMENTS, ROOM_ID_GENERAL, ROOM_ID_LOBBY, ROOM_ID_SUPPORT } from "../utils";

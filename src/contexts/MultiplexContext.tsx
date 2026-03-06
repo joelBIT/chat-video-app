@@ -6,7 +6,7 @@ import { getSelectedRoom, isSelectedRoom, removeRoom, saveRoom } from "../client
 import { addUserToRoom, getUsersInSelectedRoom, removeUserFromRoom } from "../clientApplication/services/userService";
 import { saveConversationMessage, saveMessage } from "../clientApplication/services/messageService";
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
-import type { Message, Namespace, Room } from "../../types";
+import type { Message, Namespace, Room } from "../types";
 import { CHAT_MESSAGE, PRIVATE_MESSAGE, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../socketApplication/utils";
 
 export interface MultiplexContextProvider {

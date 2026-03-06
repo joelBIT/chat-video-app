@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import { Server } from "socket.io";
 import { getUserByUsername, saveUser, setOnlineStatusForUser } from "../services/userService.js";
 import type { ISocket } from "../interfaces.js";
-import type{ TriviaUser } from "../../types";
+import type{ TriviaUser } from "../../src/types.js";
 
 const randomId = () => crypto.randomBytes(8).toString("hex");
 

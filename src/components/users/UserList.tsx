@@ -1,7 +1,7 @@
 import { type ReactElement } from "react";
 import { useRoom } from "../../hooks";
 import { UserCard } from "..";
-import type { TriviaUser } from "../../../types";
+import type { TriviaUser } from "../../types";
 
 import "./UserList.css";
 

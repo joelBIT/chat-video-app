@@ -3,7 +3,7 @@ import { getDataForUser } from "../services/namespaceService";
 import { getAllUsers, getUserByID, getUserByUsername, saveUser, setOnlineStatusForUser } from "../services/userService";
 import type { ISocket } from "../interfaces";
 import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../utils";
-import type { TriviaUser } from "../../types";
+import type { TriviaUser } from "../../src/types";
 
 /**
  * Initializes events for the main namespace ('/') only. The connected client receives data via the "namespaces" event. This data consists of

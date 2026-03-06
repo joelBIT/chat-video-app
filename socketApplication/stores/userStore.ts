@@ -1,4 +1,4 @@
-import type { TriviaUser } from "../../types";
+import type { TriviaUser } from "../../src/types";
 
 class InMemoryUserStore {
     users: Map<string, TriviaUser>;                     // <userID, TriviaUser>

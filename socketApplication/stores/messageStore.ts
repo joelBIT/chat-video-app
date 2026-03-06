@@ -1,4 +1,4 @@
-import type { Message } from "../../types";
+import type { Message } from "../../src/types";
 
 /**
  * This class is used to store private conversations between users (namespace DMs).

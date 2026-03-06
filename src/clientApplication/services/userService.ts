@@ -1,4 +1,4 @@
-import type { Namespace, Room, TriviaUser } from "@/../../types";
+import type { Namespace, Room, TriviaUser } from "../../types";
 import namespaceStore from "../stores/namespaceStore";
 import userStore from "../stores/userStore";
 

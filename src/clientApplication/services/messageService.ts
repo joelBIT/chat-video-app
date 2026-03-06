@@ -1,6 +1,6 @@
 import { NAMESPACE_ID_DM } from "../../../socketApplication/utils";
 import namespaceStore from "../stores/namespaceStore";
-import type { Message, Namespace, Room } from "@/../../types";
+import type { Message, Namespace, Room } from "../../types";
 
 /**
  * Public rooms have their own unique IDs and members of a room always send messages to that

@@ -1,6 +1,6 @@
 import { NAMESPACE_ID_GAMES, ROOM_ID_NONE } from "../../../socketApplication/utils";
 import namespaceStore from "../stores/namespaceStore";
-import type { Namespace, Room } from "@/../../types";
+import type { Namespace, Room } from "../../types";
 
 /**
  * A room may be "undefined" if the user is not active in a specific room at any given point in time.

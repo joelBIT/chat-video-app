@@ -2,7 +2,7 @@ import { useEffect, useRef, type ReactElement } from "react";
 import { useRoom } from "../../hooks";
 import { setSelectedNamespaceId } from "../../clientApplication/services/namespaceService";
 import { NAMESPACE_ID_DM } from "../../../socketApplication/utils";
-import type { TriviaUser } from "../../../types";
+import type { TriviaUser } from "../../types";
 
 import "./MenuModal.css";
 

@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import type { Message, Namespace } from "../../types";
+import type { Message, Namespace } from "../../src/types";
 import { getNamespaceByID } from "../services/namespaceService";
 import { saveMessage } from "../services/messageService";
 import type { ISocket } from "../interfaces";

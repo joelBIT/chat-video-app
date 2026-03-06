@@ -1,7 +1,6 @@
 /**
  * Names of custom events used in the application.
  */
-
 export const CHAT_MESSAGE = 'chat-message';
 export const PRIVATE_MESSAGE = 'private-message';
 export const CHANGE_ROOM = 'change-room';
@@ -15,6 +14,7 @@ export const USER_CONNECTED = 'user-connected';
 export const USER_DISCONNECTED = 'user-disconnected';
 export const USER_UPDATED = 'user-updated';
 export const NAMESPACES = 'namespaces';
+export const NEW_OFFER = "new-offer";
 
 // Namespace IDs can only be these.
 export const NAMESPACE_ID_NONE = -1;        // ID -1 means no namespace is selected.

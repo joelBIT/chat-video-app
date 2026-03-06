@@ -1,7 +1,7 @@
 import { type ReactElement, useRef } from "react";
 import { useRoom } from "../../hooks";
 import { Message } from "..";
-import type { Message as MessageType } from "../../../types";
+import type { Message as MessageType } from "../../types";
 
 import "./RoomChat.css";
 

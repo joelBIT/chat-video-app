@@ -1,5 +1,5 @@
 import { createContext, type ReactElement, type ReactNode, useState } from "react";
-import type { Message, Room, TriviaUser } from "../../types";
+import type { Message, Room, TriviaUser } from "../types";
 import { multiplexSockets } from "../socket-client";
 import { useUser } from "../hooks";
 import { getUsersInRoom } from "../clientApplication/services/userService";

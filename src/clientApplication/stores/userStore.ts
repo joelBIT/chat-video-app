@@ -1,4 +1,4 @@
-import type { TriviaUser } from "../../../types";
+import type { TriviaUser } from "../../types";
 
 /**
  * Keeps track of application users. Update user information (e.g., online status or username/avatar changes).

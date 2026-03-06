@@ -1,7 +1,7 @@
 import namespaceStore from "../stores/namespaceStore";
 import { getConversationsByUserID, getPrivateConversation } from "./messageService";
 import { getUserByID } from "./userService";
-import type { Namespace, Room, TriviaUser } from "../../types";
+import type { Namespace, Room, TriviaUser } from "../../src/types";
 import { NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME } from "../utils";
 
 export function getNamespaceByID(namespaceID: number): Namespace {

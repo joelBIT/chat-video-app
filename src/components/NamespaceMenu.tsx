@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router";
 import { useRoom, useSocket } from "../hooks";
 import { CreateRoomModal } from ".";
 import { getNamespaces, isSelectedNamespace } from "../clientApplication/services/namespaceService";
-import type { Namespace } from "../../types";
+import type { Namespace } from "../types";
 import { NAMESPACE_ID_GAMES, PROFILE_URL, ROOMS_URL } from "../../socketApplication/utils";
 
 import "./NamespaceMenu.css";

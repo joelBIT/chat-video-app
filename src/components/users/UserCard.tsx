@@ -1,7 +1,7 @@
 import { useState, type ReactElement } from "react";
 import { useUser } from "../../hooks";
 import { MenuModal } from "..";
-import type { TriviaUser } from "../../../types";
+import type { TriviaUser } from "../../types";
 
 import "./UserCard.css";
 

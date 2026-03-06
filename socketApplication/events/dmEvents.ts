@@ -2,7 +2,7 @@ import { Server } from "socket.io";
 import { getNamespaceByID } from "../services/namespaceService";
 import { getUserByUsername } from "../services/userService";
 import { getPrivateConversation, hasConversationMessage, saveConversationForUser, saveMessage } from "../services/messageService";
-import type { Message, Namespace, Room, TriviaUser } from "../../types";
+import type { Message, Namespace, Room, TriviaUser } from "../../src/types";
 import type { ISocket } from "../interfaces";
 import { CREATE_ROOM, NAMESPACE_ID_DM, PRIVATE_MESSAGE, UPDATE_ROOMS } from "../utils";
 
