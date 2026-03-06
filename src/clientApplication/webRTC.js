@@ -1,3 +1,7 @@
+/**
+ * The client will send a request to a STUN server on the Internet who will reply with the 
+ * client's public address and whether or not the client is accessible behind the router's NAT.
+ */
 const peerConfiguration = {
     iceServers:[
         {
@@ -7,4 +11,8 @@ const peerConfiguration = {
             ]
         }
     ]
+}
+
+export function call() {
+    
 }

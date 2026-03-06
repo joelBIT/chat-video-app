@@ -5,5 +5,6 @@ export * from "./NamespaceMenu";
 export * from "./rooms/RoomCard";
 export * from "./rooms/RoomChat";
 export * from "./rooms/RoomList";
+export * from "./users/MenuModal";
 export * from "./users/UserCard";
 export * from "./users/UserList";
