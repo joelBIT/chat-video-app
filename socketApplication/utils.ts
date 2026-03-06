@@ -14,7 +14,9 @@ export const USER_CONNECTED = 'user-connected';
 export const USER_DISCONNECTED = 'user-disconnected';
 export const USER_UPDATED = 'user-updated';
 export const NAMESPACES = 'namespaces';
-export const NEW_OFFER = "new-offer";
+export const NEW_OFFER = 'new-offer';
+export const NEW_ANSWER = 'new-answer';
+export const ANSWER_RESPONSE = 'answer-response';
 
 // Namespace IDs can only be these.
 export const NAMESPACE_ID_NONE = -1;        // ID -1 means no namespace is selected.
