@@ -1,6 +1,6 @@
 import type { Server } from "socket.io";
 import { getNamespaceByID } from "../services/namespaceService";
-import { ANSWER_RESPONSE, NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER } from "../utils";
+import { ANSWER_RESPONSE, NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER, NEW_OFFER_AWAITING, RECEIVED_ICE_CANDIDATE_FROM_SERVER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER } from "../utils";
 import type { Namespace, Offer } from "../../src/types";
 import type { ISocket } from "../interfaces";
 import { getUserByUsername } from "../services/userService";
@@ -17,14 +17,23 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
         console.log(socket);
 
         socket.on(NEW_OFFER, (fromUsername: string, toUsername: string, newOffer: RTCSessionDescriptionInit) => {
-            offers.push({
+            const offer = {
                 offererUserName: fromUsername,
                 offer: newOffer,
                 offerIceCandidates: [],
                 answererUserName: toUsername,
                 answer: null,
                 answererIceCandidates: []
-            });
+            };
+            offers.push(offer);
+
+            const user = getUserByUsername(toUsername);
+            if (!user) {
+                console.log(`No user found for username ${toUsername}`);
+                return;
+            }
+
+            socket.to(user.id).emit(NEW_OFFER_AWAITING, offer);
         });
 
         socket.on(NEW_ANSWER, (offerObject, ackFunction) => {
@@ -51,7 +60,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             socket.to(socketIdToAnswer).emit(ANSWER_RESPONSE, offer);
         });
 
-        socket.on('sendIceCandidateToSignalingServer', iceCandidateObject => {
+        socket.on(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, iceCandidateObject => {
             const { didIOffer, iceUserName, iceCandidate } = iceCandidateObject;
             console.log(iceCandidate);
 
@@ -65,7 +74,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
                     if (offer.answererUserName) {
                         const user = getUserByUsername(offer.answererUserName);
                         if (user) {
-                            socket.to(user.id).emit('receivedIceCandidateFromServer', iceCandidate);
+                            socket.to(user.id).emit(RECEIVED_ICE_CANDIDATE_FROM_SERVER, iceCandidate);
                         } else {
                             console.log("Ice candidate recieved but could not find answerer");
                         }
@@ -77,7 +86,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
                 if (offer) {
                     const user = getUserByUsername(offer.offererUserName);
                     if (user) {
-                        socket.to(user.id).emit('receivedIceCandidateFromServer', iceCandidate);
+                        socket.to(user.id).emit(RECEIVED_ICE_CANDIDATE_FROM_SERVER, iceCandidate);
                     } else {
                         console.log("Ice candidate recieved but could not find offerer");
                     }

@@ -6,8 +6,9 @@ import { useMultiplex, useRoom, useUser } from "../hooks";
 import { clearSelectedRoom, getSelectedRoom, isSelectedRoom } from "../clientApplication/services/roomService";
 import { addAllUsers, getSignedOutUser, getUsersInSelectedRoom, saveUser } from "../clientApplication/services/userService";
 import { addNamespaces } from "../clientApplication/services/namespaceService";
-import type { ActionState, Namespace, TriviaUser } from "../types";
-import { NAMESPACE_ID_HOME, NAMESPACES, ROOM_ID_NONE, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../../socketApplication/utils";
+import { addAnswer, addNewIceCandidate } from "../clientApplication/webRTC";
+import type { ActionState, Namespace, Offer, TriviaUser } from "../types";
+import { ANSWER_RESPONSE, NAMESPACE_ID_HOME, NAMESPACES, NEW_OFFER_AWAITING, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../../socketApplication/utils";
 
 export interface SocketContextProvider {
     isConnected: boolean;
@@ -50,6 +51,9 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
         socket.on(USER_CONNECTED, onUserConnected);            // Another client connects
         socket.on(USER_DISCONNECTED, onUserDisconnected);
         socket.on(USER_UPDATED, onUserUpdated);
+        socket.on(NEW_OFFER_AWAITING, onNewOfferAwaiting);
+        socket.on(ANSWER_RESPONSE, onAnswerResponse);
+        socket.on(RECEIVED_ICE_CANDIDATE_FROM_SERVER, onReceivedIceCandidateFromServer);
         socket.on("connect_error", onConnectError);
         socket.io.on("reconnect", onReconnect);     // Manager event
 
@@ -60,6 +64,9 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
             socket.off(USER_CONNECTED, onUserConnected);
             socket.off(USER_DISCONNECTED, onUserDisconnected);
             socket.off(USER_UPDATED, onUserUpdated);
+            socket.off(NEW_OFFER_AWAITING, onNewOfferAwaiting);
+            socket.off(ANSWER_RESPONSE, onAnswerResponse);
+            socket.off(RECEIVED_ICE_CANDIDATE_FROM_SERVER, onReceivedIceCandidateFromServer);
             socket.off("connect_error", onConnectError);
             socket.io.off("reconnect", onReconnect);
         };
@@ -139,6 +146,23 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
     function onUserUpdated(updatedUser: TriviaUser): void {
         saveUser(updatedUser);
         setRoomParticipants(getUsersInSelectedRoom());
+    }
+
+    /**
+     * Receive an offer for a WebRTC call.
+     */
+    function onNewOfferAwaiting(offer: Offer): void {
+        // TODO: Show in the UI that offer.offererUserName is calling.
+        // TODO: Add button in UI that calls answerOffer(offer) in webRTC.js when clicked.
+    }
+
+    function onAnswerResponse(answer: Offer): void {
+        addAnswer(answer);
+    }
+
+    function onReceivedIceCandidateFromServer(iceCandidate: RTCIceCandidate): void {
+        addNewIceCandidate(iceCandidate);
+        console.log(iceCandidate);
     }
 
     /**

@@ -17,6 +17,9 @@ export const NAMESPACES = 'namespaces';
 export const NEW_OFFER = 'new-offer';
 export const NEW_ANSWER = 'new-answer';
 export const ANSWER_RESPONSE = 'answer-response';
+export const NEW_OFFER_AWAITING = 'new-offer-awaiting';
+export const RECEIVED_ICE_CANDIDATE_FROM_SERVER = 'receivedIceCandidateFromServer';
+export const SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER = 'sendIceCandidateToSignalingServer';
 
 // Namespace IDs can only be these.
 export const NAMESPACE_ID_NONE = -1;        // ID -1 means no namespace is selected.

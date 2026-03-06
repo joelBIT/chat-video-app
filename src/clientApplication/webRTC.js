@@ -1,4 +1,4 @@
-import { NEW_ANSWER, NEW_OFFER } from "../../socketApplication/utils";
+import { NEW_ANSWER, NEW_OFFER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER } from "../../socketApplication/utils";
 import { socket } from "../socket-client";
 
 /**
@@ -46,10 +46,10 @@ function fetchUserMedia() {
 }
 
 /**
- * Is called by socket listeners when an answerResponse is emitted.
+ * Is called by socket listeners when an 'answer-response' event is emitted.
  * At this point, the offer and answer have been exchanged and client 1 needs to set the remote.
  */
-async function addAnswer(offerObject) {
+export async function addAnswer(offerObject) {
     await peerConnection.setRemoteDescription(offerObject.answer);
     console.log(peerConnection.signalingState);
 }
@@ -82,7 +82,7 @@ function createPeerConnection(offerObject) {
             console.log(e);
 
             if (e.candidate) {
-                socket.emit('sendIceCandidateToSignalingServer', {
+                socket.emit(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, {
                     iceCandidate: e.candidate,
                     iceUserName: userName,
                     didIOffer
@@ -110,7 +110,7 @@ function createPeerConnection(offerObject) {
     })
 }
 
-function addNewIceCandidate(iceCandidate) {
+export function addNewIceCandidate(iceCandidate) {
     peerConnection.addIceCandidate(iceCandidate);
     console.log("======Added Ice Candidate======");
 }
