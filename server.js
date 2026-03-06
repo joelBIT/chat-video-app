@@ -8,6 +8,7 @@ import {initializeDmEvents} from "./socketApplication/events/dmEvents.ts";
 import {initializeGamesEvents} from "./socketApplication/events/gamesEvents.ts";
 import {initializeCommonEvents} from "./socketApplication/events/commonEvents.ts";
 import {initializeMainNamespaceEvents} from "./socketApplication/events/mainEvents.ts";
+import {initializeWebRtcEvents} from "./socketApplication/events/webRtcEvents.ts";
 
 const app = express();
 app.use(express.static(import.meta.dirname + "/dist/"));
@@ -35,6 +36,7 @@ initializeCommonEvents(io);
 initializeHomeEvents(io);
 initializeDmEvents(io);
 initializeGamesEvents(io);
+initializeWebRtcEvents(io);
 
 expressServer.listen(8181, () => {
     console.log(`Server listening on port ${8181}`);

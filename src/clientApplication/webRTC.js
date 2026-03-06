@@ -1,3 +1,5 @@
+import { socket } from "../socket-client";
+
 /**
  * The client will send a request to a STUN server on the Internet who will reply with the 
  * client's public address and whether or not the client is accessible behind the router's NAT.
@@ -21,20 +23,23 @@ let didIOffer = false;      // True if you initiated the call
 const localVideoEl = document.querySelector('#local-video');
 const remoteVideoEl = document.querySelector('#remote-video');
 
+/**
+ * A user must approve that the application uses media devices.
+ */
 function fetchUserMedia() {
     return new Promise( async(resolve, reject) => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: true,
-                // audio: true,
+                audio: true
             });
 
             localVideoEl.srcObject = stream;
             localStream = stream;    
-            resolve();    
+            resolve();          // User approved
         } catch(error) {
             console.log(error);
-            reject();
+            reject();           // User did not approve
         }
     });
 }
@@ -49,9 +54,11 @@ async function addAnswer(offerObject) {
 }
 
 /**
- * RTCPeerConnection is the thing that creates the connection.
- * We can pass a config object, and that config object can contain stun servers
- * which will fetch us ICE candidates.
+ * RTCPeerConnection creates the connection.
+ * We can pass a config object, and that config object can contain stun servers which will fetch us ICE candidates.
+ * A WebRTC track represents a single media stream, often audio and video.
+ * Tracks are the fundamental, individual components of real-time communication sent between peers, 
+ * enabling functionalities like pausing video while keeping audio active, or managing multi-camera setups.
  */
 function createPeerConnection(offerObject) {
     return new Promise( async(resolve, reject) => {
@@ -108,9 +115,9 @@ function addNewIceCandidate(iceCandidate) {
 }
 
 async function answerOffer(offerObject) {
-    await fetchUserMedia();
+    await fetchUserMedia();                     // Block the application until the user approves
     await createPeerConnection(offerObject);
-    
+
     const answer = await peerConnection.createAnswer({});       // Just to make the docs happy
     await peerConnection.setLocalDescription(answer);           // This is CLIENT2, and CLIENT2 uses the answer as the localDesc
     console.log(offerObject);
