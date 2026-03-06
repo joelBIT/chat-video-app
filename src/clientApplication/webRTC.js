@@ -40,6 +40,15 @@ function fetchUserMedia() {
 }
 
 /**
+ * Is called by socket listeners when an answerResponse is emitted.
+ * At this point, the offer and answer have been exchanged and client 1 needs to set the remote.
+ */
+async function addAnswer(offerObject) {
+    await peerConnection.setRemoteDescription(offerObject.answer);
+    console.log(peerConnection.signalingState);
+}
+
+/**
  * RTCPeerConnection is the thing that creates the connection.
  * We can pass a config object, and that config object can contain stun servers
  * which will fetch us ICE candidates.
@@ -85,12 +94,17 @@ function createPeerConnection(offerObject) {
         if (offerObject) {
             // This won't be set when called from call();
             // Will be set when we call from answerOffer()
-            // console.log(peerConnection.signalingState) //should be stable because no setDesc has been run yet
+            // console.log(peerConnection.signalingState) should be stable because no setDesc has been run yet
             await peerConnection.setRemoteDescription(offerObject.offer);
-            // console.log(peerConnection.signalingState) //should be have-remote-offer, because client2 has setRemoteDesc on the offer
+            // console.log(peerConnection.signalingState) should be have-remote-offer, because client2 has setRemoteDesc on the offer
         }
         resolve();
     })
+}
+
+function addNewIceCandidate(iceCandidate) {
+    peerConnection.addIceCandidate(iceCandidate);
+    console.log("======Added Ice Candidate======");
 }
 
 export async function call() {
@@ -101,12 +115,11 @@ export async function call() {
 
     // Create offer
     try {
-        console.log("Creating offer...")
         const offer = await peerConnection.createOffer();
         console.log(offer);
         peerConnection.setLocalDescription(offer);
         didIOffer = true;
-        socket.emit('newOffer', offer); //send offer to signalingServer
+        socket.emit('newOffer', offer);             // Send offer to signalingServer
     } catch (error) {
         console.log(error);
     }

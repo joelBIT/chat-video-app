@@ -34,15 +34,15 @@ export function MenuModal({member, isOpen, close}: {member: TriviaUser, isOpen: 
     /**
      * Change to private room in DM namespace and change selected room to that room.
      */
-    function toPrivateRoom(): void {
+    function toPrivateChatRoom(): void {
         setSelectedNamespaceId(NAMESPACE_ID_DM);
         createPrivateRoom(member);
     }
 
     return (
         <div className="menu-modal" ref={modalRef}>
-            <button onClick={toPrivateRoom}>Chat</button>
-            <button>Call</button>
+            <button onClick={toPrivateChatRoom}>Chat</button>
+            <button>View Profile</button>
         </div>
     )
 }
