@@ -107,6 +107,29 @@ function addNewIceCandidate(iceCandidate) {
     console.log("======Added Ice Candidate======");
 }
 
+async function answerOffer(offerObject) {
+    await fetchUserMedia();
+    await createPeerConnection(offerObject);
+    
+    const answer = await peerConnection.createAnswer({});       // Just to make the docs happy
+    await peerConnection.setLocalDescription(answer);           // This is CLIENT2, and CLIENT2 uses the answer as the localDesc
+    console.log(offerObject);
+    console.log(answer);
+    console.log(peerConnection.signalingState)      // Should be have-local-pranswer because CLIENT2 has set its local desc to it's answer (but it won't be)
+
+    offerObject.answer = answer;                    // Add the answer to the offerObj so the server knows which offer this is related to
+    
+    // Emit the answer to the signaling server, so it can emit to CLIENT1
+    // Expect a response from the server with the already existing ICE candidates
+    const offerIceCandidates = await socket.emitWithAck('newAnswer', offerObject);
+    offerIceCandidates.forEach( candidate => {
+        peerConnection.addIceCandidate(candidate);
+        console.log("======Added Ice Candidate======");
+    });
+
+    console.log(offerIceCandidates);
+}
+
 export async function call() {
     await fetchUserMedia();
 
