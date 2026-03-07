@@ -14,9 +14,13 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
     const namespace: Namespace = getNamespaceByID(NAMESPACE_ID_DM);
 
     io.of(namespace.endpoint).on("connection", async (socket: ISocket) => {
-        console.log(socket);
-
         socket.on(NEW_OFFER, (fromUsername: string, toUsername: string, newOffer: RTCSessionDescriptionInit) => {
+            const user: ChatUser | undefined = getUserByUsername(toUsername);
+            if (!user) {
+                console.log(`No user found for username ${toUsername}`);
+                return;
+            }
+            
             const offer: Offer = {
                 offererUserName: fromUsername,
                 offer: newOffer,
@@ -26,12 +30,6 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
                 answererIceCandidates: []
             };
             offers.push(offer);
-
-            const user: ChatUser | undefined = getUserByUsername(toUsername);
-            if (!user) {
-                console.log(`No user found for username ${toUsername}`);
-                return;
-            }
 
             socket.to(user.id).emit(NEW_OFFER_AWAITING, offer);
         });

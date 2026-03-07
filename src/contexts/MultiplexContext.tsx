@@ -6,8 +6,9 @@ import { getSelectedRoom, isSelectedRoom, removeRoom, saveRoom } from "../client
 import { addUserToRoom, getUsersInSelectedRoom, removeUserFromRoom } from "../clientApplication/services/userService";
 import { saveConversationMessage, saveMessage } from "../clientApplication/services/messageService";
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
-import type { Message, Namespace, Room } from "../types";
-import { CHAT_MESSAGE, PRIVATE_MESSAGE, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../socketApplication/utils";
+import { addAnswer, addNewIceCandidate } from "../clientApplication/webRTC";
+import type { Message, Namespace, Offer, Room } from "../types";
+import { ANSWER_RESPONSE, CHAT_MESSAGE, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../socketApplication/utils";
 
 export interface MultiplexContextProvider {
     connectMultiplexSockets: (namespaces: Namespace[]) => void;
@@ -31,7 +32,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         if (multiplexSockets.length === 0) {
             const socketList: Socket[] = [];
             namespaces.forEach((namespace: Namespace) => {
-                socketList.push(createMultiplexSocket(namespace.endpoint));      // The list index corresponds to the namespace ID
+                socketList.push(createMultiplexSocket(namespace));      // The list index corresponds to the namespace ID
             });
             multiplexSockets.push(...socketList);
         } else {
@@ -44,8 +45,8 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     /**
      * Create a connected socket (for multiplexing) for the supplied namespace.
      */
-    function createMultiplexSocket(endpoint: string): Socket {
-        const socket = io(endpoint);
+    function createMultiplexSocket(namespace: Namespace): Socket {
+        const socket = io(namespace.endpoint);
         socket.connect();
         socket.on(CHAT_MESSAGE, onChatMessage);
         socket.on(PRIVATE_MESSAGE, onPrivateMessage);
@@ -53,6 +54,12 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         socket.on(USER_LEFT, onUserLeft);
         socket.on(UPDATE_ROOMS, onUpdateRooms);
         socket.on(UPDATE_CUSTOM_GAME_ROOM, onUpdateCustomGameRoom);
+        
+        if (namespace.id === NAMESPACE_ID_DM) {
+            socket.on(NEW_OFFER_AWAITING, onNewOfferAwaiting);
+            socket.on(ANSWER_RESPONSE, onAnswerResponse);
+            socket.on(RECEIVED_ICE_CANDIDATE_FROM_SERVER, onReceivedIceCandidateFromServer);
+        }
 
         return socket;
     }
@@ -141,6 +148,24 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
                 socket.disconnect();
             }
         });
+    }
+
+    /**
+     * Receive an offer for a WebRTC call.
+     */
+    function onNewOfferAwaiting(offer: Offer): void {
+        console.log(offer);
+        // TODO: Show in the UI that offer.offererUserName is calling.
+        // TODO: Add button in UI that calls answerOffer(offer) in webRTC.js when clicked.
+    }
+
+    function onAnswerResponse(answer: Offer): void {
+        addAnswer(answer);
+    }
+
+    function onReceivedIceCandidateFromServer(iceCandidate: RTCIceCandidate): void {
+        addNewIceCandidate(iceCandidate);
+        console.log(iceCandidate);
     }
 
     return (

@@ -138,7 +138,7 @@ async function answerOffer(offerObject) {
     console.log(offerIceCandidates);
 }
 
-export async function call(toUsername) {
+export async function call(fromUsername, toUsername) {
     await fetchUserMedia();
 
     // peerConnection is all set with our STUN servers sent over
@@ -147,11 +147,10 @@ export async function call(toUsername) {
     // Create offer
     try {
         const offer = await peerConnection.createOffer();
-        offer.answererUserName = toUsername;
         console.log(offer);
         peerConnection.setLocalDescription(offer);
         didIOffer = true;
-        socket.emit(NEW_OFFER, offer);             // Send offer to signalingServer
+        socket.emit(NEW_OFFER, fromUsername, toUsername, offer);             // Send offer to signalingServer
     } catch (error) {
         console.log(error);
     }

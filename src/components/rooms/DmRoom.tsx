@@ -1,11 +1,11 @@
 import { type ReactElement, useRef } from "react";
-import { useRoom } from "../../hooks";
+import { useRoom, useUser } from "../../hooks";
 import { Message } from "..";
-import type { Message as MessageType } from "../../types";
+import { getSelectedRoom } from "../../clientApplication/services/roomService";
 import { call } from "../../clientApplication/webRTC";
+import type { Message as MessageType } from "../../types";
 
 import "./DmRoom.css";
-import { getSelectedRoom } from "../../clientApplication/services/roomService";
 
 /**
  * A DM room chat where a user may write messages to another user directly.
@@ -13,6 +13,7 @@ import { getSelectedRoom } from "../../clientApplication/services/roomService";
 export function DmRoom(): ReactElement {
     const messageRef = useRef<HTMLInputElement>(null);
     const { selectedRoom, sendMessage } = useRoom();
+    const { user } = useUser();
 
     /**
      * Send a DM to another user.
@@ -26,7 +27,7 @@ export function DmRoom(): ReactElement {
     if (!selectedRoom) {
         return (
             <main id="dmRoom">
-                <h1 className="select-room__text"> Select a room </h1>
+                <h1 className="select-room__text"> Select a conversation </h1>
             </main>
         )
     }
@@ -42,7 +43,7 @@ export function DmRoom(): ReactElement {
             </section>
 
             <section id="chat-message">
-                <button onClick={() => call(getSelectedRoom()?.name)}> Call </button>
+                <button onClick={() => call(user.username, getSelectedRoom()?.name)}> Call </button>
                 <input placeholder="Enter message" ref={messageRef} />
                 <button onClick={sendDmMessage}> Send </button>
             </section>

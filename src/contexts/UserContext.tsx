@@ -1,5 +1,3 @@
-'use client';
-
 import { createContext, type ReactElement, type ReactNode, useState } from "react";
 import { getSignedOutUser } from "../clientApplication/services/userService";
 import type { ChatUser } from "../types";
