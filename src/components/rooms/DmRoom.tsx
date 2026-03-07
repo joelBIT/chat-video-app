@@ -5,6 +5,7 @@ import type { Message as MessageType } from "../../types";
 import { call } from "../../clientApplication/webRTC";
 
 import "./DmRoom.css";
+import { getSelectedRoom } from "../../clientApplication/services/roomService";
 
 /**
  * A DM room chat where a user may write messages to another user directly.
@@ -41,7 +42,7 @@ export function DmRoom(): ReactElement {
             </section>
 
             <section id="chat-message">
-                <button onClick={call}> Call </button>
+                <button onClick={() => call(getSelectedRoom()?.name)}> Call </button>
                 <input placeholder="Enter message" ref={messageRef} />
                 <button onClick={sendDmMessage}> Send </button>
             </section>

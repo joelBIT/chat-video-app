@@ -138,7 +138,7 @@ async function answerOffer(offerObject) {
     console.log(offerIceCandidates);
 }
 
-export async function call() {
+export async function call(toUsername) {
     await fetchUserMedia();
 
     // peerConnection is all set with our STUN servers sent over
@@ -147,6 +147,7 @@ export async function call() {
     // Create offer
     try {
         const offer = await peerConnection.createOffer();
+        offer.answererUserName = toUsername;
         console.log(offer);
         peerConnection.setLocalDescription(offer);
         didIOffer = true;
