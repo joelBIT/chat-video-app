@@ -1,5 +1,5 @@
-import { NEW_ANSWER, NEW_OFFER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER } from "../../socketApplication/utils";
-import { socket } from "../socket-client";
+import { multiplexSockets } from "../socket-client";
+import { NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER } from "../../socketApplication/utils";
 
 /**
  * The client will send a request to a STUN server on the Internet who will reply with the 
@@ -21,15 +21,13 @@ let remoteStream;           // Hold the remote video stream
 let peerConnection;         // The peer connection that the two clients use to talk
 let didIOffer = false;      // True if you initiated the call
 
-const localVideoEl = document.querySelector('#local-video');
-const remoteVideoEl = document.querySelector('#remote-video');
-
 /**
  * A user must approve that the application uses media devices.
  */
 function fetchUserMedia() {
     return new Promise( async(resolve, reject) => {
         try {
+            const localVideoEl = document.querySelector('#local-video');
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: true,
                 audio: true
@@ -61,10 +59,11 @@ export async function addAnswer(offerObject) {
  * Tracks are the fundamental, individual components of real-time communication sent between peers, 
  * enabling functionalities like pausing video while keeping audio active, or managing multi-camera setups.
  */
-function createPeerConnection(offerObject) {
+function createPeerConnection(offerObject, username) {
     return new Promise( async(resolve, reject) => {
         peerConnection = await new RTCPeerConnection(peerConfiguration);
         remoteStream = new MediaStream();
+        const remoteVideoEl = document.querySelector('#remote-video');
         remoteVideoEl.srcObject = remoteStream;
 
         localStream.getTracks().forEach( track => {
@@ -82,9 +81,9 @@ function createPeerConnection(offerObject) {
             console.log(e);
 
             if (e.candidate) {
-                socket.emit(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, {
+                multiplexSockets[NAMESPACE_ID_DM].emit(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, {
                     iceCandidate: e.candidate,
-                    iceUserName: userName,
+                    iceUserName: username,
                     didIOffer
                 });
             }
@@ -115,9 +114,9 @@ export function addNewIceCandidate(iceCandidate) {
     console.log("======Added Ice Candidate======");
 }
 
-async function answerOffer(offerObject) {
+export async function answerOffer(offerObject) {
     await fetchUserMedia();                     // Block the application until the user approves
-    await createPeerConnection(offerObject);
+    await createPeerConnection(offerObject, offerObject.answererUserName);
 
     const answer = await peerConnection.createAnswer({});       // Just to make the docs happy
     await peerConnection.setLocalDescription(answer);           // This is CLIENT2, and CLIENT2 uses the answer as the localDesc
@@ -129,7 +128,7 @@ async function answerOffer(offerObject) {
     
     // Emit the answer to the signaling server, so it can emit to CLIENT1
     // Expect a response from the server with the already existing ICE candidates
-    const offerIceCandidates = await socket.emitWithAck(NEW_ANSWER, offerObject);
+    const offerIceCandidates = await multiplexSockets[NAMESPACE_ID_DM].emitWithAck(NEW_ANSWER, offerObject);
     offerIceCandidates.forEach( candidate => {
         peerConnection.addIceCandidate(candidate);
         console.log("======Added Ice Candidate======");
@@ -142,7 +141,7 @@ export async function call(fromUsername, toUsername) {
     await fetchUserMedia();
 
     // peerConnection is all set with our STUN servers sent over
-    await createPeerConnection();
+    await createPeerConnection(null, fromUsername);
 
     // Create offer
     try {
@@ -150,7 +149,7 @@ export async function call(fromUsername, toUsername) {
         console.log(offer);
         peerConnection.setLocalDescription(offer);
         didIOffer = true;
-        socket.emit(NEW_OFFER, fromUsername, toUsername, offer);             // Send offer to signalingServer
+        multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER, fromUsername, toUsername, offer);             // Send offer to signalingServer
     } catch (error) {
         console.log(error);
     }

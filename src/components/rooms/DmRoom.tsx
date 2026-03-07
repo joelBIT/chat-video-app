@@ -35,6 +35,12 @@ export function DmRoom(): ReactElement {
     
     return (
         <section id="dmRoom">
+            <section id="videos">
+                <video className="video-player" id="local-video" autoPlay playsInline controls />
+
+                <video className="video-player" id="remote-video" autoPlay playsInline controls />
+            </section>
+
             <section id="message-area">
                 {
                     selectedRoom.history
