@@ -39,7 +39,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
         socket.on(NEW_ANSWER, (offerObject: Offer, ackFunction) => {
             console.log(offerObject);
             // Emit this answer (offerObj) back to CLIENT1. In order to do that, we need CLIENT1's socketid.
-            const user = getUserByUsername(offerObject.offererUserName);
+            const user: ChatUser | undefined = getUserByUsername(offerObject.offererUserName);
             if (!user) {
                 console.log(`No user found for username ${offerObject.offererUserName}`);
                 return;
@@ -72,7 +72,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
                     // 1. When the answerer answers, all existing ice candidates are sent
                     // 2. Any candidates that come in after the offer has been answered, will be passed through
                     if (offer.answererUserName) {
-                        const user = getUserByUsername(offer.answererUserName);
+                        const user: ChatUser | undefined = getUserByUsername(offer.answererUserName);
                         if (user) {
                             socket.to(user.id).emit(RECEIVED_ICE_CANDIDATE_FROM_SERVER, iceCandidate);
                         } else {
@@ -84,7 +84,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
                 // This ice candidate is coming from the answerer. Send to the offerer.
                 const offer: Offer | undefined = offers.find(offer => offer.answererUserName === iceUserName);
                 if (offer) {
-                    const user = getUserByUsername(offer.offererUserName);
+                    const user: ChatUser | undefined = getUserByUsername(offer.offererUserName);
                     if (user) {
                         socket.to(user.id).emit(RECEIVED_ICE_CANDIDATE_FROM_SERVER, iceCandidate);
                     } else {

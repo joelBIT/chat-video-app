@@ -1,0 +1,53 @@
+#dmRoom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    background-color: #528b8bbb;
+
+    & .select-room__text {
+        height: 100%;
+        align-content: center;
+        align-self: center;
+        font-family: "LINE Seed JP", sans-serif;
+        font-size: 2rem;
+    }
+
+    & .room-title {
+        display: flex;
+        align-self: flex-start;
+        align-items: center;
+        gap: 0.5rem;
+        padding-left: 2rem;
+        padding-top: 2rem;
+
+        & .room-icon {
+            width: 30px;
+        }
+
+        & .room-text {
+            font-family: "LINE Seed JP", sans-serif;
+            font-size: 2rem;
+        }
+    }
+
+    & #message-area {
+        display: flex;
+        flex-direction: column-reverse;
+        width: 100%;
+        max-width: 1000px;
+        height: 600px;
+        border: 1px solid black;
+        overflow-y: auto;
+        scroll-behavior: smooth;
+        scrollbar-width: thin;
+        scrollbar-color: black #FFFFFF20;
+        border: none;
+    }
+
+    & #chat-message {
+        display: flex;
+        gap: 1rem;
+    }
+}
