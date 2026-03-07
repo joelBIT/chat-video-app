@@ -1,5 +1,5 @@
 import { type ReactElement, useRef } from "react";
-import { useRoom, useUser } from "../../hooks";
+import { useMultiplex, useRoom, useUser } from "../../hooks";
 import { Message } from "..";
 import { getSelectedRoom } from "../../clientApplication/services/roomService";
 import { call } from "../../clientApplication/webRTC";
@@ -14,6 +14,7 @@ export function DmRoom(): ReactElement {
     const messageRef = useRef<HTMLInputElement>(null);
     const { selectedRoom, sendMessage } = useRoom();
     const { user } = useUser();
+    const { incomingCall, answerCall } = useMultiplex();
 
     /**
      * Send a DM to another user.
@@ -43,6 +44,9 @@ export function DmRoom(): ReactElement {
             </section>
 
             <section id="chat-message">
+                {
+                    incomingCall ? <button onClick={answerCall}> Answer </button> : <></>
+                }
                 <button onClick={() => call(user.username, getSelectedRoom()?.name)}> Call </button>
                 <input placeholder="Enter message" ref={messageRef} />
                 <button onClick={sendDmMessage}> Send </button>

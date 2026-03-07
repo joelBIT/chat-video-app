@@ -15,12 +15,13 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
 
     io.of(namespace.endpoint).on("connection", async (socket: ISocket) => {
         socket.on(NEW_OFFER, (fromUsername: string, toUsername: string, newOffer: RTCSessionDescriptionInit) => {
+            console.log("SERVER")
             const user: ChatUser | undefined = getUserByUsername(toUsername);
             if (!user) {
                 console.log(`No user found for username ${toUsername}`);
                 return;
             }
-            
+
             const offer: Offer = {
                 offererUserName: fromUsername,
                 offer: newOffer,

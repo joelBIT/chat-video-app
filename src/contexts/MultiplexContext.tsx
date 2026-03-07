@@ -1,4 +1,4 @@
-import { createContext, type ReactElement, type ReactNode } from "react";
+import { createContext, useState, type ReactElement, type ReactNode } from "react";
 import { io, Socket } from "socket.io-client";
 import { multiplexSockets } from "../socket-client";
 import { useRoom } from "../hooks";
@@ -12,6 +12,8 @@ import { ANSWER_RESPONSE, CHAT_MESSAGE, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, PRI
 
 export interface MultiplexContextProvider {
     connectMultiplexSockets: (namespaces: Namespace[]) => void;
+    incomingCall: boolean;
+    answerCall: () => void;
     disconnectMultiplexSockets: () => void;
 }
 
@@ -23,6 +25,7 @@ export const MultiplexContext = createContext<MultiplexContextProvider>({} as Mu
  * connection (also called "multiplexing").
  */
 export function MultiplexProvider({ children }: { children: ReactNode }): ReactElement {
+    const [incomingCall, setIncomingCall] = useState<boolean>(false);
     const { setRoomParticipants, changeNamespace, changeSelectedRoom } = useRoom();
 
     /**
@@ -54,7 +57,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         socket.on(USER_LEFT, onUserLeft);
         socket.on(UPDATE_ROOMS, onUpdateRooms);
         socket.on(UPDATE_CUSTOM_GAME_ROOM, onUpdateCustomGameRoom);
-        
+
         if (namespace.id === NAMESPACE_ID_DM) {
             socket.on(NEW_OFFER_AWAITING, onNewOfferAwaiting);
             socket.on(ANSWER_RESPONSE, onAnswerResponse);
@@ -150,11 +153,16 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         });
     }
 
+    function answerCall(): void {
+        setIncomingCall(false);
+    }
+
     /**
      * Receive an offer for a WebRTC call.
      */
     function onNewOfferAwaiting(offer: Offer): void {
         console.log(offer);
+        setIncomingCall(true);
         // TODO: Show in the UI that offer.offererUserName is calling.
         // TODO: Add button in UI that calls answerOffer(offer) in webRTC.js when clicked.
     }
@@ -169,7 +177,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     }
 
     return (
-        <MultiplexContext.Provider value={{ connectMultiplexSockets, disconnectMultiplexSockets }}>
+        <MultiplexContext.Provider value={{ incomingCall, connectMultiplexSockets, disconnectMultiplexSockets, answerCall }}>
             { children }
         </MultiplexContext.Provider>
     );
