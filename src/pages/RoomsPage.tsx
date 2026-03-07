@@ -2,7 +2,7 @@ import { type ReactElement } from "react";
 import { redirect } from "react-router";
 import { useRoom, useSocket } from "../hooks";
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
-import { DmRoom, NamespaceMenu, RoomChat, RoomList, UserList } from "../components";
+import { ConversationList, DmRoom, NamespaceMenu, RoomChat, RoomList, UserList } from "../components";
 import { HOME_URL, NAMESPACE_ID_DM } from "../../socketApplication/utils";
 
 import "./RoomsPage.css";
@@ -22,7 +22,7 @@ export default function RoomsPage(): ReactElement {
         return (
             <main id="roomsPage">
                 <NamespaceMenu />
-                <RoomList />
+                <ConversationList />
                 <DmRoom />
             </main>
         )
