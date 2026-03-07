@@ -5,11 +5,13 @@ import LandingPage from "./pages/LandingPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import RoomsPage from "./pages/RoomsPage";
 import ProfilePage from "./pages/ProfilePage";
+import { ErrorPage } from "./pages/ErrorPage";
 
 export const routes = createBrowserRouter([
     {
         path: HOME_URL,
         Component: App,
+        ErrorBoundary: ErrorPage,
         children: [
             {
                 index: true,
