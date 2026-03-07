@@ -2,20 +2,21 @@ import { type ReactElement, useRef } from "react";
 import { useRoom } from "../../hooks";
 import { Message } from "..";
 import type { Message as MessageType } from "../../types";
+import { call } from "../../clientApplication/webRTC";
 
-import "./RoomChat.css";
+import "./DmRoom.css";
 
 /**
- * A chat where a user may write messages to other users in the same room.
+ * A DM room chat where a user may write messages to another user directly.
  */
-export function RoomChat(): ReactElement {
+export function DmRoom(): ReactElement {
     const messageRef = useRef<HTMLInputElement>(null);
     const { selectedRoom, sendMessage } = useRoom();
 
     /**
-     * Send message to selected room.
+     * Send a DM to another user.
      */
-    function sendChatMessage(): void {
+    function sendDmMessage(): void {
         if (messageRef.current?.value && selectedRoom) {
             sendMessage(messageRef.current?.value);
         }
@@ -23,19 +24,14 @@ export function RoomChat(): ReactElement {
 
     if (!selectedRoom) {
         return (
-            <main id="roomChat">
+            <main id="dmRoom">
                 <h1 className="select-room__text"> Select a room </h1>
             </main>
         )
     }
     
     return (
-        <section id="roomChat">
-            <section className="room-title">
-                <img src={selectedRoom.private ? "/lock.svg" : "/open_lock.svg"} className="room-icon" />
-                <h1 className="room-text">{selectedRoom?.name}</h1>
-            </section>
-
+        <section id="dmRoom">
             <section id="message-area">
                 {
                     selectedRoom.history
@@ -45,8 +41,9 @@ export function RoomChat(): ReactElement {
             </section>
 
             <section id="chat-message">
+                <button onClick={call}> Call </button>
                 <input placeholder="Enter message" ref={messageRef} />
-                <button onClick={sendChatMessage}> Send </button>
+                <button onClick={sendDmMessage}> Send </button>
             </section>
         </section>
     )

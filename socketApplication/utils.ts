@@ -1,7 +1,6 @@
 /**
  * Names of custom events used in the application.
  */
-
 export const CHAT_MESSAGE = 'chat-message';
 export const PRIVATE_MESSAGE = 'private-message';
 export const CHANGE_ROOM = 'change-room';
@@ -15,6 +14,12 @@ export const USER_CONNECTED = 'user-connected';
 export const USER_DISCONNECTED = 'user-disconnected';
 export const USER_UPDATED = 'user-updated';
 export const NAMESPACES = 'namespaces';
+export const NEW_OFFER = 'new-offer';
+export const NEW_ANSWER = 'new-answer';
+export const ANSWER_RESPONSE = 'answer-response';
+export const NEW_OFFER_AWAITING = 'new-offer-awaiting';
+export const RECEIVED_ICE_CANDIDATE_FROM_SERVER = 'receivedIceCandidateFromServer';
+export const SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER = 'sendIceCandidateToSignalingServer';
 
 // Namespace IDs can only be these.
 export const NAMESPACE_ID_NONE = -1;        // ID -1 means no namespace is selected.
@@ -38,5 +43,6 @@ export function isValidNamespace(namespaceID: number): boolean {
 }
 
 export const HOME_URL = "/";
-export const ROOMS_URL = "/rooms";
+export const NOT_FOUND_URL = "*";
 export const PROFILE_URL = "/profile";
+export const ROOMS_URL = "/rooms";

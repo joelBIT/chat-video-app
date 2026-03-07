@@ -1,0 +1,10 @@
+#notFoundPage {
+    display: flex;
+
+    & .message-failure {
+        font-family: 'Inter';
+        font-size: 1.6rem;
+        margin-top: 5rem;
+        margin-bottom: 5rem;
+    }
+}

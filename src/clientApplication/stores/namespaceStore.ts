@@ -1,5 +1,5 @@
 import { NAMESPACE_ID_NONE, ROOM_ID_NONE } from "../../../socketApplication/utils";
-import type { Namespace } from "../../../types";
+import type { Namespace } from "../../types";
 
 /**
  * Handles client data received from the server (e.g, namespaces, rooms, users).

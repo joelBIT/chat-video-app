@@ -1,5 +1,5 @@
 import { createContext, type ReactElement, type ReactNode, useState } from "react";
-import type { Message, Room, TriviaUser } from "../../types";
+import type { Message, Room, ChatUser } from "../types";
 import { multiplexSockets } from "../socket-client";
 import { useUser } from "../hooks";
 import { getUsersInRoom } from "../clientApplication/services/userService";
@@ -9,14 +9,14 @@ import { CHANGE_ROOM, CHAT_MESSAGE, CREATE_ROOM, LEAVE_ROOM, NAMESPACE_ID_DM, NA
 
 export interface RoomContextProvider {
     selectedRoom: Room | undefined;
-    roomParticipants: TriviaUser[];
+    roomParticipants: ChatUser[];
     sendMessage: (text: string) => void;
     changeRoom: (room: Room) => void;
     leaveRoom: (room: Room) => void;
-    setRoomParticipants: (participants: TriviaUser[]) => void;
+    setRoomParticipants: (participants: ChatUser[]) => void;
     changeNamespace: (namespaceID: number) => void;
     changeSelectedRoom: (room: Room | undefined) => void;
-    createPrivateRoom: (recipient: TriviaUser) => void;
+    createPrivateRoom: (recipient: ChatUser) => void;
     createGameRoom: (roomName: string, privateRoom: boolean) => void;
 }
 
@@ -28,7 +28,7 @@ export const RoomContext = createContext<RoomContextProvider>({} as RoomContextP
  */
 export function RoomProvider({ children }: { children: ReactNode }): ReactElement {
     const [selectedRoom, setSelectedRoom] = useState<Room | undefined>(getSelectedRoom());
-    const [roomParticipants, setRoomParticipants] = useState<TriviaUser[]>([]);
+    const [roomParticipants, setRoomParticipants] = useState<ChatUser[]>([]);
     const { user } = useUser();
     
     /**
@@ -80,7 +80,7 @@ export function RoomProvider({ children }: { children: ReactNode }): ReactElemen
     /**
      * Create a new private room in the "DMs" namespace (id 1).
      */
-    async function createPrivateRoom(recipient: TriviaUser): Promise<void> {
+    async function createPrivateRoom(recipient: ChatUser): Promise<void> {
         const response = await multiplexSockets[NAMESPACE_ID_DM].emitWithAck(CREATE_ROOM, user, recipient);
         saveRoom(response.room);
         setSelectedRoomId(response.room.id);

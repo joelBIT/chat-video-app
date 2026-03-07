@@ -2,14 +2,13 @@ import { type ReactElement } from "react";
 import { redirect } from "react-router";
 import { useRoom, useSocket } from "../hooks";
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
-import { NamespaceMenu, RoomChat, RoomList, UserList } from "../components";
+import { ConversationList, DmRoom, NamespaceMenu, RoomChat, RoomList, UserList } from "../components";
 import { HOME_URL, NAMESPACE_ID_DM } from "../../socketApplication/utils";
 
 import "./RoomsPage.css";
 
 /**
  * Page containing the namespace menu and list of rooms (including the chat of the selected room).
- * If a room is private (meaning direct communication between two users) no user list is shown.
  */
 export default function RoomsPage(): ReactElement {
     const { isConnected } = useSocket();
@@ -19,6 +18,16 @@ export default function RoomsPage(): ReactElement {
         redirect(HOME_URL);
     }
 
+    if (isSelectedNamespace(NAMESPACE_ID_DM)) {
+        return (
+            <main id="roomsPage">
+                <NamespaceMenu />
+                <ConversationList />
+                <DmRoom />
+            </main>
+        )
+    }
+
     return (
         <main id="roomsPage">
             <NamespaceMenu />
@@ -26,7 +35,7 @@ export default function RoomsPage(): ReactElement {
             <RoomChat />
 
             {
-                isSelectedNamespace(NAMESPACE_ID_DM) || roomParticipants?.length === 0 ? <></> : <UserList />
+                roomParticipants?.length === 0 ? <></> : <UserList />
             }
         </main>
     )

@@ -1,4 +1,4 @@
-import type { TriviaUser } from "../../../types";
+import type { ChatUser } from "../../types";
 
 /**
  * Keeps track of application users. Update user information (e.g., online status or username/avatar changes).
@@ -6,17 +6,17 @@ import type { TriviaUser } from "../../../types";
  * The server sends updates when something of importance happens. Then the client updates this data.
  */
 class InMemoryUserStore {
-    users: Map<string, TriviaUser>;                       // <userID, TriviaUser>
+    users: Map<string, ChatUser>;                       // <userID, TriviaUser>
 
     constructor() {
         this.users = new Map();
     }
 
-    saveUser(user: TriviaUser): void {
+    saveUser(user: ChatUser): void {
         this.users.set(user.id, user);
     };
 
-    getUserById(userID: string): TriviaUser {
+    getUserById(userID: string): ChatUser {
         const user = this.users.get(userID);
         if (user) {
             return user;
@@ -29,8 +29,8 @@ class InMemoryUserStore {
      * Store all users of the application (does not matter which rooms they are member of). This function is executed when the client
      * connects to the server and retrieves a list of all application users.
      */
-    addAllUsers(users: TriviaUser[]): void {
-        users.forEach((user: TriviaUser) => {
+    addAllUsers(users: ChatUser[]): void {
+        users.forEach((user: ChatUser) => {
             this.users.set(user.id, user);
         });
     }
@@ -38,7 +38,7 @@ class InMemoryUserStore {
     /**
      * @returns an empty placeholder user representing someone who is logged out.
      */
-    getSignedOutUser(): TriviaUser {
+    getSignedOutUser(): ChatUser {
         return {username: '', avatar: "businessman_avatar.svg", online: false, id: ""};
     }
 }

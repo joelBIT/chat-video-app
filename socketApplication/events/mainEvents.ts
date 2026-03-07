@@ -3,7 +3,7 @@ import { getDataForUser } from "../services/namespaceService";
 import { getAllUsers, getUserByID, getUserByUsername, saveUser, setOnlineStatusForUser } from "../services/userService";
 import type { ISocket } from "../interfaces";
 import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../utils";
-import type { TriviaUser } from "../../types";
+import type { ChatUser } from "../../src/types";
 
 /**
  * Initializes events for the main namespace ('/') only. The connected client receives data via the "namespaces" event. This data consists of
@@ -20,7 +20,7 @@ export function initializeMainNamespaceEvents(io: Server): void {
             io.except(socket.id).emit(USER_CONNECTED, getUserByID(userID));                                // Inform other clients that the user is online
         }
 
-        socket.on(USER_UPDATED, (updatedUser: TriviaUser, ackCallback) => {
+        socket.on(USER_UPDATED, (updatedUser: ChatUser, ackCallback) => {
             const user = getUserByUsername(updatedUser.username);
             if (user && user.id !== updatedUser.id) {
                 ackCallback({ message: 'Username is already taken', success: false });

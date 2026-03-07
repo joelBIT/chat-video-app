@@ -1,0 +1,24 @@
+#conversationList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 350px;
+    font-family: "LINE Seed JP", sans-serif;
+    font-weight: 400;
+    background-color: #528b8b;
+    padding: 2rem 0.5rem;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+
+    & .conversations-title {
+        font-size: 1.5rem;
+        padding: 1rem;
+    }
+
+    & .conversations-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 337px;
+    }
+}

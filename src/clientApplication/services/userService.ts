@@ -1,9 +1,9 @@
-import type { Namespace, Room, TriviaUser } from "@/../../types";
+import type { Namespace, Room, ChatUser } from "../../types";
 import namespaceStore from "../stores/namespaceStore";
 import userStore from "../stores/userStore";
 
-export function getUsersInRoom(roomID: string, namespaceID: number): TriviaUser[] {
-    const memberList: TriviaUser[] = [];
+export function getUsersInRoom(roomID: string, namespaceID: number): ChatUser[] {
+    const memberList: ChatUser[] = [];
     const matchingRoom: Room | undefined = namespaceStore.getNamespace(namespaceID).rooms.find((room: Room) => room.id === roomID);
     if (matchingRoom) {
         matchingRoom.members.forEach((memberID: string) => {
@@ -14,8 +14,8 @@ export function getUsersInRoom(roomID: string, namespaceID: number): TriviaUser[
     return memberList;
 }
 
-export function getUsersInSelectedRoom(): TriviaUser[] {
-    const memberList: TriviaUser[] = [];
+export function getUsersInSelectedRoom(): ChatUser[] {
+    const memberList: ChatUser[] = [];
     const matchingRoom: Room | undefined = namespaceStore.getSelectedNamespace()?.rooms.find((room: Room) => room.id === namespaceStore.selectedRoomId);
     if (matchingRoom) {
         matchingRoom.members.forEach((memberID: string) => {
@@ -54,14 +54,14 @@ export function removeUserFromRoom(roomID: string, userID: string, namespaceID: 
     }
 }
 
-export function addAllUsers(users: TriviaUser[]): void {
+export function addAllUsers(users: ChatUser[]): void {
     userStore.addAllUsers(users);
 }
 
-export function saveUser(user: TriviaUser): void {
+export function saveUser(user: ChatUser): void {
     userStore.saveUser(user);
 }
 
-export function getSignedOutUser(): TriviaUser {
+export function getSignedOutUser(): ChatUser {
     return userStore.getSignedOutUser();
 }

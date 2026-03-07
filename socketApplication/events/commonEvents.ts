@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import { getAllNamespaces } from "../services/namespaceService";
 import { getUserByUsername } from "../services/userService";
-import type { Namespace, Room } from "../../types";
+import type { Namespace, Room } from "../../src/types";
 import type { ISocket } from "../interfaces";
 import { isCommonRoom, USER_JOINED } from "../utils";
 

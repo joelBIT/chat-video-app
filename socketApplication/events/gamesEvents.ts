@@ -2,7 +2,7 @@ import { Server } from "socket.io";
 import { getNamespaceByID } from "../services/namespaceService";
 import { addUserToRoom, getRoomByID, isMember, removeUserFromRoom, saveGameRoom } from "../services/roomService";
 import { saveMessage } from "../services/messageService";
-import type { Message, Namespace, Room } from "../../types";
+import type { Message, Namespace, Room } from "../../src/types";
 import type { ISocket } from "../interfaces";
 import { CHANGE_ROOM, CHAT_MESSAGE, CREATE_ROOM, isCommonRoom, LEAVE_ROOM, NAMESPACE_ID_GAMES, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../utils";
 

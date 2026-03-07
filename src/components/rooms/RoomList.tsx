@@ -3,7 +3,7 @@ import { useUser } from "../../hooks";
 import { isSelectedNamespace } from "../../clientApplication/services/namespaceService";
 import { getSelectedNamespaceRooms, memberGameRooms, nonMemberGameRooms } from "../../clientApplication/services/roomService";
 import { RoomCard } from "..";
-import type { Room } from "../../../types";
+import type { Room } from "../../types";
 import { NAMESPACE_ID_GAMES } from "../../../socketApplication/utils";
 
 import "./RoomList.css";

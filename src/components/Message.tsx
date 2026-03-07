@@ -1,6 +1,6 @@
 import { type ReactElement } from "react";
 import Textarea from 'rc-textarea';
-import type { Message } from "../../types";
+import type { Message } from "../types";
 
 import "./Message.css";
 

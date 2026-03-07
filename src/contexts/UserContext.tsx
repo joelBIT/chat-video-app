@@ -2,11 +2,11 @@
 
 import { createContext, type ReactElement, type ReactNode, useState } from "react";
 import { getSignedOutUser } from "../clientApplication/services/userService";
-import type { TriviaUser } from "../../types";
+import type { ChatUser } from "../types";
 
 export interface UserContextProvider {
-    user: TriviaUser;
-    setUserInformation: (user: TriviaUser) => void;
+    user: ChatUser;
+    setUserInformation: (user: ChatUser) => void;
 }
 
 export const UserContext = createContext<UserContextProvider>({} as UserContextProvider);
@@ -15,9 +15,9 @@ export const UserContext = createContext<UserContextProvider>({} as UserContextP
  * The businessman-avatar.svg icon is the default avatar. A user that is not logged in has an empty username.
  */
 export function UserProvider({ children }: { children: ReactNode }): ReactElement {
-    const [user, setUser] = useState<TriviaUser>(getSignedOutUser());
+    const [user, setUser] = useState<ChatUser>(getSignedOutUser());
 
-    function setUserInformation(user: TriviaUser): void {
+    function setUserInformation(user: ChatUser): void {
         setUser(user);
     }
 

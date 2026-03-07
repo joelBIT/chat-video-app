@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useRoom, useSocket, useUser } from "../hooks";
 import { getUsersInSelectedRoom, saveUser } from "../clientApplication/services/userService";
 import { NamespaceMenu } from "../components";
-import type { TriviaUser } from "@/../../types";
+import type { ChatUser } from "../types";
 import { HOME_URL } from "../../socketApplication/utils";
 
 import "./ProfilePage.css";
@@ -29,7 +29,7 @@ export default function ProfilePage(): ReactElement {
      * Only update the profile information if the server sends back "success" = true.
      */
     async function updateUserProfile(): Promise<void> {
-        const updatedUser: TriviaUser = { username, id: user.id, avatar: selectedAvatar, online: user.online };
+        const updatedUser: ChatUser = { username, id: user.id, avatar: selectedAvatar, online: user.online };
         const response = await updateUser(updatedUser);
         if (response.success) {
             setUserInformation(updatedUser);

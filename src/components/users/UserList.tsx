@@ -1,7 +1,7 @@
 import { type ReactElement } from "react";
 import { useRoom } from "../../hooks";
 import { UserCard } from "..";
-import type { TriviaUser } from "../../../types";
+import type { ChatUser } from "../../types";
 
 import "./UserList.css";
 
@@ -23,7 +23,7 @@ export function UserList(): ReactElement {
         <section id="userList">
             <h2 className="userList-title"> Members - {roomParticipants?.length} </h2>
             {
-                roomParticipants.map((user: TriviaUser) => <UserCard key={user.username} member={user} />)
+                roomParticipants.map((user: ChatUser) => <UserCard key={user.username} member={user} />)
             }
         </section>
     )
