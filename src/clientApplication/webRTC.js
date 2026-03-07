@@ -154,3 +154,35 @@ export async function call(fromUsername, toUsername) {
         console.log(error);
     }
 }
+
+export function closeVideoCall() {
+    const localVideoEl = document.querySelector('#local-video');
+    const remoteVideoEl = document.querySelector('#remote-video');
+
+    if (peerConnection) {
+        peerConnection.ontrack = null;
+        peerConnection.onremovetrack = null;
+        peerConnection.onremovestream = null;
+        peerConnection.onicecandidate = null;
+        peerConnection.oniceconnectionstatechange = null;
+        peerConnection.onsignalingstatechange = null;
+        peerConnection.onicegatheringstatechange = null;
+        peerConnection.onnegotiationneeded = null;
+
+        if (remoteVideoEl.srcObject) {
+            remoteVideoEl.srcObject.getTracks().forEach((track) => track.stop());
+        }
+
+        if (localVideoEl.srcObject) {
+            localVideoEl.srcObject.getTracks().forEach((track) => track.stop());
+        }
+
+        peerConnection.close();
+        peerConnection = null;
+    }
+
+    remoteVideoEl.removeAttribute("src");
+    remoteVideoEl.removeAttribute("srcObject");
+    localVideoEl.removeAttribute("src");
+    localVideoEl.removeAttribute("srcObject");
+}

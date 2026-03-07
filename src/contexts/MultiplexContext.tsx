@@ -6,14 +6,16 @@ import { getSelectedRoom, isSelectedRoom, removeRoom, saveRoom } from "../client
 import { addUserToRoom, getUsersInSelectedRoom, removeUserFromRoom } from "../clientApplication/services/userService";
 import { saveConversationMessage, saveMessage } from "../clientApplication/services/messageService";
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
-import { addAnswer, addNewIceCandidate, answerOffer } from "../clientApplication/webRTC";
+import { addAnswer, addNewIceCandidate, answerOffer, closeVideoCall } from "../clientApplication/webRTC";
 import type { Message, Namespace, Offer, Room } from "../types";
 import { ANSWER_RESPONSE, CHAT_MESSAGE, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../socketApplication/utils";
 
 export interface MultiplexContextProvider {
     connectMultiplexSockets: (namespaces: Namespace[]) => void;
     incomingCall: boolean;
+    activeCall: boolean;
     answerCall: () => Promise<void>;
+    closeCall: () => void;
     disconnectMultiplexSockets: () => void;
 }
 
@@ -26,6 +28,7 @@ export const MultiplexContext = createContext<MultiplexContextProvider>({} as Mu
  */
 export function MultiplexProvider({ children }: { children: ReactNode }): ReactElement {
     const [incomingCall, setIncomingCall] = useState<boolean>(false);
+    const [activeCall, setActiveCall] = useState<boolean>(false);
     const [offers, setOffers] = useState<Offer[]>([]);
     const { setRoomParticipants, changeNamespace, changeSelectedRoom } = useRoom();
 
@@ -157,6 +160,12 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     async function answerCall(): Promise<void> {
         setIncomingCall(false);
         await answerOffer(offers[0]);
+        setActiveCall(true);
+    }
+
+    function closeCall(): void {
+        closeVideoCall();
+        setActiveCall(false);
     }
 
     /**
@@ -169,6 +178,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
 
     function onAnswerResponse(answer: Offer): void {
         addAnswer(answer);
+        setActiveCall(true);
     }
 
     function onReceivedIceCandidateFromServer(iceCandidate: RTCIceCandidate): void {
@@ -176,7 +186,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     }
 
     return (
-        <MultiplexContext.Provider value={{ incomingCall, connectMultiplexSockets, disconnectMultiplexSockets, answerCall }}>
+        <MultiplexContext.Provider value={{ incomingCall, activeCall, connectMultiplexSockets, disconnectMultiplexSockets, answerCall, closeCall }}>
             { children }
         </MultiplexContext.Provider>
     );

@@ -14,7 +14,7 @@ export function DmRoom(): ReactElement {
     const messageRef = useRef<HTMLInputElement>(null);
     const { selectedRoom, sendMessage } = useRoom();
     const { user } = useUser();
-    const { incomingCall, answerCall } = useMultiplex();
+    const { incomingCall, activeCall, answerCall, closeCall } = useMultiplex();
 
     /**
      * Send a DM to another user.
@@ -53,7 +53,11 @@ export function DmRoom(): ReactElement {
                 {
                     incomingCall ? <button onClick={answerCall}> Answer </button> : <></>
                 }
-                <button onClick={() => call(user.username, getSelectedRoom()?.name)}> Call </button>
+                {
+                    activeCall ? <button onClick={closeCall}> Close </button> 
+                    : 
+                    <button onClick={() => call(user.username, getSelectedRoom()?.name)}> Call </button>
+                }
                 <input placeholder="Enter message" ref={messageRef} />
                 <button onClick={sendDmMessage}> Send </button>
             </section>
