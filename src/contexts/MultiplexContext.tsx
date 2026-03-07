@@ -1,4 +1,4 @@
-import { createContext, type ReactElement, type ReactNode } from "react";
+import { createContext, useState, type ReactElement, type ReactNode } from "react";
 import { io, Socket } from "socket.io-client";
 import { multiplexSockets } from "../socket-client";
 import { useRoom } from "../hooks";
@@ -6,11 +6,16 @@ import { getSelectedRoom, isSelectedRoom, removeRoom, saveRoom } from "../client
 import { addUserToRoom, getUsersInSelectedRoom, removeUserFromRoom } from "../clientApplication/services/userService";
 import { saveConversationMessage, saveMessage } from "../clientApplication/services/messageService";
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
-import type { Message, Namespace, Room } from "../types";
-import { CHAT_MESSAGE, PRIVATE_MESSAGE, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../socketApplication/utils";
+import { addAnswer, addNewIceCandidate, answerOffer, closeVideoCall } from "../clientApplication/webRTC";
+import type { Message, Namespace, Offer, Room } from "../types";
+import { ANSWER_RESPONSE, CHAT_MESSAGE, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../socketApplication/utils";
 
 export interface MultiplexContextProvider {
     connectMultiplexSockets: (namespaces: Namespace[]) => void;
+    incomingCall: boolean;
+    activeCall: boolean;
+    answerCall: () => Promise<void>;
+    closeCall: () => void;
     disconnectMultiplexSockets: () => void;
 }
 
@@ -22,6 +27,9 @@ export const MultiplexContext = createContext<MultiplexContextProvider>({} as Mu
  * connection (also called "multiplexing").
  */
 export function MultiplexProvider({ children }: { children: ReactNode }): ReactElement {
+    const [incomingCall, setIncomingCall] = useState<boolean>(false);
+    const [activeCall, setActiveCall] = useState<boolean>(false);
+    const [offers, setOffers] = useState<Offer[]>([]);
     const { setRoomParticipants, changeNamespace, changeSelectedRoom } = useRoom();
 
     /**
@@ -31,7 +39,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         if (multiplexSockets.length === 0) {
             const socketList: Socket[] = [];
             namespaces.forEach((namespace: Namespace) => {
-                socketList.push(createMultiplexSocket(namespace.endpoint));      // The list index corresponds to the namespace ID
+                socketList.push(createMultiplexSocket(namespace));      // The list index corresponds to the namespace ID
             });
             multiplexSockets.push(...socketList);
         } else {
@@ -44,8 +52,8 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     /**
      * Create a connected socket (for multiplexing) for the supplied namespace.
      */
-    function createMultiplexSocket(endpoint: string): Socket {
-        const socket = io(endpoint);
+    function createMultiplexSocket(namespace: Namespace): Socket {
+        const socket = io(namespace.endpoint);
         socket.connect();
         socket.on(CHAT_MESSAGE, onChatMessage);
         socket.on(PRIVATE_MESSAGE, onPrivateMessage);
@@ -53,6 +61,12 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         socket.on(USER_LEFT, onUserLeft);
         socket.on(UPDATE_ROOMS, onUpdateRooms);
         socket.on(UPDATE_CUSTOM_GAME_ROOM, onUpdateCustomGameRoom);
+
+        if (namespace.id === NAMESPACE_ID_DM) {
+            socket.on(NEW_OFFER_AWAITING, onNewOfferAwaiting);
+            socket.on(ANSWER_RESPONSE, onAnswerResponse);
+            socket.on(RECEIVED_ICE_CANDIDATE_FROM_SERVER, onReceivedIceCandidateFromServer);
+        }
 
         return socket;
     }
@@ -143,8 +157,36 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         });
     }
 
+    async function answerCall(): Promise<void> {
+        setIncomingCall(false);
+        await answerOffer(offers[0]);
+        setActiveCall(true);
+    }
+
+    function closeCall(): void {
+        closeVideoCall();
+        setActiveCall(false);
+    }
+
+    /**
+     * Receive an offer for a WebRTC call.
+     */
+    function onNewOfferAwaiting(offer: Offer): void {
+        setIncomingCall(true);
+        setOffers([...offers, offer]);
+    }
+
+    function onAnswerResponse(answer: Offer): void {
+        addAnswer(answer);
+        setActiveCall(true);
+    }
+
+    function onReceivedIceCandidateFromServer(iceCandidate: RTCIceCandidate): void {
+        addNewIceCandidate(iceCandidate);
+    }
+
     return (
-        <MultiplexContext.Provider value={{ connectMultiplexSockets, disconnectMultiplexSockets }}>
+        <MultiplexContext.Provider value={{ incomingCall, activeCall, connectMultiplexSockets, disconnectMultiplexSockets, answerCall, closeCall }}>
             { children }
         </MultiplexContext.Provider>
     );

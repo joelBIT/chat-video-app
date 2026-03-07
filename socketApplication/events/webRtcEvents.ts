@@ -14,9 +14,13 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
     const namespace: Namespace = getNamespaceByID(NAMESPACE_ID_DM);
 
     io.of(namespace.endpoint).on("connection", async (socket: ISocket) => {
-        console.log(socket);
-
         socket.on(NEW_OFFER, (fromUsername: string, toUsername: string, newOffer: RTCSessionDescriptionInit) => {
+            const user: ChatUser | undefined = getUserByUsername(toUsername);
+            if (!user) {
+                console.log(`No user found for username ${toUsername}`);
+                return;
+            }
+
             const offer: Offer = {
                 offererUserName: fromUsername,
                 offer: newOffer,
@@ -27,18 +31,11 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             };
             offers.push(offer);
 
-            const user: ChatUser | undefined = getUserByUsername(toUsername);
-            if (!user) {
-                console.log(`No user found for username ${toUsername}`);
-                return;
-            }
-
             socket.to(user.id).emit(NEW_OFFER_AWAITING, offer);
         });
 
         socket.on(NEW_ANSWER, (offerObject: Offer, ackFunction) => {
-            console.log(offerObject);
-            // Emit this answer (offerObj) back to CLIENT1. In order to do that, we need CLIENT1's socketid.
+            // Emit this answer (offerObject) back to CLIENT1. In order to do that, we need CLIENT1's id.
             const user: ChatUser | undefined = getUserByUsername(offerObject.offererUserName);
             if (!user) {
                 console.log(`No user found for username ${offerObject.offererUserName}`);
@@ -62,7 +59,6 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
 
         socket.on(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, iceCandidateObject => {
             const { didIOffer, iceUserName, iceCandidate } = iceCandidateObject;
-            console.log(iceCandidate);
 
             if (didIOffer) {
                 // This ice candidate is coming from the offerer. Send to the answerer
