@@ -1,6 +1,6 @@
 import { type ReactElement } from "react";
 import { getSelectedNamespaceRooms } from "../../clientApplication/services/roomService";
-import { RoomCard } from "..";
+import { DmCard } from "..";
 import type { Room } from "../../types";
 
 import "./ConversationList.css";
@@ -16,7 +16,7 @@ export function ConversationList(): ReactElement {
             
                 <ul className="conversations-list">
                     {
-                        getSelectedNamespaceRooms().map((room: Room) => <RoomCard key={room.id} room={room} />)
+                        getSelectedNamespaceRooms().map((room: Room) => <DmCard key={room.id} room={room} />)
                     }
                 </ul>
         </section>

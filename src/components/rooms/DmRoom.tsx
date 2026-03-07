@@ -2,6 +2,7 @@ import { type ReactElement, useRef } from "react";
 import { useRoom } from "../../hooks";
 import { Message } from "..";
 import type { Message as MessageType } from "../../types";
+import { call } from "../../clientApplication/webRTC";
 
 import "./DmRoom.css";
 
@@ -40,6 +41,7 @@ export function DmRoom(): ReactElement {
             </section>
 
             <section id="chat-message">
+                <button onClick={call}> Call </button>
                 <input placeholder="Enter message" ref={messageRef} />
                 <button onClick={sendDmMessage}> Send </button>
             </section>

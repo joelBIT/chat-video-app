@@ -1,0 +1,49 @@
+& .dm-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 1rem;
+    cursor: pointer;
+
+    & .dm-section {
+        display: flex;
+        gap: 0.4rem;
+
+        & .dm-name {
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: lightcyan;
+        }
+
+        & .active-dm {
+            font-weight: 600;
+            color: black;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+    }
+
+    &:hover {
+        background-color: lightsteelblue;
+        border-radius: 4px;
+    }
+
+    &:has(.active-dm) {
+        background-color: lightsteelblue;
+        border-radius: 4px;
+        cursor: default;
+    }
+
+    & .leave-dm__button {
+        align-self: center;
+        font-size: 10px;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 4px;
+
+        &:hover {
+            background-color: darkgray;
+        }
+    }
+}
