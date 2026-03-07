@@ -1,7 +1,8 @@
 import { createBrowserRouter } from "react-router";
-import { HOME_URL, PROFILE_URL, ROOMS_URL } from "../socketApplication/utils";
+import { HOME_URL, NOT_FOUND_URL, PROFILE_URL, ROOMS_URL } from "../socketApplication/utils";
 import { App } from "./App";
 import LandingPage from "./pages/LandingPage";
+import NotFoundPage from "./pages/NotFoundPage";
 import RoomsPage from "./pages/RoomsPage";
 import ProfilePage from "./pages/ProfilePage";
 
@@ -13,6 +14,10 @@ export const routes = createBrowserRouter([
             {
                 index: true,
                 Component: LandingPage
+            },
+            {
+                path: NOT_FOUND_URL,
+                Component: NotFoundPage
             },
             {
                 path: ROOMS_URL,

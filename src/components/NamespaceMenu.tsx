@@ -4,7 +4,7 @@ import { useRoom, useSocket } from "../hooks";
 import { CreateRoomModal } from ".";
 import { getNamespaces, isSelectedNamespace } from "../clientApplication/services/namespaceService";
 import type { Namespace } from "../types";
-import { NAMESPACE_ID_GAMES, PROFILE_URL, ROOMS_URL } from "../../socketApplication/utils";
+import { HOME_URL, NAMESPACE_ID_GAMES, PROFILE_URL, ROOMS_URL } from "../../socketApplication/utils";
 
 import "./NamespaceMenu.css";
 
@@ -37,6 +37,11 @@ export function NamespaceMenu(): ReactElement {
         if (location.pathname !== ROOMS_URL) {
             navigate(ROOMS_URL);
         }
+    }
+
+    function logoutUser(): void {
+        logout();
+        navigate(HOME_URL, { replace: true });
     }
 
     return (
@@ -86,7 +91,7 @@ export function NamespaceMenu(): ReactElement {
                     alt="Disconnect icon" 
                     title="Disconnect" 
                     className="disconnect-button" 
-                    onClick={logout}
+                    onClick={logoutUser}
                 />
             </section>
         </section>

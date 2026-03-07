@@ -14,7 +14,7 @@ export default function LandingPage(): ReactElement {
     const { isConnected, connect, errorMessage } = useSocket();
 
     if (isConnected) {
-        navigate(ROOMS_URL);
+        navigate(ROOMS_URL, { replace: true });
     }
     
     return (
