@@ -57,9 +57,16 @@ main {
 
 
 
+
+
+/***********
+* Messages *
+***********/
+
 .message {
     font-family: "LINE Seed JP", sans-serif;
     font-size: 1rem;
+    color: white;
 }
 
 .error-message {

@@ -48,24 +48,24 @@ export default function ProfilePage(): ReactElement {
 
                  <section id="select-avatar">
                     <img 
-                        src="/businessman_avatar.svg" 
-                        alt="Profile businessman avatar" 
-                        onClick={() => setSelectedAvatar("businessman_avatar.svg")}
-                        className={selectedAvatar === "businessman_avatar.svg" ? "selected-avatar": ""}
+                        src="/mario.png" 
+                        alt="Mario avatar" 
+                        onClick={() => setSelectedAvatar("mario.png")}
+                        className={selectedAvatar === "mario.png" ? "selected-avatar": ""}
                     />
 
                     <img 
-                        src="/engineer_avatar.svg" 
-                        alt="Profile engineer avatar" 
-                        onClick={() => setSelectedAvatar("engineer_avatar.svg")} 
-                        className={selectedAvatar === "engineer_avatar.svg" ? "selected-avatar": ""}
+                        src="/wario.png" 
+                        alt="Wario avatar" 
+                        onClick={() => setSelectedAvatar("wario.png")} 
+                        className={selectedAvatar === "wario.png" ? "selected-avatar": ""}
                     />
 
                     <img 
-                        src="/doctor_avatar.svg" 
-                        alt="Profile doctor avatar" 
-                        onClick={() => setSelectedAvatar("doctor_avatar.svg")} 
-                        className={selectedAvatar === "doctor_avatar.svg" ? "selected-avatar": ""}
+                        src="/mushroom.png" 
+                        alt="Mushroom avatar" 
+                        onClick={() => setSelectedAvatar("mushroom.png")} 
+                        className={selectedAvatar === "mushroom.svg" ? "selected-avatar": ""}
                     />
                 </section>
 

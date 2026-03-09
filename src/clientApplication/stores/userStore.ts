@@ -39,7 +39,7 @@ class InMemoryUserStore {
      * @returns an empty placeholder user representing someone who is logged out.
      */
     getSignedOutUser(): ChatUser {
-        return {username: '', avatar: "businessman_avatar.svg", online: false, id: ""};
+        return {username: '', avatar: "mario.png", online: false, id: ""};
     }
 }
 
