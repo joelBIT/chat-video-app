@@ -1,9 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=LINE+Seed+JP');
 
 :root {
-  --color-black: #000000;
-  --color-white: #FFFFFF;
-  --color-warning: red;
+    --color-background-dark: #121214;
+    --color-background-light: #242428;
+    --color-black: #000000;
+    --color-border: #d7cdcd20;
+    --color-highlight: #d7cdcd20;
+    --color-text: #606064;
+    --color-warning: red;
+    --color-white: #FFFFFF;
 }
 
 * {

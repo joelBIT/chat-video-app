@@ -4,7 +4,8 @@
     align-items: center;
     gap: 1rem;
     width: 100%;
-    background-color: #528b8bbb;
+    background-color: var(--color-background-light);
+    border-top: 1px solid var(--color-border);
 
     & .select-room__text {
         height: 100%;
@@ -12,6 +13,7 @@
         align-self: center;
         font-family: "LINE Seed JP", sans-serif;
         font-size: 2rem;
+        color: white;
     }
 
     & .room-title {
@@ -29,6 +31,7 @@
         & .room-text {
             font-family: "LINE Seed JP", sans-serif;
             font-size: 2rem;
+            color: white;
         }
     }
 
@@ -44,10 +47,27 @@
         scrollbar-width: thin;
         scrollbar-color: black #FFFFFF20;
         border: none;
+        margin-left: 1rem;
+        margin-right: 1rem;
     }
 
     & #chat-message {
         display: flex;
         gap: 1rem;
+        width: 100%;
+        background-color: #222327;
+        border-radius: 4px;
+
+        & .text-input {
+            width: 100%;
+            background-color: #222327;
+            padding: 0.3rem;
+            outline: none;
+            border: 1px solid #d7cdcd63;
+            border-radius: 4px;
+            color: white;
+            margin-left: 1rem;
+            margin-right: 1rem;
+        }
     }
 }
