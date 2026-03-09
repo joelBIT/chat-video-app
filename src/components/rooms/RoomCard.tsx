@@ -36,7 +36,7 @@ export function RoomCard({room}: {room: Room}): ReactElement {
                     room.id === ROOM_ID_LOBBY ?
                         <img src={"/grid.svg"} className="room-icon" />
                         :
-                        <img src={room.private ? "/lock.svg" : "/open_lock.svg"} className="room-icon" />
+                        <img src={room.private ? "/locked.svg" : "/unlocked.svg"} className="room-icon" />
                 }
                 <h2 className={isSelectedRoom(room.id) ? "active-room" : "room-name"}>
                     {room.name}
