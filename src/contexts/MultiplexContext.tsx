@@ -14,8 +14,10 @@ export interface MultiplexContextProvider {
     connectMultiplexSockets: (namespaces: Namespace[]) => void;
     incomingCall: boolean;
     activeCall: boolean;
+    isCalling: boolean;
     answerCall: () => Promise<void>;
-    closeCall: () => void;
+    hangup: () => void;
+    setIsCalling: (isCalling: boolean) => void;
     disconnectMultiplexSockets: () => void;
 }
 
@@ -29,6 +31,7 @@ export const MultiplexContext = createContext<MultiplexContextProvider>({} as Mu
 export function MultiplexProvider({ children }: { children: ReactNode }): ReactElement {
     const [incomingCall, setIncomingCall] = useState<boolean>(false);
     const [activeCall, setActiveCall] = useState<boolean>(false);
+    const [isCalling, setIsCalling] = useState<boolean>(false);
     const [offers, setOffers] = useState<Offer[]>([]);
     const { setRoomParticipants, changeNamespace, changeSelectedRoom } = useRoom();
 
@@ -163,9 +166,10 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         setActiveCall(true);
     }
 
-    function closeCall(): void {
+    function hangup(): void {
         closeVideoCall();
         setActiveCall(false);
+        setIncomingCall(false);
     }
 
     /**
@@ -186,7 +190,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     }
 
     return (
-        <MultiplexContext.Provider value={{ incomingCall, activeCall, connectMultiplexSockets, disconnectMultiplexSockets, answerCall, closeCall }}>
+        <MultiplexContext.Provider value={{ incomingCall, activeCall, isCalling, connectMultiplexSockets, disconnectMultiplexSockets, answerCall, hangup, setIsCalling }}>
             { children }
         </MultiplexContext.Provider>
     );
