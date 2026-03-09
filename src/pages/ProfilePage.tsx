@@ -65,7 +65,7 @@ export default function ProfilePage(): ReactElement {
                         src="/mushroom.png" 
                         alt="Mushroom avatar" 
                         onClick={() => setSelectedAvatar("mushroom.png")} 
-                        className={selectedAvatar === "mushroom.svg" ? "selected-avatar": ""}
+                        className={selectedAvatar === "mushroom.png" ? "selected-avatar": ""}
                     />
                 </section>
 
