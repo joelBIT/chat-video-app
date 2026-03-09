@@ -24,4 +24,21 @@
         gap: 0.5rem;
         width: 337px;
     }
+
+    & .available-game-rooms {
+        display: flex;
+        align-items: center;
+        position: relative;
+
+        & .rooms-title {
+            width: 100%;
+        }
+
+        & .createRoom-button {
+            width: 15px;
+            position: absolute;
+            right: 0;
+            cursor: pointer;
+        }
+    }
 }

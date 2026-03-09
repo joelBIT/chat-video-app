@@ -47,15 +47,10 @@
         }
     }
 
-    & .createRoom-button,
     & .profile-button,
     & .disconnect-button {
         width: 50px;
         cursor: pointer;
-    }
-
-    & .createRoom-button {
-        opacity: 1;
     }
 
     & .disabled-button {
