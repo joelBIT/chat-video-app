@@ -29,14 +29,15 @@
             gap: 1rem;
         }
 
-        & .message-date,
         & .message-text,
         & .message-sender {
             font-size: 0.9rem;
         }
 
         & .message-date {
+            align-content: flex-end;
             color: darkgrey;
+            font-size: 0.7rem;
         }
 
         & .message-text {

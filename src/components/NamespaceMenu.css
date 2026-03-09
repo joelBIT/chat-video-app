@@ -5,7 +5,8 @@
     padding-top: 1rem;
     width: 100px;
     height: 100%;
-    background-color: darkslategrey;
+    background-color: var(--color-background-dark);
+    border-right: 1px solid var(--color-border);
 
     & .namespace-buttons {
         display: flex;
@@ -32,6 +33,7 @@
             & .namespace-name {
                 font-family: "LINE Seed JP", sans-serif;
                 font-size: 1rem;
+                color: white;
             }
         }
 
@@ -60,6 +62,11 @@
         cursor: default;
         opacity: 0.5;
         width: 50px;
+    }
+
+    & .disconnect-button {
+        background: white;
+        border-radius: 100%;
     }
 
     & .other-buttons {

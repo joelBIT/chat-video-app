@@ -1,6 +1,7 @@
 .userCard {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
     padding: 0.2rem;
     position: relative;
 
@@ -30,11 +31,12 @@
     & .user-username {
         font-family: "LINE Seed JP", sans-serif;
         font-size: 1rem;
+        color: green;
     }
 
     &:hover {
         cursor: pointer;
-        background-color: lightsteelblue;
+        background-color: var(--color-highlight);
         border-radius: 4px;
     }
 }
