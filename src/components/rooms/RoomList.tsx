@@ -2,7 +2,7 @@ import { type ReactElement } from "react";
 import { useUser } from "../../hooks";
 import { isSelectedNamespace } from "../../clientApplication/services/namespaceService";
 import { getSelectedNamespaceRooms, memberGameRooms, nonMemberGameRooms } from "../../clientApplication/services/roomService";
-import { RoomCard } from "..";
+import { CommonRoomCard, RoomCard } from "..";
 import type { Room } from "../../types";
 import { NAMESPACE_ID_GAMES } from "../../../socketApplication/utils";
 
@@ -17,14 +17,14 @@ export function RoomList(): ReactElement {
     if (isSelectedNamespace(NAMESPACE_ID_GAMES)) {
         return (
             <section id="roomList">
-                <h1 className="rooms-title">Rooms &#8250;</h1>
+                <h1 className="rooms-title">Rooms</h1>
                 <ul className="rooms-list">
                     {
                         memberGameRooms(user.id).map((room: Room) => <RoomCard key={room.id} room={room} />)
                     }
                 </ul>
 
-                <h1 className="rooms-title">Available Rooms &#8250;</h1>
+                <h1 className="rooms-title">Available Rooms</h1>
                 <ul className="rooms-list">
                     {
                         nonMemberGameRooms(user.id).map((room: Room) => <RoomCard key={room.id} room={room} />)
@@ -36,10 +36,10 @@ export function RoomList(): ReactElement {
 
     return (
         <section id="roomList">
-            <h1 className="rooms-title">Rooms &#8250;</h1>
+            <h1 className="rooms-title">Rooms</h1>
                 <ul className="rooms-list">
                     {
-                        getSelectedNamespaceRooms().map((room: Room) => <RoomCard key={room.id} room={room} />)
+                        getSelectedNamespaceRooms().map((room: Room) => <CommonRoomCard key={room.id} room={room} />)
                     }
                 </ul>
         </section>

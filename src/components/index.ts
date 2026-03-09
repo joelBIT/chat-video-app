@@ -2,6 +2,7 @@ export * from "./CreateRoomModal";
 export * from "./Header";
 export * from "./Message";
 export * from "./NamespaceMenu";
+export * from "./rooms/CommonRoomCard";
 export * from "./rooms/ConversationList";
 export * from "./rooms/DmCard";
 export * from "./rooms/DmRoom";

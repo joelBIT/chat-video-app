@@ -16,25 +16,6 @@
         color: white;
     }
 
-    & .room-title {
-        display: flex;
-        align-self: flex-start;
-        align-items: center;
-        gap: 0.5rem;
-        padding-left: 2rem;
-        padding-top: 2rem;
-
-        & .room-icon {
-            width: 30px;
-        }
-
-        & .room-text {
-            font-family: "LINE Seed JP", sans-serif;
-            font-size: 2rem;
-            color: white;
-        }
-    }
-
     & #message-area {
         display: flex;
         flex-direction: column-reverse;

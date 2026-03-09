@@ -32,11 +32,6 @@ export function RoomChat(): ReactElement {
     
     return (
         <section id="roomChat">
-            <section className="room-title">
-                <img src={selectedRoom.private ? "/lock.svg" : "/open_lock.svg"} className="room-icon" />
-                <h1 className="room-text">{selectedRoom?.name}</h1>
-            </section>
-
             <section id="message-area">
                 {
                     selectedRoom.history
