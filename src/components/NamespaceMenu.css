@@ -59,11 +59,6 @@
         width: 50px;
     }
 
-    & .disconnect-button {
-        background: white;
-        border-radius: 100%;
-    }
-
     & .other-buttons {
         display: flex;
         flex-direction: column;
