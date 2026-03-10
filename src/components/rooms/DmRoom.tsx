@@ -1,4 +1,4 @@
-import { type ReactElement, useRef } from "react";
+import { type ReactElement, useState } from "react";
 import { useMultiplex, useRoom, useUser } from "../../hooks";
 import { Message } from "..";
 import { getSelectedRoom } from "../../clientApplication/services/roomService";
@@ -11,7 +11,7 @@ import "./DmRoom.css";
  * A DM room chat where a user may write messages to another user directly.
  */
 export function DmRoom(): ReactElement {
-    const messageRef = useRef<HTMLInputElement>(null);
+    const [message, setMessage] = useState<string>('');
     const { selectedRoom, sendMessage } = useRoom();
     const { user } = useUser();
     const { incomingCall, activeCall, answerCall, hangup, isCalling, setIsCalling } = useMultiplex();
@@ -19,9 +19,10 @@ export function DmRoom(): ReactElement {
     /**
      * Send a DM to another user.
      */
-    function sendDmMessage(): void {
-        if (messageRef.current?.value && selectedRoom) {
-            sendMessage(messageRef.current?.value);
+    function sendDmMessage(event: React.KeyboardEvent): void {
+        if (event.key ==="Enter" && message.length > 0 && selectedRoom) {
+            sendMessage(message);
+            setMessage('');
         }
     }
 
@@ -82,13 +83,20 @@ export function DmRoom(): ReactElement {
                 </section>
             }
 
+            {
+                incomingCall ? <button onClick={answerCall}> Answer </button> : <></>       // TODO: Make incoming call a modal -> Answer/Deny
+            }
+
             <section id="chat-message">
-                {
-                    incomingCall ? <button onClick={answerCall}> Answer </button> : <></>
-                }
-                
-                <input placeholder="Enter message" ref={messageRef} />
-                <button onClick={sendDmMessage}> Send </button>
+                <input 
+                    id="text-input" 
+                    className="text-input" 
+                    placeholder={`Message @${selectedRoom.name}`}
+                    value={message}
+                    onChange={e => setMessage(e.target.value)} 
+                    onKeyUp={sendDmMessage} 
+                    autoComplete="off"
+                />
             </section>
         </section>
     )

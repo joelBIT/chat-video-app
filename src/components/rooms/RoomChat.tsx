@@ -48,6 +48,7 @@ export function RoomChat(): ReactElement {
                     value={message}
                     onChange={e => setMessage(e.target.value)} 
                     onKeyUp={sendChatMessage} 
+                    autoComplete="off"
                 />
             </section>
         </section>
