@@ -52,16 +52,37 @@ export function MenuModal({member, isOpen, close}: {member: ChatUser, isOpen: bo
                 <h2 className="menu-modal__username"> {member.username} </h2>
 
                 <section className="menu-modal__buttons">
-                    <article className="communication-buttons">
+                    <article className="communication-button" onClick={toPrivateChatRoom}>
                         <img 
-                            src="/dm.svg" 
-                            alt="Chat icon" 
+                            src="/chat-black.svg" 
+                            alt="Text chat icon" 
                             title="Send DM" 
-                            className="communication-button" 
-                            onClick={toPrivateChatRoom}
+                            className="button__icon" 
                         />
 
-                        <h2 className="communication-button__label"> Chat </h2>
+                        <h2 className="button__label"> Text </h2>
+                    </article>
+
+                    <article className="communication-button">
+                        <img 
+                            src="/chat.svg" 
+                            alt="Audio chat icon" 
+                            title="Call User" 
+                            className="button__icon" 
+                        />
+
+                        <h2 className="button__label"> Audio </h2>
+                    </article>
+
+                    <article className="communication-button">
+                        <img 
+                            src="/video.svg" 
+                            alt="Video chat icon" 
+                            title="Video conference" 
+                            className="button__icon" 
+                        />
+
+                        <h2 className="button__label"> Video </h2>
                     </article>
                 </section>
             </section>

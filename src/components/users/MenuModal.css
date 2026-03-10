@@ -54,29 +54,30 @@
         border-bottom-right-radius: 9px;
 
         & .menu-modal__username {
-            font-family: "LINE Seed JP", sans-serif;
+            font-family: "Nanum Brush Script", cursive;
             padding: 0.5rem;
-            font-size: 1.5rem;
-            letter-spacing: 1px;
-            font-style: italic;
+            font-size: 1.9rem;
+            letter-spacing: 2px;
         }
 
         & .menu-modal__buttons {
             display: flex;
+            align-self: center;
+            gap: 1.5rem;
             padding: 1rem;
 
-            & .communication-buttons {
+            & .communication-button {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 gap: 0.1rem;
+                cursor: pointer;
 
-                & .communication-button {
+                & .button__icon {
                     width: 20px;
-                    cursor: pointer;
                 }
 
-                & .communication-button__label {
+                & .button__label {
                     font-family: "LINE Seed JP", sans-serif;
                     font-size: 0.7rem;
                 }
