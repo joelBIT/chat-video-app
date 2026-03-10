@@ -54,15 +54,39 @@ export function DmRoom(): ReactElement {
                 }
             </section>
 
+            {
+                activeCall || isCalling ? <button onClick={hangup}> Hangup </button> 
+                : 
+                <section className="chat-buttons">
+                    <article className="communication-button">
+                        <img 
+                            src="/audio.svg" 
+                            alt="Audio chat icon" 
+                            title="Call User" 
+                            className="button__icon" 
+                        />
+
+                        <h2 className="button__label"> Audio </h2>
+                    </article>
+
+                    <article className="communication-button" onClick={callUser}>
+                        <img 
+                            src="/video.svg" 
+                            alt="Video chat icon" 
+                            title="Video conference" 
+                            className="button__icon" 
+                        />
+
+                        <h2 className="button__label"> Video </h2>
+                    </article>
+                </section>
+            }
+
             <section id="chat-message">
                 {
                     incomingCall ? <button onClick={answerCall}> Answer </button> : <></>
                 }
-                {
-                    activeCall || isCalling ? <button onClick={hangup}> Hangup </button> 
-                    : 
-                    <button onClick={callUser}> Call </button>
-                }
+                
                 <input placeholder="Enter message" ref={messageRef} />
                 <button onClick={sendDmMessage}> Send </button>
             </section>
