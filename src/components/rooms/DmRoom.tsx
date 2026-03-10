@@ -11,10 +11,11 @@ import "./DmRoom.css";
  * A DM room chat where a user may write messages to another user directly.
  */
 export function DmRoom(): ReactElement {
+    const [isCalling, setIsCalling] = useState<boolean>(false);
     const [message, setMessage] = useState<string>('');
     const { selectedRoom, sendMessage } = useRoom();
     const { user } = useUser();
-    const { incomingCall, activeCall, answerCall, hangup, isCalling, setIsCalling } = useMultiplex();
+    const { incomingCall, activeCall, answerCall, hangup } = useMultiplex();
 
     /**
      * Send a DM to another user.
@@ -27,8 +28,13 @@ export function DmRoom(): ReactElement {
     }
 
     function callUser(): void {
-        setIsCalling(true);
         call(user.username, getSelectedRoom()?.name);
+        setIsCalling(true);
+    }
+
+    function endCall(): void {
+        setIsCalling(false);
+        hangup();
     }
 
     if (!selectedRoom) {
@@ -56,7 +62,7 @@ export function DmRoom(): ReactElement {
             </section>
 
             {
-                activeCall || isCalling ? <button onClick={hangup}> Hangup </button> 
+                activeCall || isCalling ? <button onClick={endCall}> Hangup </button> 
                 : 
                 <section className="chat-buttons">
                     <article className="communication-button">

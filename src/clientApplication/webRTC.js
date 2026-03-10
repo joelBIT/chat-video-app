@@ -27,12 +27,15 @@ let didIOffer = false;      // True if you initiated the call
 function fetchUserMedia() {
     return new Promise( async(resolve, reject) => {
         try {
+            const videosEl = document.querySelector('#videos');
+            videosEl.style.display = "flex";
             const localVideoEl = document.querySelector('#local-video');
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: true,
                 audio: true
             });
 
+            localVideoEl.style.display = "flex";
             localVideoEl.srcObject = stream;
             localStream = stream;    
             resolve();          // User approved
@@ -134,6 +137,11 @@ export async function answerOffer(offerObject) {
         console.log("======Added Ice Candidate======");
     });
 
+    const localVideoEl = document.querySelector('#local-video');
+    const remoteVideoEl = document.querySelector('#remote-video');
+    remoteVideoEl.srcObject = remoteStream;
+    localVideoEl.srcObject = localStream;
+
     console.log(offerIceCandidates);
 }
 
@@ -171,10 +179,12 @@ export function closeVideoCall() {
 
         if (remoteVideoEl.srcObject) {
             remoteVideoEl.srcObject.getTracks().forEach((track) => track.stop());
+            remoteVideoEl.srcObject = null;
         }
 
         if (localVideoEl.srcObject) {
             localVideoEl.srcObject.getTracks().forEach((track) => track.stop());
+            localVideoEl.srcObject = null;
         }
 
         peerConnection.close();
@@ -185,4 +195,7 @@ export function closeVideoCall() {
     remoteVideoEl.removeAttribute("srcObject");
     localVideoEl.removeAttribute("src");
     localVideoEl.removeAttribute("srcObject");
+
+    const videosEl = document.querySelector('#videos');
+    videosEl.style.display = "none";
 }
