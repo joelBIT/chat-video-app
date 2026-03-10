@@ -2,9 +2,85 @@
     display: flex;
     flex-direction: column;
     position: absolute;
-    right: 0;
+    right: 200px;
     z-index: 10;
-    width: 10rem;
+    width: 15rem;
+    height: 15rem;
     border-radius: 9px;
-    cursor: pointer;
+    border: 1px solid var(--color-border);
+
+    & .menu-modal__header {
+        display: flex;
+        align-items: center;
+        position: relative;
+        height: 40%;
+        background-color: var(--color-black);
+        border-top-left-radius: 9px;
+        border-top-right-radius: 9px;
+
+         & .user-image {
+            position: absolute;
+            left: 40px;
+            top: 40px;
+
+            & .online-status {
+                position: absolute;
+                width: 12px;
+                height: 12px;
+                border-radius: 100%;
+                left: 40px;
+                top: 40px;
+                background-color: red;
+            }
+
+            & .user-avatar {
+                width: 50px;
+                border-radius: 100%;
+            }
+
+            & .online {
+                background-color: green;
+            }
+        }
+    }
+
+    & .menu-modal__content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #7a9a43;
+        height: 100%;
+        border-bottom-left-radius: 9px;
+        border-bottom-right-radius: 9px;
+
+        & .menu-modal__username {
+            font-family: "LINE Seed JP", sans-serif;
+            padding: 0.5rem;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            font-style: italic;
+        }
+
+        & .menu-modal__buttons {
+            display: flex;
+            padding: 1rem;
+
+            & .communication-buttons {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.1rem;
+
+                & .communication-button {
+                    width: 20px;
+                    cursor: pointer;
+                }
+
+                & .communication-button__label {
+                    font-family: "LINE Seed JP", sans-serif;
+                    font-size: 0.7rem;
+                }
+            }
+        }
+    }
 }

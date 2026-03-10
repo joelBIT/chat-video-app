@@ -24,7 +24,7 @@ export function MenuModal({member, isOpen, close}: {member: ChatUser, isOpen: bo
         
     }, [isOpen, close]);
 
-    function handleClickOutside(e: any) {
+    function handleClickOutside(e: any): void {
         const value = e.target instanceof HTMLElement ? e.target : undefined;
         if (value && modalRef.current && !modalRef.current?.contains(value)) {
             close();
@@ -41,8 +41,30 @@ export function MenuModal({member, isOpen, close}: {member: ChatUser, isOpen: bo
 
     return (
         <div className="menu-modal" ref={modalRef}>
-            <button onClick={toPrivateChatRoom}>Chat</button>
-            <button>View Profile</button>
+            <section className="menu-modal__header">
+                <article className="user-image">
+                    <img src={member.avatar} alt="User Avatar" className="user-avatar" />
+                    <div className={member.online ? "online-status online" : "online-status"} />
+                </article>
+            </section>
+
+            <section className="menu-modal__content">
+                <h2 className="menu-modal__username"> {member.username} </h2>
+
+                <section className="menu-modal__buttons">
+                    <article className="communication-buttons">
+                        <img 
+                            src="/dm.svg" 
+                            alt="Chat icon" 
+                            title="Send DM" 
+                            className="communication-button" 
+                            onClick={toPrivateChatRoom}
+                        />
+
+                        <h2 className="communication-button__label"> Chat </h2>
+                    </article>
+                </section>
+            </section>
         </div>
     )
 }

@@ -33,7 +33,7 @@
             & .namespace-name {
                 font-family: "LINE Seed JP", sans-serif;
                 font-size: 1rem;
-                color: white;
+                color: var(--color-white);
             }
         }
 

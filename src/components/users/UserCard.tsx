@@ -22,15 +22,17 @@ export function UserCard({member}: {member: ChatUser}): ReactElement {
     }
 
     return (
-        <section className={member.username === user.username ? "userCard userCard-client" : "userCard"} onClick={openMenu}>
-            <article className="user-image">
-                <img src={member.avatar} alt="User Avatar" className="user-avatar" />
-                <div className={member.online ? "online-status online" : "online-status"} />
-            </article>
+        <>
+            <section className={member.username === user.username ? "userCard userCard-client" : "userCard"} onClick={openMenu}>
+                <article className="user-image">
+                    <img src={member.avatar} alt="User Avatar" className="user-avatar" />
+                    <div className={member.online ? "online-status online" : "online-status"} />
+                </article>
 
-            <h2 className="user-username"> {member.username} </h2>
-
+                <h2 className="user-username"> {member.username} </h2>
+            </section>
+            
             { openModal ? <MenuModal member={member} isOpen={openModal} close={() => setOpenModal(false)} /> : <></> }
-        </section>
+        </>
     )
 }
