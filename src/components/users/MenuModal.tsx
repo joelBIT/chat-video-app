@@ -42,10 +42,13 @@ export function MenuModal({member, isOpen, close}: {member: ChatUser, isOpen: bo
     return (
         <div className="menu-modal" ref={modalRef}>
             <section className="menu-modal__header">
-                <article className="user-image">
-                    <img src={member.avatar} alt="User Avatar" className="user-avatar" />
+                <img src={member.avatar} alt="User Avatar" className="user-avatar" />
+             
+                <section className="menu-modal__status">
+                    <h2 className="member-status"> {member.online ? "Online" : "Offline"} </h2>
+             
                     <div className={member.online ? "online-status online" : "online-status"} />
-                </article>
+                </section>
             </section>
 
             <section className="menu-modal__content">
@@ -59,7 +62,7 @@ export function MenuModal({member, isOpen, close}: {member: ChatUser, isOpen: bo
                         className="button__icon" 
                     />
 
-                    <h2 className="button__label"> Text </h2>
+                    <h2 className="button__label"> Chat </h2>
                 </article>
             </section>
         </div>

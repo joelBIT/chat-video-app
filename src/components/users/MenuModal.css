@@ -4,7 +4,7 @@
     position: absolute;
     right: 200px;
     z-index: 10;
-    width: 15rem;
+    width: 12rem;
     height: 15rem;
     border-radius: 9px;
     border: 1px solid var(--color-border);
@@ -18,24 +18,33 @@
         border-top-left-radius: 9px;
         border-top-right-radius: 9px;
 
-         & .user-image {
+        & .user-avatar {
             position: absolute;
             left: 40px;
             top: 40px;
+            width: 50px;
+            border-radius: 100%;
+        }
+
+        & .menu-modal__status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: absolute;
+            right: 7px;
+            top: 10px;
+
+            & .member-status {
+                color: var(--color-white);
+                font-family: "LINE Seed JP", sans-serif;
+                font-size: 0.7rem;
+            }
 
             & .online-status {
-                position: absolute;
                 width: 12px;
                 height: 12px;
                 border-radius: 100%;
-                left: 40px;
-                top: 40px;
                 background-color: red;
-            }
-
-            & .user-avatar {
-                width: 50px;
-                border-radius: 100%;
             }
 
             & .online {
