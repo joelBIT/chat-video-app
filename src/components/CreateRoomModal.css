@@ -27,6 +27,7 @@
             font-family: "LINE Seed JP", sans-serif;
             font-size: 1.2rem;
             padding: 0.5rem 1rem;
+            color: var(--color-username);
         }
 
         & .lock {
@@ -100,15 +101,26 @@
         }
     }
 
-    & .roomName__input {
-        background-color: var(--color-chat-background);
-        padding: 0.3rem;
-        outline: none;
-        border: 1px solid #d7cdcd63;
-        border-radius: 4px;
-        color: var(--color-white);
-        margin-left: 1rem;
-        margin-right: 1rem;
+    & #roomName-input {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+
+        & .roomName__input-label {
+            align-self: center;
+            font-size: 0.7rem;
+        }
+
+        & .roomName__input {
+            background-color: var(--color-chat-background);
+            padding: 0.3rem;
+            outline: none;
+            border: 1px solid #d7cdcd63;
+            border-radius: 4px;
+            color: var(--color-white);
+            margin-left: 1rem;
+            margin-right: 1rem;
+        }
     }
 
     & .createRoomModal__buttons {

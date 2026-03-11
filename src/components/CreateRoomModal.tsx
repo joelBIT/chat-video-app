@@ -35,7 +35,15 @@ export function CreateRoomModal({ close }: { close: () => void }): ReactElement 
                 <input type="checkbox" name="private-room" role="switch" className="lock" onChange={() => setPrivateRoom(!privateRoom)} />
             </section>
 
-            <input placeholder="Room Name" onChange={event => setRoomName(event.target.value)} className='roomName__input' />
+            <section id="roomName-input">
+                <h2 className='roomName__input-label'> Max 20 characters </h2>
+                <input 
+                    placeholder="Room Name" 
+                    maxLength={20} 
+                    onChange={event => setRoomName(event.target.value)} 
+                    className='roomName__input' 
+                />
+            </section>
 
             <section className='createRoomModal__buttons'>
                 <button onClick={close} className="app-button"> Cancel </button>
