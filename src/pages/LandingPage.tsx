@@ -19,11 +19,11 @@ export default function LandingPage(): ReactElement {
     
     return (
         <main id="landingPage">            
-            <p className="landing-text">Enter a username and connect to the Chat app</p>
+            <p className="landing-text"> Enter a username and connect to the Chat app </p>
 
             <section id="username-connection">
-                <input placeholder="Username" onChange={event => setUsername(event.target.value)} />
-                <button onClick={() => connect(username)} disabled={username.length < 1}> Connect </button>
+                <input className="login-input" placeholder="Username" onChange={event => setUsername(event.target.value)} />
+                <button className="login-button" onClick={() => connect(username)} disabled={username.length < 1}> Connect </button>
             </section>
 
             {

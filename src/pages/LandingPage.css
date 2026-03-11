@@ -5,18 +5,36 @@
     justify-content: center;
     gap: 1rem;
     width: 100%;
+    background-color: var(--color-background-light);
 
     & .landing-text {
         font-family: "LINE Seed JP", sans-serif;
         font-size: 1.3rem;
+        color: var(--color-white);
     }
 
     & #username-connection {
         display: flex;
         gap: 1rem;
 
-        & button {
+        & .login-input {
+            outline: none;
+        }
+
+        & .login-button {
+            font-family: "LINE Seed JP", sans-serif;
+            font-size: 1rem;
             width: fit-content;
+            padding: 0.4rem;
+            background-color: var(--color-text);
+            border-radius: 4px;
+            color: var(--color-white);
+            border: 1px solid var(--color-highlight);
+            cursor: pointer;
+
+            &:active {
+                border: none;
+            }
         }
     }
 }
