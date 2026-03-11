@@ -61,48 +61,50 @@ export function DmRoom(): ReactElement {
                 }
             </section>
 
-            {
-                activeCall || isCalling ? <button onClick={endCall}> Hangup </button> 
-                : 
-                <section className="chat-buttons">
-                    <article className="communication-button">
-                        <img 
-                            src="/audio.svg" 
-                            alt="Audio chat icon" 
-                            title="Call User" 
-                            className="button__icon" 
-                        />
+            <section id="chat-input-area">
+                {
+                    activeCall || isCalling ? <button onClick={endCall}> Hangup </button> 
+                    : 
+                    <section className="chat-buttons">
+                        <article className="communication-button">
+                            <img 
+                                src="/audio.svg" 
+                                alt="Audio chat icon" 
+                                title="Call User" 
+                                className="button__icon" 
+                            />
 
-                        <h2 className="button__label"> Audio </h2>
-                    </article>
+                            <h2 className="button__label"> Audio </h2>
+                        </article>
 
-                    <article className="communication-button" onClick={callUser}>
-                        <img 
-                            src="/video.svg" 
-                            alt="Video chat icon" 
-                            title="Video conference" 
-                            className="button__icon" 
-                        />
+                        <article className="communication-button" onClick={callUser}>
+                            <img 
+                                src="/video.svg" 
+                                alt="Video chat icon" 
+                                title="Video conference" 
+                                className="button__icon" 
+                            />
 
-                        <h2 className="button__label"> Video </h2>
-                    </article>
+                            <h2 className="button__label"> Video </h2>
+                        </article>
+                    </section>
+                }
+
+                {
+                    incomingCall ? <button onClick={answerCall}> Answer </button> : <></>       // TODO: Make incoming call a modal -> Answer/Deny
+                }
+
+                <section id="chat-message">
+                    <input 
+                        id="text-input" 
+                        className="text-input" 
+                        placeholder={`Message @${selectedRoom.name}`}
+                        value={message}
+                        onChange={e => setMessage(e.target.value)} 
+                        onKeyUp={sendDmMessage} 
+                        autoComplete="off"
+                    />
                 </section>
-            }
-
-            {
-                incomingCall ? <button onClick={answerCall}> Answer </button> : <></>       // TODO: Make incoming call a modal -> Answer/Deny
-            }
-
-            <section id="chat-message">
-                <input 
-                    id="text-input" 
-                    className="text-input" 
-                    placeholder={`Message @${selectedRoom.name}`}
-                    value={message}
-                    onChange={e => setMessage(e.target.value)} 
-                    onKeyUp={sendDmMessage} 
-                    autoComplete="off"
-                />
             </section>
         </section>
     )

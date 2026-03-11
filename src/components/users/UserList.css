@@ -7,6 +7,12 @@
     width: 350px;
     border-left: 1px solid var(--color-border);
     border-top: 1px solid var(--color-border);
+    max-height: 100vh;
+    height: 100%;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: black #FFFFFF20;
 
     & .userList-title {
         font-family: "LINE Seed JP", sans-serif;
