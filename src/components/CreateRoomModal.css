@@ -117,12 +117,4 @@
         padding-left: 1rem;
         padding-right: 1rem;
     }
-
-    & .closeButton,
-    & .createButton {
-        width: fit-content;
-        padding: 0.2rem;
-        margin: 0.5rem;
-        cursor: pointer;
-    }
 }

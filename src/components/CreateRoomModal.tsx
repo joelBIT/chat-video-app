@@ -38,8 +38,8 @@ export function CreateRoomModal({ close }: { close: () => void }): ReactElement 
             <input placeholder="Room Name" onChange={event => setRoomName(event.target.value)} className='roomName__input' />
 
             <section className='createRoomModal__buttons'>
-                <button onClick={close} className="closeButton"> Cancel </button>
-                <button onClick={createRoom} className="createButton" disabled={roomName.length === 0}> Create </button>
+                <button onClick={close} className="app-button"> Cancel </button>
+                <button onClick={createRoom} className="app-button" disabled={roomName.length === 0}> Create </button>
             </section>
         </dialog>
     );

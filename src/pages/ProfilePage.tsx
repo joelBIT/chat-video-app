@@ -72,7 +72,7 @@ export default function ProfilePage(): ReactElement {
                     </section>
                 </section>
 
-                <button className="update-button" onClick={updateUserProfile}> Update </button>
+                <button className="app-button" onClick={updateUserProfile}> Update </button>
 
                 {
                     updatedResponse.message.length > 0 ?

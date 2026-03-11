@@ -27,30 +27,5 @@
             margin-left: 1rem;
             margin-right: 1rem;
         }
-
-        & .login-button {
-            font-family: "LINE Seed JP", sans-serif;
-            font-size: 1rem;
-            width: fit-content;
-            padding: 0.4rem;
-            background-color: var(--color-text);
-            border-radius: 4px;
-            color: var(--color-white);
-            border: 1px solid var(--color-highlight);
-            cursor: pointer;
-
-            &:active {
-                border: none;
-            }
-
-            &:disabled {
-                opacity: 0.3;
-                cursor: default;
-
-                &:active {
-                    border: 1px solid var(--color-highlight);
-                }
-            }
-        }
     }
 }

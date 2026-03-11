@@ -23,7 +23,7 @@ export default function LandingPage(): ReactElement {
 
             <section id="username-connection">
                 <input className="login-input" placeholder="Username" onChange={event => setUsername(event.target.value)} />
-                <button className="login-button" onClick={() => connect(username)} disabled={username.length < 1}> Connect </button>
+                <button className="app-button" onClick={() => connect(username)} disabled={username.length < 1}> Connect </button>
             </section>
 
             {
