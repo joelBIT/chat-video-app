@@ -33,8 +33,8 @@
         & .lock {
             align-self: center;
             cursor: pointer;
-            --c1: #bd72c2;
-            --c2: #3b21a5;
+            --c1: #234d1e;
+            --c2: #31270a;
             appearance: none;
             font-size: 2rem;
             width: 4rem;
