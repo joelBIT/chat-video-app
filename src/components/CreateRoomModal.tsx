@@ -29,11 +29,13 @@ export function CreateRoomModal({ close }: { close: () => void }): ReactElement 
 
     return (
         <dialog id="createRoomModal" ref={dialogRef}>
-            <h1 className='createRoomModal__title'> Create Room </h1>
+            <section className='create-room__header'>
+                <h1 className='createRoomModal__title'> Create Room </h1>
+
+                <input type="checkbox" name="private-room" role="switch" className="lock" onChange={() => setPrivateRoom(!privateRoom)} />
+            </section>
 
             <input placeholder="Room Name" onChange={event => setRoomName(event.target.value)} className='roomName__input' />
-
-            <input type="checkbox" role="switch" className="lock" onChange={() => setPrivateRoom(!privateRoom)} />
 
             <section className='createRoomModal__buttons'>
                 <button onClick={close} className="closeButton"> Cancel </button>
