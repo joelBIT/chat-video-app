@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useRoom, useSocket, useUser } from "../hooks";
 import { getUsersInSelectedRoom, saveUser } from "../clientApplication/services/userService";
 import { NamespaceMenu } from "../components";
-import type { ChatUser } from "../types";
+import type { ActionState, ChatUser } from "../types";
 import { HOME_URL } from "../../socketApplication/utils";
 
 import "./ProfilePage.css";
@@ -17,8 +17,7 @@ export default function ProfilePage(): ReactElement {
     const { isConnected, updateUser } = useSocket();
     const { setRoomParticipants } = useRoom();
     const [selectedAvatar, setSelectedAvatar] = useState<string>(user.avatar);
-    const [username, setUsername] = useState<string>(user.username);
-    const [message, setMessage] = useState<string>('');
+    const [updatedResponse, setUpdatedResponse] = useState<ActionState>({message: '', success: false});
 
     if (!isConnected) {
         navigate(HOME_URL);
@@ -29,14 +28,14 @@ export default function ProfilePage(): ReactElement {
      * Only update the profile information if the server sends back "success" = true.
      */
     async function updateUserProfile(): Promise<void> {
-        const updatedUser: ChatUser = { username, id: user.id, avatar: selectedAvatar, online: user.online };
+        const updatedUser: ChatUser = { username: user.username, id: user.id, avatar: selectedAvatar, online: user.online };
         const response = await updateUser(updatedUser);
         if (response.success) {
             setUserInformation(updatedUser);
             saveUser(updatedUser);
             setRoomParticipants(getUsersInSelectedRoom());
         }
-        setMessage(response.message);
+        setUpdatedResponse(response);
     }
 
     return (
@@ -47,37 +46,37 @@ export default function ProfilePage(): ReactElement {
                 <h1 className="profile-title"> Profile information </h1>
 
                  <section id="select-avatar">
-                    <img 
-                        src="/mario.png" 
-                        alt="Mario avatar" 
-                        onClick={() => setSelectedAvatar("mario.png")}
-                        className={selectedAvatar === "mario.png" ? "selected-avatar": ""}
-                    />
+                    <h2 className="avatar-title"> Select Avatar </h2>
 
-                    <img 
-                        src="/wario.png" 
-                        alt="Wario avatar" 
-                        onClick={() => setSelectedAvatar("wario.png")} 
-                        className={selectedAvatar === "wario.png" ? "selected-avatar": ""}
-                    />
+                    <section className="avatars">
+                        <img 
+                            src="/mario.png" 
+                            alt="Mario avatar" 
+                            onClick={() => setSelectedAvatar("mario.png")}
+                            className={selectedAvatar === "mario.png" ? "selected-avatar": ""}
+                        />
 
-                    <img 
-                        src="/mushroom.png" 
-                        alt="Mushroom avatar" 
-                        onClick={() => setSelectedAvatar("mushroom.png")} 
-                        className={selectedAvatar === "mushroom.png" ? "selected-avatar": ""}
-                    />
+                        <img 
+                            src="/wario.png" 
+                            alt="Wario avatar" 
+                            onClick={() => setSelectedAvatar("wario.png")} 
+                            className={selectedAvatar === "wario.png" ? "selected-avatar": ""}
+                        />
+
+                        <img 
+                            src="/mushroom.png" 
+                            alt="Mushroom avatar" 
+                            onClick={() => setSelectedAvatar("mushroom.png")} 
+                            className={selectedAvatar === "mushroom.png" ? "selected-avatar": ""}
+                        />
+                    </section>
                 </section>
 
-                <section className="profile-username">
-                    <input placeholder="Username" value={username} onChange={event => setUsername(event.target.value)} />
-
-                    <button disabled={username.length < 1} onClick={updateUserProfile}> Save </button>
-                </section>
+                <button className="update-button" onClick={updateUserProfile}> Update </button>
 
                 {
-                    message.length > 0 ?
-                        <h2 className="message"> {message} </h2>
+                    updatedResponse.message.length > 0 ?
+                        <h2 className={updatedResponse.success ? "message" : "error-message"}> {updatedResponse.message} </h2>
                         : <></>
                 }
             </section>

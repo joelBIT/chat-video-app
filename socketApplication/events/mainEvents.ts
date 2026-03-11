@@ -23,7 +23,7 @@ export function initializeMainNamespaceEvents(io: Server): void {
         socket.on(USER_UPDATED, (updatedUser: ChatUser, ackCallback) => {
             const user = getUserByUsername(updatedUser.username);
             if (user && user.id !== updatedUser.id) {
-                ackCallback({ message: 'Username is already taken', success: false });
+                ackCallback({ message: 'Username is already taken', success: false });      // Updated user may have a new username that already exists
             } else {
                 saveUser(updatedUser);
                 io.except(socket.id).emit(USER_UPDATED, updatedUser);
