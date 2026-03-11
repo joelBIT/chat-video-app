@@ -20,7 +20,7 @@ export function UserList(): ReactElement {
     }
 
     return (
-        <section id="userList">
+        <section id="userList" className="scrollable">
             <h2 className="userList-title"> Members - {roomParticipants?.length} </h2>
             {
                 roomParticipants.map((user: ChatUser) => <UserCard key={user.username} member={user} />)

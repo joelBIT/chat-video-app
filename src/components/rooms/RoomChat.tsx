@@ -32,7 +32,7 @@ export function RoomChat(): ReactElement {
     
     return (
         <section id="roomChat">
-            <section id="message-area">
+            <section id="message-area" className="scrollable">
                 {
                     selectedRoom.history
                         .sort((message1: MessageType, message2: MessageType) => message2.date - message1.date)

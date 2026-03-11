@@ -8,6 +8,7 @@
     background-color: var(--color-background-dark);
     padding: 2rem 0.5rem;
     border-top: 1px solid var(--color-border);
+    max-height: 100vh;
 
     & .rooms-title {
         font-size: 1.2rem;
@@ -23,6 +24,8 @@
         flex-direction: column;
         gap: 0.5rem;
         width: 337px;
+        max-height: 38vh;
+        overflow-x: hidden;
     }
 
     & .available-game-rooms {

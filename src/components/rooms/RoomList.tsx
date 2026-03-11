@@ -28,7 +28,7 @@ export function RoomList(): ReactElement {
         return (
             <section id="roomList">
                 <h1 className="rooms-title">Rooms</h1>
-                <ul className="rooms-list">
+                <ul className="rooms-list scrollable">
                     {
                         memberGameRooms(user.id).map((room: Room) => <RoomCard key={room.id} room={room} />)
                     }
@@ -48,7 +48,7 @@ export function RoomList(): ReactElement {
                     />
                 </section>
                 
-                <ul className="rooms-list">
+                <ul className="rooms-list scrollable">
                     {
                         nonMemberGameRooms(user.id).map((room: Room) => <RoomCard key={room.id} room={room} />)
                     }
@@ -60,7 +60,7 @@ export function RoomList(): ReactElement {
     return (
         <section id="roomList">
             <h1 className="rooms-title">Rooms</h1>
-                <ul className="rooms-list">
+                <ul className="rooms-list scrollable">
                     {
                         getSelectedNamespaceRooms().map((room: Room) => <CommonRoomCard key={room.id} room={room} />)
                     }

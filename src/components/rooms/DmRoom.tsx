@@ -53,7 +53,7 @@ export function DmRoom(): ReactElement {
                 <video className="video-player" id="remote-video" autoPlay playsInline controls />
             </section>
 
-            <section id="message-area">
+            <section id="message-area" className="scrollable">
                 {
                     selectedRoom.history
                         .sort((message1: MessageType, message2: MessageType) => message2.date - message1.date)
