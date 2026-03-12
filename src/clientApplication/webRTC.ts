@@ -97,7 +97,7 @@ function createPeerConnection(username: string, offer?: Offer): Promise<void> {
             console.log(peerConnection.signalingState);
         });
 
-        peerConnection.addEventListener('icecandidate', e => {
+        peerConnection.addEventListener('icecandidate', (e: RTCPeerConnectionIceEvent) => {
             if (e.candidate) {
                 multiplexSockets[NAMESPACE_ID_DM].emit(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, {
                     iceCandidate: e.candidate,
@@ -107,9 +107,8 @@ function createPeerConnection(username: string, offer?: Offer): Promise<void> {
             }
         })
         
-        peerConnection.addEventListener('track', e => {
+        peerConnection.addEventListener('track', (e: RTCTrackEvent) => {
             e.streams[0].getTracks().forEach((track: MediaStreamTrack) => {
-                //remoteStream.addTrack(track, remoteStream);
                 remoteStream.addTrack(track);
             });
         })
@@ -134,7 +133,7 @@ export async function answerOffer(offer: Offer): Promise<void> {
     await fetchUserMedia(offer.video);                     // Block the application until the user approves
     await createPeerConnection(offer.answererUserName, offer);
 
-    const answer = await peerConnection.createAnswer({});
+    const answer: RTCSessionDescriptionInit = await peerConnection.createAnswer({});
     await peerConnection.setLocalDescription(answer);           // This is CLIENT2, and CLIENT2 uses the answer as the localDesc
 
     offer.answer = answer;                    // Add the answer to the offer so the server knows which offer this is related to
@@ -157,16 +156,17 @@ export async function answerOffer(offer: Offer): Promise<void> {
     }
 }
 
+/**
+ * Initiate a video or audio (video = false) call to a remote user.
+ */
 export async function call(fromUsername: string, toUsername: string, video: boolean) {
     await fetchUserMedia(video);
 
     // peerConnection is all set with our STUN servers sent over
     await createPeerConnection(fromUsername);
 
-    // Create offer
     try {
-        const offer = await peerConnection.createOffer();
-        console.log(offer);
+        const offer: RTCSessionDescriptionInit = await peerConnection.createOffer();
         peerConnection.setLocalDescription(offer);
         didIOffer = true;
         multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER, fromUsername, toUsername, video, offer);             // Send offer to signalingServer
