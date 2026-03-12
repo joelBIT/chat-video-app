@@ -48,9 +48,9 @@ export function DmRoom(): ReactElement {
     return (
         <section id="dmRoom">
             <section id="videos">
-                <video className="video-player" id="local-video" autoPlay playsInline controls />
+                <video className="video-player" id="local-video" autoPlay playsInline />
 
-                <video className="video-player" id="remote-video" autoPlay playsInline controls />
+                <video className="video-player" id="remote-video" autoPlay playsInline />
             </section>
 
             <section id="message-area" className="scrollable">
@@ -63,7 +63,7 @@ export function DmRoom(): ReactElement {
 
             <section id="chat-input-area">
                 {
-                    activeCall || isCalling ? <button onClick={endCall}> Hangup </button> 
+                    activeCall || isCalling ? <button className="app-button" onClick={endCall}> Hangup </button> 
                     : 
                     <section className="chat-buttons">
                         <article className="communication-button">
@@ -91,7 +91,7 @@ export function DmRoom(): ReactElement {
                 }
 
                 {
-                    incomingCall ? <button onClick={answerCall}> Answer </button> : <></>       // TODO: Make incoming call a modal -> Answer/Deny
+                    incomingCall ? <button className="app-button" onClick={answerCall}> Answer </button> : <></>       // TODO: Make incoming call a modal -> Answer/Deny
                 }
 
                 <section id="chat-message">

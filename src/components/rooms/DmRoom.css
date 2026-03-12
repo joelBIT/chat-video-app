@@ -75,6 +75,10 @@
             }
         }
 
+        & .app-button {
+            align-self: center;
+        }
+
         & #chat-message {
             display: flex;
             gap: 1rem;
