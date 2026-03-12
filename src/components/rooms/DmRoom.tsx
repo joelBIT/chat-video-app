@@ -27,9 +27,15 @@ export function DmRoom(): ReactElement {
         }
     }
 
-    function callUser(): void {
-        call(user.username, getSelectedRoom()?.name);
-        setIsCalling(true);
+    /**
+     * Parameter 'video' is true if it is a video call, otherwise false (only audio).
+     */
+    function callUser(video: boolean): void {
+        const remoteUsername: string | undefined = getSelectedRoom()?.name;
+        if (remoteUsername) {
+            call(user.username, remoteUsername, video);
+            setIsCalling(true);
+        }
     }
 
     function endCall(): void {
@@ -48,9 +54,9 @@ export function DmRoom(): ReactElement {
     return (
         <section id="dmRoom">
             <section id="videos">
-                <video className="video-player" id="local-video" autoPlay playsInline controls />
+                <video className="video-player" id="local-video" autoPlay playsInline />
 
-                <video className="video-player" id="remote-video" autoPlay playsInline controls />
+                <video className="video-player" id="remote-video" autoPlay playsInline />
             </section>
 
             <section id="message-area" className="scrollable">
@@ -63,10 +69,10 @@ export function DmRoom(): ReactElement {
 
             <section id="chat-input-area">
                 {
-                    activeCall || isCalling ? <button onClick={endCall}> Hangup </button> 
+                    activeCall || isCalling ? <button className="app-button" onClick={endCall}> Hangup </button> 
                     : 
                     <section className="chat-buttons">
-                        <article className="communication-button">
+                        <article className="communication-button" onClick={() => callUser(false)}>
                             <img 
                                 src="/audio.svg" 
                                 alt="Audio chat icon" 
@@ -77,7 +83,7 @@ export function DmRoom(): ReactElement {
                             <h2 className="button__label"> Audio </h2>
                         </article>
 
-                        <article className="communication-button" onClick={callUser}>
+                        <article className="communication-button" onClick={() => callUser(true)}>
                             <img 
                                 src="/video.svg" 
                                 alt="Video chat icon" 
@@ -91,7 +97,7 @@ export function DmRoom(): ReactElement {
                 }
 
                 {
-                    incomingCall ? <button onClick={answerCall}> Answer </button> : <></>       // TODO: Make incoming call a modal -> Answer/Deny
+                    incomingCall ? <button className="app-button" onClick={answerCall}> Answer </button> : <></>       // TODO: Make incoming call a modal -> Answer/Deny
                 }
 
                 <section id="chat-message">

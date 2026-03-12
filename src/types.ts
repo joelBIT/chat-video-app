@@ -40,5 +40,6 @@ export type Offer = {
     offerIceCandidates: RTCIceCandidate[],
     answererUserName: string,
     answer: RTCSessionDescriptionInit | null,       // An answer may be null if the Offer is new
-    answererIceCandidates: RTCIceCandidate[]
+    answererIceCandidates: RTCIceCandidate[],
+    video:  boolean                                 // True if video, otherwise only audio
 }

@@ -14,7 +14,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
     const namespace: Namespace = getNamespaceByID(NAMESPACE_ID_DM);
 
     io.of(namespace.endpoint).on("connection", async (socket: ISocket) => {
-        socket.on(NEW_OFFER, (fromUsername: string, toUsername: string, newOffer: RTCSessionDescriptionInit) => {
+        socket.on(NEW_OFFER, (fromUsername: string, toUsername: string, video: boolean, newOffer: RTCSessionDescriptionInit) => {
             const user: ChatUser | undefined = getUserByUsername(toUsername);
             if (!user) {
                 console.log(`No user found for username ${toUsername}`);
@@ -27,7 +27,8 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
                 offerIceCandidates: [],
                 answererUserName: toUsername,
                 answer: null,
-                answererIceCandidates: []
+                answererIceCandidates: [],
+                video
             };
             offers.push(offer);
 
