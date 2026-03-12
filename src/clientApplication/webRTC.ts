@@ -1,5 +1,6 @@
 import { multiplexSockets } from "../socket-client";
 import { NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER } from "../../socketApplication/utils";
+import type { Offer } from "../types";
 
 /**
  * The client will send a request to a STUN server on the Internet who will reply with the 
@@ -16,33 +17,39 @@ const peerConfiguration = {
     ]
 }
 
-let localStream;            // Hold the local video stream
-let remoteStream;           // Hold the remote video stream
-let peerConnection;         // The peer connection that the two clients use to talk
-let didIOffer = false;      // True if you initiated the call
+let localStream: MediaStream;            // Hold the local video stream
+let remoteStream: MediaStream;           // Hold the remote video stream
+let peerConnection: RTCPeerConnection;   // The peer connection that the two clients use to talk
+let didIOffer: boolean = false;          // True if you initiated the call
 
 /**
  * A user must approve that the application uses media devices. 
  * The 'video' parameter is true if it is a video call, otherwise false (audio only).
  */
-function fetchUserMedia(video) {
+function fetchUserMedia(video: boolean): Promise<void> {
     return new Promise( async(resolve, reject) => {
         try {
-            const videosEl = document.querySelector('#videos');
-            videosEl.style.display = "flex";
-            const localVideoEl = document.querySelector('#local-video');
-            const stream = await navigator.mediaDevices.getUserMedia(video ? {
+            const videosEl: HTMLElement | null = document.querySelector('#videos');
+            if (videosEl) {
+                videosEl.style.display = "flex";
+            }
+            
+            const localVideoEl: HTMLVideoElement | null = document.querySelector('#local-video');
+            const stream: MediaStream = await navigator.mediaDevices.getUserMedia(video ? {
                 video: true,
                 audio: true
             } : {
                 audio: true
             });
 
-            localVideoEl.style.display = "flex";
-            localVideoEl.srcObject = stream;
+            if (localVideoEl) {
+                localVideoEl.style.display = "flex";
+                localVideoEl.srcObject = stream;
+            }
+            
             localStream = stream;    
             resolve();          // User approved
-        } catch(error) {
+        } catch (error) {
             console.log(error);
             reject();           // User did not approve
         }
@@ -53,8 +60,10 @@ function fetchUserMedia(video) {
  * Is called by socket listeners when an 'answer-response' event is emitted.
  * At this point, the offer and answer have been exchanged and client 1 needs to set the remote.
  */
-export async function addAnswer(offerObject) {
-    await peerConnection.setRemoteDescription(offerObject.answer);
+export async function addAnswer(offer: Offer) {
+    if (offer && offer.answer) {
+        await peerConnection.setRemoteDescription(offer.answer);
+    }
 }
 
 /**
@@ -64,14 +73,21 @@ export async function addAnswer(offerObject) {
  * Tracks are the fundamental, individual components of real-time communication sent between peers, 
  * enabling functionalities like pausing video while keeping audio active, or managing multi-camera setups.
  */
-function createPeerConnection(offerObject, username) {
+function createPeerConnection(username: string, offer?: Offer): Promise<void> {
     return new Promise( async(resolve, reject) => {
-        peerConnection = await new RTCPeerConnection(peerConfiguration);
-        remoteStream = new MediaStream();
-        const remoteVideoEl = document.querySelector('#remote-video');
-        remoteVideoEl.srcObject = remoteStream;
+        try {
+            peerConnection = await new RTCPeerConnection(peerConfiguration);
+            remoteStream = new MediaStream();
+        } catch (error) {
+            reject();
+        }
+        
+        const remoteVideoEl: HTMLVideoElement | null = document.querySelector('#remote-video');
+        if (remoteVideoEl) {
+            remoteVideoEl.srcObject = remoteStream;
+        }
 
-        localStream.getTracks().forEach( track => {
+        localStream.getTracks().forEach((track: MediaStreamTrack) => {
             //add localtracks so that they can be sent once the connection is established
             peerConnection.addTrack(track, localStream);
         })
@@ -92,60 +108,60 @@ function createPeerConnection(offerObject, username) {
         })
         
         peerConnection.addEventListener('track', e => {
-            e.streams[0].getTracks().forEach(track => {
-                remoteStream.addTrack(track, remoteStream);
+            e.streams[0].getTracks().forEach((track: MediaStreamTrack) => {
+                //remoteStream.addTrack(track, remoteStream);
+                remoteStream.addTrack(track);
             });
         })
 
-        if (offerObject) {
+        if (offer) {
             // This won't be set when called from call();
             // Will be set when we call from answerOffer()
             // console.log(peerConnection.signalingState) should be stable because no setDesc has been run yet
-            await peerConnection.setRemoteDescription(offerObject.offer);
+            await peerConnection.setRemoteDescription(offer.offer);
             // console.log(peerConnection.signalingState) should be have-remote-offer, because client2 has setRemoteDesc on the offer
         }
+
         resolve();
-    })
+    });
 }
 
-export function addNewIceCandidate(iceCandidate) {
+export function addNewIceCandidate(iceCandidate: RTCIceCandidateInit) {
     peerConnection.addIceCandidate(iceCandidate);
-    console.log("======Added Ice Candidate======");
 }
 
-export async function answerOffer(offerObject) {
-    await fetchUserMedia(offerObject.video);                     // Block the application until the user approves
-    await createPeerConnection(offerObject, offerObject.answererUserName);
+export async function answerOffer(offer: Offer): Promise<void> {
+    await fetchUserMedia(offer.video);                     // Block the application until the user approves
+    await createPeerConnection(offer.answererUserName, offer);
 
-    const answer = await peerConnection.createAnswer({});       // Just to make the docs happy
+    const answer = await peerConnection.createAnswer({});
     await peerConnection.setLocalDescription(answer);           // This is CLIENT2, and CLIENT2 uses the answer as the localDesc
-    console.log(offerObject);
-    console.log(answer);
-    console.log(peerConnection.signalingState)      // Should be have-local-pranswer because CLIENT2 has set its local desc to it's answer (but it won't be)
 
-    offerObject.answer = answer;                    // Add the answer to the offerObj so the server knows which offer this is related to
+    offer.answer = answer;                    // Add the answer to the offer so the server knows which offer this is related to
     
     // Emit the answer to the signaling server, so it can emit to CLIENT1
     // Expect a response from the server with the already existing ICE candidates
-    const offerIceCandidates = await multiplexSockets[NAMESPACE_ID_DM].emitWithAck(NEW_ANSWER, offerObject);
-    offerIceCandidates.forEach( candidate => {
+    const offerIceCandidates = await multiplexSockets[NAMESPACE_ID_DM].emitWithAck(NEW_ANSWER, offer);
+    offerIceCandidates.forEach((candidate: RTCIceCandidateInit) => {
         peerConnection.addIceCandidate(candidate);
-        console.log("======Added Ice Candidate======");
     });
 
-    const localVideoEl = document.querySelector('#local-video');
-    const remoteVideoEl = document.querySelector('#remote-video');
-    remoteVideoEl.srcObject = remoteStream;
-    localVideoEl.srcObject = localStream;
+    const localVideoEl: HTMLVideoElement | null = document.querySelector('#local-video');
+    if (localVideoEl) {
+        localVideoEl.srcObject = localStream;
+    }
 
-    console.log(offerIceCandidates);
+    const remoteVideoEl: HTMLVideoElement | null = document.querySelector('#remote-video');
+    if (remoteVideoEl) {
+        remoteVideoEl.srcObject = remoteStream;
+    }
 }
 
-export async function call(fromUsername, toUsername, video) {
+export async function call(fromUsername: string, toUsername: string, video: boolean) {
     await fetchUserMedia(video);
 
     // peerConnection is all set with our STUN servers sent over
-    await createPeerConnection(null, fromUsername);
+    await createPeerConnection(fromUsername);
 
     // Create offer
     try {
@@ -159,39 +175,36 @@ export async function call(fromUsername, toUsername, video) {
     }
 }
 
-export function closeVideoCall() {
-    const localVideoEl = document.querySelector('#local-video');
-    const remoteVideoEl = document.querySelector('#remote-video');
-
+export function closeVideoCall(): void {
     if (peerConnection) {
         peerConnection.ontrack = null;
-        peerConnection.onremovetrack = null;
-        peerConnection.onremovestream = null;
         peerConnection.onicecandidate = null;
         peerConnection.oniceconnectionstatechange = null;
         peerConnection.onsignalingstatechange = null;
         peerConnection.onicegatheringstatechange = null;
         peerConnection.onnegotiationneeded = null;
 
-        if (remoteVideoEl.srcObject) {
-            remoteVideoEl.srcObject.getTracks().forEach((track) => track.stop());
+        const remoteVideoEl: HTMLVideoElement | null = document.querySelector('#remote-video');
+        if (remoteVideoEl && remoteVideoEl.srcObject && remoteVideoEl.srcObject instanceof MediaStream) {
+            remoteVideoEl.srcObject.getTracks().forEach((track: MediaStreamTrack) => track.stop());
             remoteVideoEl.srcObject = null;
+            remoteVideoEl.removeAttribute("src");
+            remoteVideoEl.removeAttribute("srcObject");
         }
 
-        if (localVideoEl.srcObject) {
-            localVideoEl.srcObject.getTracks().forEach((track) => track.stop());
+        const localVideoEl: HTMLVideoElement | null = document.querySelector('#local-video');
+        if (localVideoEl && localVideoEl.srcObject && localVideoEl.srcObject instanceof MediaStream) {
+            localVideoEl.srcObject.getTracks().forEach((track: MediaStreamTrack) => track.stop());
             localVideoEl.srcObject = null;
+            localVideoEl.removeAttribute("src");
+            localVideoEl.removeAttribute("srcObject");
         }
 
         peerConnection.close();
-        peerConnection = null;
     }
 
-    remoteVideoEl.removeAttribute("src");
-    remoteVideoEl.removeAttribute("srcObject");
-    localVideoEl.removeAttribute("src");
-    localVideoEl.removeAttribute("srcObject");
-
-    const videosEl = document.querySelector('#videos');
-    videosEl.style.display = "none";
+    const videosEl: HTMLElement | null = document.querySelector('#videos');
+    if (videosEl) {
+        videosEl.style.display = "none";
+    }
 }

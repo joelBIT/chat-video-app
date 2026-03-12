@@ -31,8 +31,11 @@ export function DmRoom(): ReactElement {
      * Parameter 'video' is true if it is a video call, otherwise false (only audio).
      */
     function callUser(video: boolean): void {
-        call(user.username, getSelectedRoom()?.name, video);
-        setIsCalling(true);
+        const remoteUsername: string | undefined = getSelectedRoom()?.name;
+        if (remoteUsername) {
+            call(user.username, remoteUsername, video);
+            setIsCalling(true);
+        }
     }
 
     function endCall(): void {
