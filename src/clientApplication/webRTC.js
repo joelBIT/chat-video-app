@@ -22,16 +22,19 @@ let peerConnection;         // The peer connection that the two clients use to t
 let didIOffer = false;      // True if you initiated the call
 
 /**
- * A user must approve that the application uses media devices.
+ * A user must approve that the application uses media devices. 
+ * The 'video' parameter is true if it is a video call, otherwise false (audio only).
  */
-function fetchUserMedia() {
+function fetchUserMedia(video) {
     return new Promise( async(resolve, reject) => {
         try {
             const videosEl = document.querySelector('#videos');
             videosEl.style.display = "flex";
             const localVideoEl = document.querySelector('#local-video');
-            const stream = await navigator.mediaDevices.getUserMedia({
+            const stream = await navigator.mediaDevices.getUserMedia(video ? {
                 video: true,
+                audio: true
+            } : {
                 audio: true
             });
 
@@ -52,7 +55,6 @@ function fetchUserMedia() {
  */
 export async function addAnswer(offerObject) {
     await peerConnection.setRemoteDescription(offerObject.answer);
-    console.log(peerConnection.signalingState);
 }
 
 /**
@@ -80,9 +82,6 @@ function createPeerConnection(offerObject, username) {
         });
 
         peerConnection.addEventListener('icecandidate', e => {
-            console.log('........Ice candidate found!......');
-            console.log(e);
-
             if (e.candidate) {
                 multiplexSockets[NAMESPACE_ID_DM].emit(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, {
                     iceCandidate: e.candidate,
@@ -93,10 +92,7 @@ function createPeerConnection(offerObject, username) {
         })
         
         peerConnection.addEventListener('track', e => {
-            console.log("Got a track from the other peer");
-            console.log(e);
-
-            e.streams[0].getTracks().forEach( track => {
+            e.streams[0].getTracks().forEach(track => {
                 remoteStream.addTrack(track, remoteStream);
             });
         })
@@ -118,7 +114,7 @@ export function addNewIceCandidate(iceCandidate) {
 }
 
 export async function answerOffer(offerObject) {
-    await fetchUserMedia();                     // Block the application until the user approves
+    await fetchUserMedia(offerObject.video);                     // Block the application until the user approves
     await createPeerConnection(offerObject, offerObject.answererUserName);
 
     const answer = await peerConnection.createAnswer({});       // Just to make the docs happy
@@ -145,8 +141,8 @@ export async function answerOffer(offerObject) {
     console.log(offerIceCandidates);
 }
 
-export async function call(fromUsername, toUsername) {
-    await fetchUserMedia();
+export async function call(fromUsername, toUsername, video) {
+    await fetchUserMedia(video);
 
     // peerConnection is all set with our STUN servers sent over
     await createPeerConnection(null, fromUsername);
@@ -157,7 +153,7 @@ export async function call(fromUsername, toUsername) {
         console.log(offer);
         peerConnection.setLocalDescription(offer);
         didIOffer = true;
-        multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER, fromUsername, toUsername, offer);             // Send offer to signalingServer
+        multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER, fromUsername, toUsername, video, offer);             // Send offer to signalingServer
     } catch (error) {
         console.log(error);
     }

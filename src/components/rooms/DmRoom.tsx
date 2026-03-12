@@ -27,8 +27,11 @@ export function DmRoom(): ReactElement {
         }
     }
 
-    function callUser(): void {
-        call(user.username, getSelectedRoom()?.name);
+    /**
+     * Parameter 'video' is true if it is a video call, otherwise false (only audio).
+     */
+    function callUser(video: boolean): void {
+        call(user.username, getSelectedRoom()?.name, video);
         setIsCalling(true);
     }
 
@@ -66,7 +69,7 @@ export function DmRoom(): ReactElement {
                     activeCall || isCalling ? <button className="app-button" onClick={endCall}> Hangup </button> 
                     : 
                     <section className="chat-buttons">
-                        <article className="communication-button">
+                        <article className="communication-button" onClick={() => callUser(false)}>
                             <img 
                                 src="/audio.svg" 
                                 alt="Audio chat icon" 
@@ -77,7 +80,7 @@ export function DmRoom(): ReactElement {
                             <h2 className="button__label"> Audio </h2>
                         </article>
 
-                        <article className="communication-button" onClick={callUser}>
+                        <article className="communication-button" onClick={() => callUser(true)}>
                             <img 
                                 src="/video.svg" 
                                 alt="Video chat icon" 
