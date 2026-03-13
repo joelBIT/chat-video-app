@@ -19,8 +19,8 @@ const peerConfiguration = {
 
 export let localStream: MediaStream;            // Hold the local video stream
 export let remoteStream: MediaStream;           // Hold the remote video stream
-let peerConnection: RTCPeerConnection;   // The peer connection that the two clients use to talk
-let didIOffer: boolean = false;          // True if you initiated the call
+let peerConnection: RTCPeerConnection | null;   // The peer connection that the two clients use to talk
+let didIOffer: boolean = false;                 // True if you initiated the call
 
 /**
  * A user must approve that the application uses media devices. 
@@ -61,7 +61,7 @@ function fetchUserMedia(video: boolean): Promise<void> {
  * At this point, the offer and answer have been exchanged and client 1 needs to set the remote.
  */
 export async function addAnswer(offer: Offer) {
-    if (offer && offer.answer) {
+    if (offer && offer.answer && peerConnection) {
         await peerConnection.setRemoteDescription(offer.answer);
     }
 }
@@ -78,81 +78,85 @@ function createPeerConnection(username: string, offer?: Offer): Promise<void> {
         try {
             peerConnection = await new RTCPeerConnection(peerConfiguration);
             remoteStream = new MediaStream();
+
+            const remoteVideoEl: HTMLVideoElement | null = document.querySelector('#remote-video');
+            if (remoteVideoEl) {
+                remoteVideoEl.srcObject = remoteStream;
+            }
+
+            localStream.getTracks().forEach((track: MediaStreamTrack) => {
+                //add localtracks so that they can be sent once the connection is established
+                peerConnection?.addTrack(track, localStream);
+            })
+
+            peerConnection.addEventListener("signalingstatechange", e => {
+                console.log(e);
+                console.log(peerConnection?.signalingState);
+            });
+
+            peerConnection.addEventListener('icecandidate', (e: RTCPeerConnectionIceEvent) => {
+                if (e.candidate) {
+                    multiplexSockets[NAMESPACE_ID_DM].emit(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, {
+                        iceCandidate: e.candidate,
+                        iceUserName: username,
+                        didIOffer
+                    });
+                }
+            })
+            
+            peerConnection.addEventListener('track', (e: RTCTrackEvent) => {
+                e.streams[0].getTracks().forEach((track: MediaStreamTrack) => {
+                    remoteStream.addTrack(track);
+                });
+            })
+
+            if (offer) {
+                // This won't be set when called from call();
+                // Will be set when we call from answerOffer()
+                // console.log(peerConnection.signalingState) should be stable because no setDesc has been run yet
+                await peerConnection.setRemoteDescription(offer.offer);
+                // console.log(peerConnection.signalingState) should be have-remote-offer, because client2 has setRemoteDesc on the offer
+            }
+
+            resolve();
         } catch (error) {
             reject();
         }
-        
-        const remoteVideoEl: HTMLVideoElement | null = document.querySelector('#remote-video');
-        if (remoteVideoEl) {
-            remoteVideoEl.srcObject = remoteStream;
-        }
-
-        localStream.getTracks().forEach((track: MediaStreamTrack) => {
-            //add localtracks so that they can be sent once the connection is established
-            peerConnection.addTrack(track, localStream);
-        })
-
-        peerConnection.addEventListener("signalingstatechange", e => {
-            console.log(e);
-            console.log(peerConnection.signalingState);
-        });
-
-        peerConnection.addEventListener('icecandidate', (e: RTCPeerConnectionIceEvent) => {
-            if (e.candidate) {
-                multiplexSockets[NAMESPACE_ID_DM].emit(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, {
-                    iceCandidate: e.candidate,
-                    iceUserName: username,
-                    didIOffer
-                });
-            }
-        })
-        
-        peerConnection.addEventListener('track', (e: RTCTrackEvent) => {
-            e.streams[0].getTracks().forEach((track: MediaStreamTrack) => {
-                remoteStream.addTrack(track);
-            });
-        })
-
-        if (offer) {
-            // This won't be set when called from call();
-            // Will be set when we call from answerOffer()
-            // console.log(peerConnection.signalingState) should be stable because no setDesc has been run yet
-            await peerConnection.setRemoteDescription(offer.offer);
-            // console.log(peerConnection.signalingState) should be have-remote-offer, because client2 has setRemoteDesc on the offer
-        }
-
-        resolve();
     });
 }
 
 export function addNewIceCandidate(iceCandidate: RTCIceCandidateInit) {
-    peerConnection.addIceCandidate(iceCandidate);
+    if (peerConnection) {
+        peerConnection.addIceCandidate(iceCandidate);
+    }
 }
 
 export async function answerOffer(offer: Offer): Promise<void> {
     await fetchUserMedia(offer.video);                     // Block the application until the user approves
     await createPeerConnection(offer.answererUserName, offer);
 
-    const answer: RTCSessionDescriptionInit = await peerConnection.createAnswer({});
-    await peerConnection.setLocalDescription(answer);           // This is CLIENT2, and CLIENT2 uses the answer as the localDesc
+    if (peerConnection) {
+        const answer: RTCSessionDescriptionInit = await peerConnection.createAnswer({});
+        await peerConnection.setLocalDescription(answer);           // This is CLIENT2, and CLIENT2 uses the answer as the localDesc
 
-    offer.answer = answer;                    // Add the answer to the offer so the server knows which offer this is related to
-    
-    // Emit the answer to the signaling server, so it can emit to CLIENT1
-    // Expect a response from the server with the already existing ICE candidates
-    const offerIceCandidates = await multiplexSockets[NAMESPACE_ID_DM].emitWithAck(NEW_ANSWER, offer);
-    offerIceCandidates.forEach((candidate: RTCIceCandidateInit) => {
-        peerConnection.addIceCandidate(candidate);
-    });
+        offer.answer = answer;                    // Add the answer to the offer so the server knows which offer this is related to
+        
+        // Emit the answer to the signaling server, so it can emit to CLIENT1
+        // Expect a response from the server with the already existing ICE candidates
+        const offerIceCandidates = await multiplexSockets[NAMESPACE_ID_DM].emitWithAck(NEW_ANSWER, offer);
+        offerIceCandidates.forEach((candidate: RTCIceCandidateInit) => {
+            peerConnection?.addIceCandidate(candidate);
+        });
 
-    const localVideoEl: HTMLVideoElement | null = document.querySelector('#local-video');
-    if (localVideoEl) {
-        localVideoEl.srcObject = localStream;
-    }
+        const localVideoEl: HTMLVideoElement | null = document.querySelector('#local-video');
+        if (localVideoEl) {
+            localVideoEl.srcObject = localStream;
+        }
 
-    const remoteVideoEl: HTMLVideoElement | null = document.querySelector('#remote-video');
-    if (remoteVideoEl) {
-        remoteVideoEl.srcObject = remoteStream;
+        const remoteVideoEl: HTMLVideoElement | null = document.querySelector('#remote-video');
+        if (remoteVideoEl) {
+            remoteVideoEl.srcObject = remoteStream;
+        }
     }
 }
 
@@ -164,14 +168,16 @@ export async function call(fromUsername: string, toUsername: string, video: bool
 
     // peerConnection is all set with our STUN servers sent over
     await createPeerConnection(fromUsername);
-
-    try {
-        const offer: RTCSessionDescriptionInit = await peerConnection.createOffer();
-        peerConnection.setLocalDescription(offer);
-        didIOffer = true;
-        multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER, fromUsername, toUsername, video, offer);             // Send offer to signalingServer
-    } catch (error) {
-        console.log(error);
+    
+    if (peerConnection) {
+        try {
+            const offer: RTCSessionDescriptionInit = await peerConnection.createOffer();
+            peerConnection.setLocalDescription(offer);
+            didIOffer = true;
+            multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER, fromUsername, toUsername, video, offer);             // Send offer to signalingServer
+        } catch (error) {
+            console.log(error);
+        }
     }
 }
 
@@ -201,6 +207,7 @@ export function closeVideoCall(): void {
         }
 
         peerConnection.close();
+        peerConnection = null;
     }
 
     const videosEl: HTMLElement | null = document.querySelector('#videos');
