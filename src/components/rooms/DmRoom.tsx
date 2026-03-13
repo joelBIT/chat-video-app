@@ -39,8 +39,8 @@ export function DmRoom(): ReactElement {
     }
 
     function endCall(): void {
+        hangup(isCalling, user.username);
         setIsCalling(false);
-        hangup();
     }
 
     if (!selectedRoom) {

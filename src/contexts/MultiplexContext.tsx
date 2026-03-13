@@ -8,14 +8,14 @@ import { saveConversationMessage, saveMessage } from "../clientApplication/servi
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
 import { addAnswer, addNewIceCandidate, answerOffer, closeVideoCall } from "../clientApplication/webRTC";
 import type { Message, Namespace, Offer, Room } from "../types";
-import { ANSWER_RESPONSE, CHAT_MESSAGE, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../socketApplication/utils";
+import { ANSWER_RESPONSE, CHAT_MESSAGE, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, NEW_OFFER_ENDED, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../socketApplication/utils";
 
 export interface MultiplexContextProvider {
     connectMultiplexSockets: (namespaces: Namespace[]) => void;
     incomingCall: boolean;
     activeCall: boolean;
     answerCall: () => Promise<void>;
-    hangup: () => void;
+    hangup: (isCalling: boolean, callerUsername: string) => void;
     disconnectMultiplexSockets: () => void;
 }
 
@@ -64,6 +64,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
 
         if (namespace.id === NAMESPACE_ID_DM) {
             socket.on(NEW_OFFER_AWAITING, onNewOfferAwaiting);
+            socket.on(NEW_OFFER_ENDED, onNewOfferCancelled);
             socket.on(ANSWER_RESPONSE, onAnswerResponse);
             socket.on(RECEIVED_ICE_CANDIDATE_FROM_SERVER, onReceivedIceCandidateFromServer);
         }
@@ -163,10 +164,17 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         setActiveCall(true);
     }
 
-    function hangup(): void {
+    /**
+     * The isCalling parameter is true if the call has not been answered yet. In this case, the remote user must be informed that
+     * the call has been cancelled so the remote user cannot answer a call that does not exist.
+     */
+    function hangup(isCalling: boolean, callerUsername: string): void {
         closeVideoCall();
         setActiveCall(false);
         setIncomingCall(false);
+        if (isCalling) {
+            multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER_ENDED, callerUsername);
+        }
     }
 
     /**
@@ -175,6 +183,11 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     function onNewOfferAwaiting(offer: Offer): void {
         setIncomingCall(true);
         setOffers([...offers, offer]);
+    }
+
+    function onNewOfferCancelled(callerUsername: string): void {
+        const remainingOffers = offers.filter((offer: Offer) => offer.offererUserName === callerUsername);
+        setOffers([...remainingOffers]);
     }
 
     function onAnswerResponse(answer: Offer): void {
