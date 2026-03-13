@@ -1,8 +1,8 @@
-import { type ReactElement, useState } from "react";
+import { type ReactElement, useEffect, useRef, useState } from "react";
 import { useMultiplex, useRoom, useUser } from "../../hooks";
 import { Message } from "..";
 import { getSelectedRoom } from "../../clientApplication/services/roomService";
-import { call } from "../../clientApplication/webRTC";
+import { call, localStream, remoteStream } from "../../clientApplication/webRTC";
 import type { Message as MessageType } from "../../types";
 
 import "./DmRoom.css";
@@ -13,9 +13,33 @@ import "./DmRoom.css";
 export function DmRoom(): ReactElement {
     const [isCalling, setIsCalling] = useState<boolean>(false);
     const [message, setMessage] = useState<string>('');
+    const localVideoRef = useRef<HTMLVideoElement>(null);
+    const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const { selectedRoom, sendMessage } = useRoom();
     const { user } = useUser();
     const { incomingCall, activeCall, answerCall, hangup } = useMultiplex();
+
+    useEffect(() => {
+        if (activeCall || isCalling) {
+            setTimeout(addVideoStream, 800);
+        }
+    }, []);
+
+    /**
+     * If navigating away from the Call room and back to it, add the streams to the newly rendered video elements to
+     * continue the streaming conversation.
+     */
+    async function addVideoStream(): Promise<void> {
+        const localVideo = localVideoRef.current;
+        if (localVideo) {
+            localVideo.srcObject = localStream;
+        }
+
+        const remoteVideo = remoteVideoRef.current;
+        if (remoteVideo) {
+            remoteVideo.srcObject = remoteStream;
+        }
+    }
 
     /**
      * Send a DM to another user.
@@ -85,10 +109,10 @@ export function DmRoom(): ReactElement {
                 }
             </section>
 
-            <section id="videos">
-                <video className="video-player" id="local-video" autoPlay playsInline />
+            <section id="videos" className={isCalling || activeCall ? "show-videos" : "hide-videos"}>
+                <video id="local-video" className="video-player" ref={localVideoRef} autoPlay playsInline />
 
-                <video className="video-player" id="remote-video" autoPlay playsInline />
+                <video id="remote-video" className="video-player" ref={remoteVideoRef} autoPlay playsInline />
             </section>
 
             <section id="message-area" className="scrollable">

@@ -17,8 +17,8 @@ const peerConfiguration = {
     ]
 }
 
-let localStream: MediaStream;            // Hold the local video stream
-let remoteStream: MediaStream;           // Hold the remote video stream
+export let localStream: MediaStream;            // Hold the local video stream
+export let remoteStream: MediaStream;           // Hold the remote video stream
 let peerConnection: RTCPeerConnection;   // The peer connection that the two clients use to talk
 let didIOffer: boolean = false;          // True if you initiated the call
 

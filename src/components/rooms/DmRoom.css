@@ -44,7 +44,6 @@
     }
 
     & #videos {
-        display: none;
         gap: 1rem;
         padding: 1rem;
 
@@ -55,6 +54,14 @@
         & #remote-video {
             width: 500px;
         }
+    }
+
+    & .show-videos {
+        display: flex;
+    }
+
+    & .hide-videos {
+        display: none;
     }
 
     & .select-room__text {
