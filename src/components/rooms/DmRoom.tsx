@@ -53,24 +53,12 @@ export function DmRoom(): ReactElement {
     
     return (
         <section id="dmRoom">
-            <section id="videos">
-                <video className="video-player" id="local-video" autoPlay playsInline />
-
-                <video className="video-player" id="remote-video" autoPlay playsInline />
-            </section>
-
-            <section id="message-area" className="scrollable">
-                {
-                    selectedRoom.history
-                        .sort((message1: MessageType, message2: MessageType) => message2.date - message1.date)
-                        .map((message: MessageType, index: number) => <Message key={index} message={message}/>)
-                }
-            </section>
-
-            <section id="chat-input-area">
+            <section className="dmRoom-header">
                 {
                     activeCall || isCalling ? <button className="app-button" onClick={endCall}> Hangup </button> 
                     : 
+                    incomingCall ? <button className="app-button" onClick={answerCall}> Answer </button> // TODO: Make incoming call a modal -> Answer/Deny
+                    :
                     <section className="chat-buttons">
                         <article className="communication-button" onClick={() => callUser(false)}>
                             <img 
@@ -95,22 +83,32 @@ export function DmRoom(): ReactElement {
                         </article>
                     </section>
                 }
+            </section>
 
+            <section id="videos">
+                <video className="video-player" id="local-video" autoPlay playsInline />
+
+                <video className="video-player" id="remote-video" autoPlay playsInline />
+            </section>
+
+            <section id="message-area" className="scrollable">
                 {
-                    incomingCall ? <button className="app-button" onClick={answerCall}> Answer </button> : <></>       // TODO: Make incoming call a modal -> Answer/Deny
+                    selectedRoom.history
+                        .sort((message1: MessageType, message2: MessageType) => message2.date - message1.date)
+                        .map((message: MessageType, index: number) => <Message key={index} message={message}/>)
                 }
+            </section>
 
-                <section id="chat-message">
-                    <input 
-                        id="text-input" 
-                        className="text-input" 
-                        placeholder={`Message @${selectedRoom.name}`}
-                        value={message}
-                        onChange={e => setMessage(e.target.value)} 
-                        onKeyUp={sendDmMessage} 
-                        autoComplete="off"
-                    />
-                </section>
+            <section id="chat-message">
+                <input 
+                    id="text-input" 
+                    className="text-input" 
+                    placeholder={`Message @${selectedRoom.name}`}
+                    value={message}
+                    onChange={e => setMessage(e.target.value)} 
+                    onKeyUp={sendDmMessage} 
+                    autoComplete="off"
+                />
             </section>
         </section>
     )
