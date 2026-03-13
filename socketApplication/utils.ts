@@ -18,7 +18,7 @@ export const NEW_OFFER = 'new-offer';
 export const NEW_ANSWER = 'new-answer';
 export const ANSWER_RESPONSE = 'answer-response';
 export const NEW_OFFER_AWAITING = 'new-offer-awaiting';
-export const NEW_OFFER_ENDED = 'new-offer-ended';
+export const NEW_OFFER_CANCELLED = 'new-offer-cancelled';
 export const RECEIVED_ICE_CANDIDATE_FROM_SERVER = 'receivedIceCandidateFromServer';
 export const SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER = 'sendIceCandidateToSignalingServer';
 

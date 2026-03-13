@@ -8,7 +8,7 @@ import { saveConversationMessage, saveMessage } from "../clientApplication/servi
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
 import { addAnswer, addNewIceCandidate, answerOffer, closeVideoCall } from "../clientApplication/webRTC";
 import type { Message, Namespace, Offer, Room } from "../types";
-import { ANSWER_RESPONSE, CHAT_MESSAGE, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, NEW_OFFER_ENDED, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../socketApplication/utils";
+import { ANSWER_RESPONSE, CHAT_MESSAGE, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../socketApplication/utils";
 
 export interface MultiplexContextProvider {
     connectMultiplexSockets: (namespaces: Namespace[]) => void;
@@ -64,7 +64,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
 
         if (namespace.id === NAMESPACE_ID_DM) {
             socket.on(NEW_OFFER_AWAITING, onNewOfferAwaiting);
-            socket.on(NEW_OFFER_ENDED, onNewOfferCancelled);
+            socket.on(NEW_OFFER_CANCELLED, onNewOfferCancelled);
             socket.on(ANSWER_RESPONSE, onAnswerResponse);
             socket.on(RECEIVED_ICE_CANDIDATE_FROM_SERVER, onReceivedIceCandidateFromServer);
         }
@@ -173,7 +173,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         setActiveCall(false);
         setIncomingCall(false);
         if (isCalling) {
-            multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER_ENDED, callerUsername);
+            multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER_CANCELLED, callerUsername);
         }
     }
 
@@ -186,8 +186,9 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     }
 
     function onNewOfferCancelled(callerUsername: string): void {
-        const remainingOffers = offers.filter((offer: Offer) => offer.offererUserName === callerUsername);
+        const remainingOffers: Offer[] = offers.filter((offer: Offer) => offer.offererUserName !== callerUsername);
         setOffers([...remainingOffers]);
+        setIncomingCall(false);
     }
 
     function onAnswerResponse(answer: Offer): void {
