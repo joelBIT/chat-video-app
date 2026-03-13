@@ -1,6 +1,6 @@
 import type { Server } from "socket.io";
 import { getNamespaceByID } from "../services/namespaceService";
-import { ANSWER_RESPONSE, NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER, NEW_OFFER_AWAITING, RECEIVED_ICE_CANDIDATE_FROM_SERVER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER } from "../utils";
+import { ANSWER_RESPONSE, NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, RECEIVED_ICE_CANDIDATE_FROM_SERVER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER } from "../utils";
 import type { Namespace, Offer, ChatUser } from "../../src/types";
 import type { ISocket } from "../interfaces";
 import { getUserByUsername } from "../services/userService";
@@ -35,16 +35,35 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             socket.to(user.id).emit(NEW_OFFER_AWAITING, offer);
         });
 
-        socket.on(NEW_ANSWER, (offerObject: Offer, ackFunction) => {
-            // Emit this answer (offerObject) back to CLIENT1. In order to do that, we need CLIENT1's id.
-            const user: ChatUser | undefined = getUserByUsername(offerObject.offererUserName);
+        socket.on(NEW_OFFER_CANCELLED, (callerUsername: string) => {
+            const offer: Offer | undefined = offers.find((offer: Offer) => offer.offererUserName === callerUsername)
+            if (!offer) {
+                console.log(`No offer found for username ${callerUsername}`);
+                return;
+            }
+
+            const remainingOffers: Offer[] = offers.filter((offer: Offer) => offer.offererUserName !== callerUsername);
+            offers.length = 0;
+            offers.push(...remainingOffers);
+
+            const user: ChatUser | undefined = getUserByUsername(offer.answererUserName);
             if (!user) {
-                console.log(`No user found for username ${offerObject.offererUserName}`);
+                console.log(`No user found for username ${offer.answererUserName}`);
+                return;
+            }
+            socket.to(user.id).emit(NEW_OFFER_CANCELLED, callerUsername);
+        });
+
+        socket.on(NEW_ANSWER, (sentOffer: Offer, ackFunction) => {
+            // Emit this answer (sentOffer) back to CLIENT1. In order to do that, we need CLIENT1's id.
+            const user: ChatUser | undefined = getUserByUsername(sentOffer.offererUserName);
+            if (!user) {
+                console.log(`No user found for username ${sentOffer.offererUserName}`);
                 return;
             }
 
             const socketIdToAnswer: string = user.id;
-            const offer: Offer | undefined = offers.find((offer: Offer) => offer.offererUserName === offerObject.offererUserName);
+            const offer: Offer | undefined = offers.find((offer: Offer) => offer.offererUserName === sentOffer.offererUserName);
             if (!offer) {
                 console.log("No offer to update");
                 return;
@@ -54,7 +73,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             ackFunction(offer.offerIceCandidates);
 
             // We find the offer to update so we can emit it
-            offer.answer = offerObject.answer;
+            offer.answer = sentOffer.answer;
             socket.to(socketIdToAnswer).emit(ANSWER_RESPONSE, offer);
         });
 
@@ -63,7 +82,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
 
             if (didIOffer) {
                 // This ice candidate is coming from the offerer. Send to the answerer
-                const offer: Offer | undefined = offers.find(offer => offer.offererUserName === iceUserName);
+                const offer: Offer | undefined = offers.find((offer: Offer) => offer.offererUserName === iceUserName);
                 if (offer) {
                     offer.offerIceCandidates.push(iceCandidate);
                     // 1. When the answerer answers, all existing ice candidates are sent
@@ -79,7 +98,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
                 }
             } else {
                 // This ice candidate is coming from the answerer. Send to the offerer.
-                const offer: Offer | undefined = offers.find(offer => offer.answererUserName === iceUserName);
+                const offer: Offer | undefined = offers.find((offer: Offer) => offer.answererUserName === iceUserName);
                 if (offer) {
                     const user: ChatUser | undefined = getUserByUsername(offer.offererUserName);
                     if (user) {
