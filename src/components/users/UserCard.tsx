@@ -29,7 +29,12 @@ export function UserCard({member}: {member: ChatUser}): ReactElement {
                     <div className={member.online ? "online-status online" : "online-status"} />
                 </article>
 
-                <h2 className="user-username"> {member.username} </h2>
+                <section className="user-details">
+                    <h2 className="user-username"> {member.username} </h2>
+                    {
+                        member.inCall ? <p className="user-status">In a call</p> : <></>
+                    }
+                </section>
             </section>
             
             { openModal ? <MenuModal member={member} isOpen={openModal} close={() => setOpenModal(false)} /> : <></> }

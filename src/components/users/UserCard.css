@@ -28,10 +28,23 @@
         }
     }
 
-    & .user-username {
-        font-family: "LINE Seed JP", sans-serif;
-        font-size: 1rem;
-        color: var(--color-username);
+    & .user-details {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        & .user-username {
+            align-self: flex-start;
+            font-family: "LINE Seed JP", sans-serif;
+            font-size: 1rem;
+            color: var(--color-username);
+        }
+
+        & .user-status {
+            font-family: "LINE Seed JP", sans-serif;
+            font-size: 0.7rem;
+            color: var(--color-white);
+        }
     }
 
     &:hover {
