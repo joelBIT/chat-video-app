@@ -32,12 +32,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             };
             offers.push(offer);
 
-            const sender: ChatUser | undefined = getUserByUsername(fromUsername);
-            if (sender) {
-                sender.inCall = true;
-                saveUser(sender);
-                io.emit(USER_UPDATED, sender);      // Inform users that this user is in a call.
-            }
+            updateUserStatus(io, fromUsername, true);
 
             socket.to(user.id).emit(NEW_OFFER_AWAITING, offer);
         });
@@ -60,25 +55,11 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             }
 
             socket.to(recipient.id).emit(NEW_OFFER_CANCELLED, callerUsername);
-
-            const sender: ChatUser | undefined = getUserByUsername(callerUsername);
-            if (sender) {
-                sender.inCall = false;
-                saveUser(sender);
-                io.emit(USER_UPDATED, sender);      // Inform users that this user is not in a call anymore.
-            }
+            updateUserStatus(io, callerUsername, false);
         });
 
         socket.on(END_CALL, (username: string) => {
-            const user: ChatUser | undefined = getUserByUsername(username);
-            if (!user) {
-                console.log(`No user found for username ${username}`);
-                return;
-            }
-
-            user.inCall = false;
-            saveUser(user);
-            io.emit(USER_UPDATED, user);      // Inform users that this user is not in a call anymore.
+            updateUserStatus(io, username, false);
         });
 
         socket.on(NEW_ANSWER, (sentOffer: Offer, ackFunction) => {
@@ -102,13 +83,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             // We find the offer to update so we can emit it
             offer.answer = sentOffer.answer;
             socket.to(socketIdToAnswer).emit(ANSWER_RESPONSE, offer);
-
-            const answerer: ChatUser | undefined = getUserByUsername(offer.answererUserName);
-            if (answerer) {
-                answerer.inCall = true;
-                saveUser(answerer);
-                io.emit(USER_UPDATED, answerer);      // Inform users that this user is in a call.
-            }
+            updateUserStatus(io, offer.answererUserName, true);
         });
 
         socket.on(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, iceCandidateObject => {
@@ -144,4 +119,19 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             }
         })
     });
+}
+
+/**
+ * Update if a user is in a call or not, and inform application users about the state change.
+ */
+function updateUserStatus(io: Server, username: string, inCall: boolean): void {
+    const user: ChatUser | undefined = getUserByUsername(username);
+    if (!user) {
+        console.log(`No user found for username ${username}`);
+        return;
+    }
+
+    user.inCall = inCall;
+    saveUser(user);
+    io.emit(USER_UPDATED, user);      // Inform users that this user is in a call.
 }
