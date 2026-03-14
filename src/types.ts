@@ -26,6 +26,7 @@ export type ChatUser = {
     id: string,
     username: string,
     avatar: string,
+    inCall: boolean,
     online: boolean
 }
 

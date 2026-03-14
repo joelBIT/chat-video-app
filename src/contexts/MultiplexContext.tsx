@@ -8,7 +8,7 @@ import { saveConversationMessage, saveMessage } from "../clientApplication/servi
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
 import { addAnswer, addNewIceCandidate, answerOffer, closeVideoCall } from "../clientApplication/webRTC";
 import type { Message, Namespace, Offer, Room } from "../types";
-import { ANSWER_RESPONSE, CHAT_MESSAGE, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../socketApplication/utils";
+import { ANSWER_RESPONSE, CHAT_MESSAGE, END_CALL, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../socketApplication/utils";
 
 export interface MultiplexContextProvider {
     connectMultiplexSockets: (namespaces: Namespace[]) => void;
@@ -165,15 +165,19 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     }
 
     /**
-     * The isCalling parameter is true if the call has not been answered yet. In this case, the remote user must be informed that
-     * the call has been cancelled so the remote user cannot answer a call that does not exist.
+     * The 'isCalling' parameter is true if the call has not been answered yet. In this case, the remote user must be informed that
+     * the call has been cancelled so the remote user cannot answer a call that does not exist. The 'isCalling' parameter being false 
+     * means a user leaves an ongoing active call.
      */
-    function hangup(isCalling: boolean, callerUsername: string): void {
+    function hangup(isCalling: boolean, username: string): void {
         closeVideoCall();
-        setActiveCall(false);
         setIncomingCall(false);
+        setActiveCall(false);
+        
         if (isCalling) {
-            multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER_CANCELLED, callerUsername);
+            multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER_CANCELLED, username);
+        } else {
+            multiplexSockets[NAMESPACE_ID_DM].emit(END_CALL, username);
         }
     }
 

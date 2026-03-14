@@ -32,6 +32,6 @@ export function getAllUsers(): ChatUser[] {
 
 export function setOnlineStatusForUser(userID: string, online: boolean): void {
     const user: ChatUser = userStore.findUserByID(userID);
-    const updatedUser: ChatUser = {username: user.username, id: user.id, online, avatar: user.avatar};
+    const updatedUser: ChatUser = {username: user.username, id: user.id, online, avatar: user.avatar, inCall: user.inCall};
     userStore.saveUser(updatedUser);
 }

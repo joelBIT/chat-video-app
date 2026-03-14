@@ -30,7 +30,7 @@ export function checkUsername(io: Server): void {
 
         const userID: string = randomId();     // Generate unique ID for new user
         socket.userID = userID;
-        const newUser: ChatUser = {username, id: userID, online: true, avatar: "mario.png"};
+        const newUser: ChatUser = {username, id: userID, online: true, avatar: "mario.png", inCall: false};
         
         saveUser(newUser);
         next();
