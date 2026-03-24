@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import type { Namespace, Room } from "../../src/types";
-import namespaceStore from "../stores/namespaceStore";
+import namespaceStore from "../stores/NamespaceStore";
 import { NAMESPACE_ID_GAMES } from "../utils";
 
 /**

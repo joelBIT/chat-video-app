@@ -1,4 +1,4 @@
-import namespaceStore from "../stores/namespaceStore";
+import namespaceStore from "../stores/NamespaceStore";
 import { getConversationsByUserID, getPrivateConversation } from "./messageService";
 import { getUserByID } from "./userService";
 import type { Namespace, Room, ChatUser } from "../../src/types";

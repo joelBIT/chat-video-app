@@ -1,6 +1,6 @@
 import type { Namespace, Room, ChatUser } from "../../types";
-import namespaceStore from "../stores/namespaceStore";
-import userStore from "../stores/userStore";
+import namespaceStore from "../stores/NamespaceStore";
+import userStore from "../stores/UserStore";
 
 export function getUsersInRoom(roomID: string, namespaceID: number): ChatUser[] {
     const memberList: ChatUser[] = [];

@@ -1,5 +1,5 @@
 import type { Namespace } from "../../types";
-import namespaceStore from "../stores/namespaceStore";
+import namespaceStore from "../stores/NamespaceStore";
 
 /**
  * Add namespaces received from the server when the client connects. 

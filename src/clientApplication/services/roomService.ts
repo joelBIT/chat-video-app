@@ -1,5 +1,5 @@
 import { NAMESPACE_ID_GAMES, ROOM_ID_NONE } from "../../../socketApplication/utils";
-import namespaceStore from "../stores/namespaceStore";
+import namespaceStore from "../stores/NamespaceStore";
 import type { Namespace, Room } from "../../types";
 
 /**
