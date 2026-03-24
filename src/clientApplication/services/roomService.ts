@@ -10,7 +10,7 @@ export function getSelectedRoom(): Room | undefined {
     const selectedNamespace: Namespace | undefined = namespaceStore.getSelectedNamespace();
     if (selectedNamespace) {
         selectedNamespace.rooms.forEach((room: Room) => {
-            if (room.id === namespaceStore.selectedRoomId) {
+            if (room.id === namespaceStore.getSelectedRoomId()) {
                 selectedRoom = room;
             }
         })
@@ -74,15 +74,15 @@ export function removeRoom(roomID: string, namespaceID: number): void {
 }
 
 export function isSelectedRoom(roomID: string): boolean {
-    return roomID === namespaceStore.selectedRoomId;
+    return roomID === namespaceStore.getSelectedRoomId();
 }
 
 export function setSelectedRoomId(roomID: string): void {
-    namespaceStore.selectedRoomId = roomID;
+    namespaceStore.setSelectedRoomId(roomID);
 }
 
 export function clearSelectedRoom(): void {
-    namespaceStore.selectedRoomId = ROOM_ID_NONE;
+    namespaceStore.setSelectedRoomId(ROOM_ID_NONE);
 }
 
 /**

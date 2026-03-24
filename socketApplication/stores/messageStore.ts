@@ -4,8 +4,8 @@ import type { Message } from "../../src/types";
  * This class is used to store private conversations between users (namespace DMs).
  */
 class InMemoryMessageStore {
-    messages: Message[];                        // Conversation messages (only in namespace "DMs").
-    conversations: Map<string, string[]>;       // <userID, roomID[]>
+    private messages: Message[];                        // Conversation messages (only in namespace "DMs").
+    private conversations: Map<string, string[]>;       // <userID, roomID[]>
 
     constructor() {
         this.messages = [];                     // Used for storing private messages between users.

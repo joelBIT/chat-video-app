@@ -7,7 +7,7 @@ import { isValidNamespace, NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, NAMESPACE_ID_HOM
  * Application users are stored in userStore.
  */
 class InMemoryNamespaceStore {
-    namespaces: Map<number, Namespace>;     // <namespaceID, namespace>
+    private namespaces: Map<number, Namespace>;     // <namespaceID, namespace>
 
     constructor() {
         this.namespaces = new Map();

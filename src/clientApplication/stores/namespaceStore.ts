@@ -7,9 +7,9 @@ import type { Namespace } from "../../types";
  * from respective data structure.
  */
 class InMemoryNamespaceStore {
-    namespaces: Map<number, Namespace>;                // <namespaceID, Namespace>
-    selectedNamespaceId: number;                       // The currently selected namespace ID
-    selectedRoomId: string;                            // The currently selected room ID
+    private namespaces: Map<number, Namespace>;                // <namespaceID, Namespace>
+    private selectedNamespaceId: number;                       // The currently selected namespace ID
+    private selectedRoomId: string;                            // The currently selected room ID
 
     constructor() {
         this.namespaces = new Map();
@@ -44,6 +44,14 @@ class InMemoryNamespaceStore {
 
     isSelectedNamespace(namespaceID: number): boolean {
         return namespaceID === this.selectedNamespaceId;
+    }
+
+    getSelectedRoomId(): string {
+        return this.selectedRoomId;
+    }
+
+    setSelectedRoomId(roomID: string): void {
+        this.selectedRoomId = roomID;
     }
 }
 

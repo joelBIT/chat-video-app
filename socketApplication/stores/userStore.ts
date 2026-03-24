@@ -1,7 +1,7 @@
 import type { ChatUser } from "../../src/types";
 
 class InMemoryUserStore {
-    users: Map<string, ChatUser>;                     // <userID, TriviaUser>
+    private users: Map<string, ChatUser>;                     // <userID, TriviaUser>
 
     constructor() {
         this.users = new Map();

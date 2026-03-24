@@ -16,7 +16,7 @@ export function getUsersInRoom(roomID: string, namespaceID: number): ChatUser[] 
 
 export function getUsersInSelectedRoom(): ChatUser[] {
     const memberList: ChatUser[] = [];
-    const matchingRoom: Room | undefined = namespaceStore.getSelectedNamespace()?.rooms.find((room: Room) => room.id === namespaceStore.selectedRoomId);
+    const matchingRoom: Room | undefined = namespaceStore.getSelectedNamespace()?.rooms.find((room: Room) => room.id === namespaceStore.getSelectedRoomId());
     if (matchingRoom) {
         matchingRoom.members.forEach((memberID: string) => {
             memberList.push(userStore.getUserById(memberID));
