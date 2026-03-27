@@ -15,6 +15,10 @@ app.use(express.static(import.meta.dirname + "/dist/"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
 
+app.all('/{*path}', async (req, res) => {
+    res.redirect(`https://${req.get('host')}`);
+});
+
 const key = readFileSync('cert.key');
 const cert = readFileSync('cert.crt');
 
