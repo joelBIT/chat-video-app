@@ -19,6 +19,7 @@
             font-size: 1.3rem;
             color: var(--color-white);
             padding: 2rem;
+            text-align: center;
         }
 
         & #select-avatar {
@@ -47,6 +48,19 @@
                 & .selected-avatar {
                     background-color: var(--color-highlight);
                     border-radius: 9px;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 500px) {
+    #profilePage {
+        & #profile-information {
+            & #select-avatar {
+                & .avatars {
+                    flex-direction: column;
+                    align-items: center;
                 }
             }
         }
