@@ -5,7 +5,7 @@ import { useUser } from "../hooks";
 import { getUsersInRoom } from "../clientApplication/services/userService";
 import { isSelectedNamespace, setSelectedNamespaceId } from "../clientApplication/services/namespaceService";
 import { clearSelectedRoom, getRoom, getSelectedRoom, isSelectedRoom, saveRoom, setSelectedRoomId } from "../clientApplication/services/roomService";
-import { CHANGE_ROOM, CHAT_MESSAGE, CREATE_ROOM, LEAVE_ROOM, NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, PRIVATE_MESSAGE, ROOM_ID_NONE } from "../../serverApplication/utils";
+import { CHANGE_ROOM, CHAT_MESSAGE, CREATE_ROOM, LEAVE_ROOM, NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, PRIVATE_MESSAGE, ROOM_ID_NONE } from "../serverApplication/utils";
 
 export interface RoomContextProvider {
     selectedRoom: Room | undefined;

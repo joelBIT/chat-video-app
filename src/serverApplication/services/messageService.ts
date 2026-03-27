@@ -1,6 +1,6 @@
 import messageStore from "../stores/MessageStore";
 import namespaceStore from "../stores/NamespaceStore";
-import type { Message, Namespace, Room } from "../../src/types";
+import type { Message, Namespace, Room } from "../../types";
 import { NAMESPACE_ID_DM } from "../utils";
 
 /**

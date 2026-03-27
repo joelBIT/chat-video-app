@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router";
 import { useRoom, useSocket } from "../hooks";
 import { getNamespaces, isSelectedNamespace } from "../clientApplication/services/namespaceService";
 import type { Namespace } from "../types";
-import { HOME_URL, PROFILE_URL, ROOMS_URL } from "../../serverApplication/utils";
+import { HOME_URL, PROFILE_URL, ROOMS_URL } from "../serverApplication/utils";
 
 import "./NamespaceMenu.css";
 

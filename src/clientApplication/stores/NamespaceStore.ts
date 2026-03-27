@@ -1,4 +1,4 @@
-import { NAMESPACE_ID_NONE, ROOM_ID_NONE } from "../../../serverApplication/utils";
+import { NAMESPACE_ID_NONE, ROOM_ID_NONE } from "../../serverApplication/utils";
 import type { Namespace } from "../../types";
 
 /**

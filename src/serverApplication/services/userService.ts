@@ -1,5 +1,5 @@
-import type { ChatUser } from "../../src/types";
-import { addUserToRoom } from "../services/roomService";
+import type { ChatUser } from "../../types";
+import { addUserToRoom } from "./roomService";
 import userStore from "../stores/UserStore";
 import { NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME, ROOM_ID_ANNOUNCEMENTS, ROOM_ID_GENERAL, ROOM_ID_LOBBY, ROOM_ID_SUPPORT } from "../utils";
 

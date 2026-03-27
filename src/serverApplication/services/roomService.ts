@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import type { Namespace, Room } from "../../src/types";
+import type { Namespace, Room } from "../../types";
 import namespaceStore from "../stores/NamespaceStore";
 import { NAMESPACE_ID_GAMES } from "../utils";
 

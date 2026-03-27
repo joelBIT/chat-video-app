@@ -1,7 +1,7 @@
 import { type ReactElement, useState } from "react";
 import { useNavigate } from "react-router";
 import { useSocket } from "../hooks";
-import { ROOMS_URL } from "../../serverApplication/utils";
+import { ROOMS_URL } from "../serverApplication/utils";
 
 import "./LandingPage.css";
 

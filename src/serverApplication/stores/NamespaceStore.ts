@@ -1,4 +1,4 @@
-import type { Namespace } from "../../src/types";
+import type { Namespace } from "../../types";
 import { isValidNamespace, NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME, ROOM_ID_ANNOUNCEMENTS, ROOM_ID_GENERAL, ROOM_ID_LOBBY, ROOM_ID_SUPPORT } from "../utils";
 
 /**

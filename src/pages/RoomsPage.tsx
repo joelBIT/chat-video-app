@@ -3,7 +3,7 @@ import { redirect } from "react-router";
 import { useRoom, useSocket } from "../hooks";
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
 import { ConversationList, DmRoom, NamespaceMenu, RoomChat, RoomList, UserList } from "../components";
-import { HOME_URL, NAMESPACE_ID_DM } from "../../serverApplication/utils";
+import { HOME_URL, NAMESPACE_ID_DM } from "../serverApplication/utils";
 
 import "./RoomsPage.css";
 

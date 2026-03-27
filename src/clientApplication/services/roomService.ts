@@ -1,4 +1,4 @@
-import { NAMESPACE_ID_GAMES, ROOM_ID_NONE } from "../../../serverApplication/utils";
+import { NAMESPACE_ID_GAMES, ROOM_ID_NONE } from "../../serverApplication/utils";
 import namespaceStore from "../stores/NamespaceStore";
 import type { Namespace, Room } from "../../types";
 

@@ -1,7 +1,7 @@
 import type { Server } from "socket.io";
 import { getNamespaceByID } from "../services/namespaceService";
 import { ANSWER_RESPONSE, END_CALL, NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, RECEIVED_ICE_CANDIDATE_FROM_SERVER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, USER_UPDATED } from "../utils";
-import type { Namespace, Offer, ChatUser } from "../../src/types";
+import type { Namespace, Offer, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
 import { getUserByUsername, saveUser } from "../services/userService";
 

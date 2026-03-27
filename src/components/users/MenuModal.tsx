@@ -1,7 +1,7 @@
 import { useEffect, useRef, type ReactElement } from "react";
 import { useRoom } from "../../hooks";
 import { setSelectedNamespaceId } from "../../clientApplication/services/namespaceService";
-import { NAMESPACE_ID_DM } from "../../../serverApplication/utils";
+import { NAMESPACE_ID_DM } from "../../serverApplication/utils";
 import type { ChatUser } from "../../types";
 
 import "./MenuModal.css";

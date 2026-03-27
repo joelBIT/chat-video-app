@@ -1,4 +1,4 @@
-import type { ChatUser } from "../../src/types";
+import type { ChatUser } from "../../types";
 
 class InMemoryUserStore {
     private users: Map<string, ChatUser>;                     // <userID, TriviaUser>

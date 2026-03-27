@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import { Server } from "socket.io";
 import { getUserByUsername, saveUser, setOnlineStatusForUser } from "../services/userService.js";
 import type { ISocket } from "../interfaces.js";
-import type{ ChatUser } from "../../src/types.js";
+import type{ ChatUser } from "../../types.js";
 
 const randomId = () => crypto.randomBytes(8).toString("hex");
 
