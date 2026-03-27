@@ -34,6 +34,7 @@ export default function LandingPage(): ReactElement {
                     onChange={event => setUsername(event.target.value)} 
                     onKeyUp={submit}
                 />
+                
                 <button 
                     className="app-button" 
                     onClick={() => connect(username)} 
