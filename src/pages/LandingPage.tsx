@@ -16,14 +16,31 @@ export default function LandingPage(): ReactElement {
     if (isConnected) {
         navigate(ROOMS_URL, { replace: true });
     }
+
+    function submit(event: React.KeyboardEvent): void {
+        if (event.key ==="Enter") {
+            connect(username);
+        }
+    }
     
     return (
         <main id="landingPage">            
-            <p className="landing-text"> Enter a username and connect to the Chat app </p>
+            <p className="landing-text"> Enter a username and connect to the Chat </p>
 
             <section id="username-connection">
-                <input className="login-input" placeholder="Username" onChange={event => setUsername(event.target.value)} />
-                <button className="app-button" onClick={() => connect(username)} disabled={username.length < 1}> Connect </button>
+                <input 
+                    className="login-input" 
+                    placeholder="Username" 
+                    onChange={event => setUsername(event.target.value)} 
+                    onKeyUp={submit}
+                />
+                <button 
+                    className="app-button" 
+                    onClick={() => connect(username)} 
+                    disabled={username.length < 1}
+                > 
+                    Connect 
+                </button>
             </section>
 
             {
