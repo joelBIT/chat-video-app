@@ -1,5 +1,5 @@
 import { multiplexSockets } from "../socket-client";
-import { NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER } from "../../socketApplication/utils";
+import { NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER } from "../../serverApplication/utils";
 import type { Offer } from "../types";
 
 /**

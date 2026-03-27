@@ -4,7 +4,7 @@ import { useRoom, useSocket, useUser } from "../hooks";
 import { getUsersInSelectedRoom, saveUser } from "../clientApplication/services/userService";
 import { NamespaceMenu } from "../components";
 import type { ActionState, ChatUser } from "../types";
-import { HOME_URL } from "../../socketApplication/utils";
+import { HOME_URL } from "../../serverApplication/utils";
 
 import "./ProfilePage.css";
 

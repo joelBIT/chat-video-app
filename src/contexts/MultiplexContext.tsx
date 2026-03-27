@@ -8,7 +8,7 @@ import { saveConversationMessage, saveMessage } from "../clientApplication/servi
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
 import { addAnswer, addNewIceCandidate, answerOffer, closeVideoCall } from "../clientApplication/webRTC";
 import type { Message, Namespace, Offer, Room } from "../types";
-import { ANSWER_RESPONSE, CHAT_MESSAGE, END_CALL, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../socketApplication/utils";
+import { ANSWER_RESPONSE, CHAT_MESSAGE, END_CALL, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../../serverApplication/utils";
 
 export interface MultiplexContextProvider {
     connectMultiplexSockets: (namespaces: Namespace[]) => void;
