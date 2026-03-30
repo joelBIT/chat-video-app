@@ -4,10 +4,11 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "nodemon",
+        "dev": "NODE_ENV=development nodemon",
         "build": "tsc -b && vite build",
         "lint": "eslint .",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "production": "NODE_ENV=production PORT=8181 URL=https://172.26.10.137 nodemon"
     },
     "dependencies": {
         "express": "^5.2.1",

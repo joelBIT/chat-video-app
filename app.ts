@@ -21,14 +21,15 @@ app.all('/{*path}', async (req, res) => {
 
 const key = readFileSync('cert.key');
 const cert = readFileSync('cert.crt');
-
 const expressServer = createServer({key, cert}, app);
-//create our socket.io server... it will listen to our express port
+
+const ORIGIN = process.env.NODE_ENV === 'production' ? process.env.URL as string : "https://localhost";
+
+// Create our socket.io server... it will listen to our express port
 const io = new Server(expressServer, {
     cors: {
         origin: [
-            "https://localhost",
-            // 'https://LOCAL-DEV-IP-HERE' //if using a phone or another computer
+            ORIGIN
         ],
         methods: ["GET", "POST"]
     }
