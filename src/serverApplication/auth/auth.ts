@@ -1,10 +1,8 @@
-import crypto from "node:crypto";
 import { Server } from "socket.io";
 import { getUserByUsername, saveUser, setOnlineStatusForUser } from "../services/userService.js";
 import type { ISocket } from "../interfaces.js";
 import type{ ChatUser } from "../../types.js";
-
-const randomId = () => crypto.randomBytes(8).toString("hex");
+import User from "../schemas/userSchema";
 
 /**
  * Check if someone is already connected with chosen username. Return an error if that is the case. Connected usernames must be unique.
@@ -28,11 +26,21 @@ export function checkUsername(io: Server): void {
             return next();
         }
 
-        const userID: string = randomId();     // Generate unique ID for new user
-        socket.userID = userID;
-        const newUser: ChatUser = {username, id: userID, online: true, avatar: "mario.png", inCall: false};
-        
-        saveUser(newUser);
-        next();
+        const dbUser = new User({
+            username,
+            password: 'test',
+            avatar: 'mario.png'
+        });
+
+        await dbUser.save().then(doc => {
+            console.log(doc);
+            const userID = doc._id.toString();
+            socket.userID = userID;
+            const newUser: ChatUser = {username, id: userID, online: true, avatar: "mario.png", inCall: false};
+            saveUser(newUser);
+            next();
+        });
+
+        return next(new Error("An error occurred when creating the user."));
     });
 }
