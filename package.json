@@ -11,7 +11,9 @@
         "production": "NODE_ENV=production PORT=8181 URL=https://172.26.10.137 nodemon"
     },
     "dependencies": {
+        "dotenv": "^17.3.1",
         "express": "^5.2.1",
+        "mongoose": "^9.3.3",
         "rc-textarea": "^1.10.2",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
