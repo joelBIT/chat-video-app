@@ -12,7 +12,6 @@ const userSchema = new mongoose.Schema({
     },
     avatar: {
         type: String,
-        required: [true, "A user must have an avatar"],
         default: "mario.png"
     },
     inCall: {
