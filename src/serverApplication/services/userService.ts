@@ -15,23 +15,9 @@ export function saveUser(user: ChatUser): void {
     addUserToRoom(user.id, ROOM_ID_LOBBY, NAMESPACE_ID_GAMES);
 }
 
-export function getUserByID(userID: string): ChatUser {
-    return userStore.findUserByID(userID);
-}
-
 /**
  * Thus function may return undefined if a user has not been created yet.
  */
 export function getUserByUsername(username: string): ChatUser | undefined {
     return userStore.findUserByUsername(username);
-}
-
-export function getAllUsers(): ChatUser[] {
-    return userStore.getAllUsers();
-}
-
-export function setOnlineStatusForUser(userID: string, online: boolean): void {
-    const user: ChatUser = userStore.findUserByID(userID);
-    const updatedUser: ChatUser = {username: user.username, id: user.id, online, avatar: user.avatar, inCall: user.inCall};
-    userStore.saveUser(updatedUser);
 }
