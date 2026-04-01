@@ -20,7 +20,8 @@
         align-items: center;
         gap: 1rem;
 
-        & .login-input {
+        & .login-input,
+        & .register-input {
             background-color: var(--color-chat-background);
             padding: 0.3rem;
             outline: none;
@@ -29,6 +30,26 @@
             color: var(--color-white);
             margin-left: 1rem;
             margin-right: 1rem;
+        }
+
+        & .register-text,
+        & .login-text {
+            display: flex;
+            font-family: LINE Seed JP, sans-serif;
+            font-size: 1rem;
+            font-weight: 100;
+            color: var(--color-white);
+
+            & .register-link,
+            & .login-link {
+                color: var(--color-username);
+                cursor: pointer;
+                padding-left: 0.3rem;
+
+                &:hover {
+                    opacity: 0.8;
+                }
+            }
         }
     }
 }

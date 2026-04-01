@@ -14,32 +14,40 @@ router
 async function registerUser(req: express.Request, res: express.Response): Promise<void> {
     const username: string = req.body.username;
     const password: string = req.body.password;
-    const user: ChatUser | null = await User.findOne({username});
-    if (user) {
+    const passwordRepeat: string = req.body.passwordRepeat;
+    if (password !== passwordRepeat) {
         res.status(400).json({
             success: false,
-            message: `Username ${username} is already in use. Choose a different username.`
+            message: "Passwords do not match"
         });
     } else {
-        const dbUser = new User({
-            username,
-            password
-        });
-
-        await dbUser.save().then(doc => {
-            const createdUser: ChatUser = {username: doc.username, id: doc._id.toString(), online: doc.online, avatar: doc.avatar, inCall: doc.inCall};
-            res.status(201).json({
-                success: true,
-                message: "Created",
-                data: createdUser
-            });
-        }).catch(error => {
-            console.log(error);
-            res.status(500).json({
+        const user: ChatUser | null = await User.findOne({username});
+        if (user) {
+            res.status(400).json({
                 success: false,
-                message: "An error occurred during registration."
+                message: `Username ${username} is already in use. Choose a different username.`
             });
-        });
+        } else {
+            const dbUser = new User({
+                username,
+                password
+            });
+
+            await dbUser.save().then(doc => {
+                const createdUser: ChatUser = {username: doc.username, id: doc._id.toString(), online: doc.online, avatar: doc.avatar, inCall: doc.inCall};
+                res.status(201).json({
+                    success: true,
+                    message: `${doc.username} successfully registered.`,
+                    data: createdUser
+                });
+            }).catch(error => {
+                console.log(error);
+                res.status(500).json({
+                    success: false,
+                    message: "An error occurred during registration."
+                });
+            });
+        }
     }
 }
 
@@ -47,6 +55,8 @@ async function registerUser(req: express.Request, res: express.Response): Promis
  * Check if POST body contains required username and password properties. Only execute the registerUser function if properties exist.
  */
 function checkBody(req: express.Request, res: express.Response, next: express.NextFunction): express.Response | undefined {
+    console.log("HEY")
+    console.log(req.body)
     if (!req.body.username || !req.body.password) {
         return res.status(400).json({
             success: false,
