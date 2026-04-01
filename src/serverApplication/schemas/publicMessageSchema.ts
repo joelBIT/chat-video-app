@@ -20,6 +20,4 @@ export const publicMessageSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-const PublicMessage = mongoose.model('PublicMessage', publicMessageSchema);
-
-export default PublicMessage;
+export const PublicMessage = mongoose.model('PublicMessage', publicMessageSchema);

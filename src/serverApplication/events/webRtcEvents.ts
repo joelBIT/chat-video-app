@@ -3,7 +3,7 @@ import { getNamespaceByID } from "../services/namespaceService";
 import { ANSWER_RESPONSE, END_CALL, NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, RECEIVED_ICE_CANDIDATE_FROM_SERVER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, USER_UPDATED } from "../utils";
 import type { Namespace, Offer, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
-import { getUserByUsername, saveUser } from "../services/userService";
+import { getByUsername, getUserByUsername, updateUser } from "../services/userService";
 
 const offers: Offer[] = [];
 
@@ -124,14 +124,14 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
 /**
  * Update if a user is in a call or not, and inform application users about the state change.
  */
-function updateUserStatus(io: Server, username: string, inCall: boolean): void {
-    const user: ChatUser | undefined = getUserByUsername(username);
+async function updateUserStatus(io: Server, username: string, inCall: boolean): Promise<void> {
+    const user: ChatUser | null = await getByUsername(username);
     if (!user) {
         console.log(`No user found for username ${username}`);
         return;
     }
 
     user.inCall = inCall;
-    saveUser(user);
+    updateUser(user);
     io.emit(USER_UPDATED, user);      // Inform users that this user is in a call.
 }

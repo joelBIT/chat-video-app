@@ -35,6 +35,7 @@ async function registerUser(req: express.Request, res: express.Response): Promis
 
             await dbUser.save().then(doc => {
                 const createdUser: ChatUser = {username: doc.username, id: doc._id.toString(), online: doc.online, avatar: doc.avatar, inCall: doc.inCall};
+                
                 res.status(201).json({
                     success: true,
                     message: `${doc.username} successfully registered.`,
@@ -55,8 +56,6 @@ async function registerUser(req: express.Request, res: express.Response): Promis
  * Check if POST body contains required username and password properties. Only execute the registerUser function if properties exist.
  */
 function checkBody(req: express.Request, res: express.Response, next: express.NextFunction): express.Response | undefined {
-    console.log("HEY")
-    console.log(req.body)
     if (!req.body.username || !req.body.password) {
         return res.status(400).json({
             success: false,
