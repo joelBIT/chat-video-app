@@ -10,6 +10,7 @@ import "./LandingPage.css";
  */
 export default function LandingPage(): ReactElement {
     const [username, setUsername] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
     const navigate = useNavigate();
     const { isConnected, connect, errorMessage } = useSocket();
 
@@ -19,7 +20,7 @@ export default function LandingPage(): ReactElement {
 
     function submit(event: React.KeyboardEvent): void {
         if (event.key ==="Enter") {
-            connect(username);
+            connect(username, password);
         }
     }
     
@@ -34,11 +35,18 @@ export default function LandingPage(): ReactElement {
                     onChange={event => setUsername(event.target.value)} 
                     onKeyUp={submit}
                 />
+
+                <input 
+                    className="login-input" 
+                    placeholder="Password" 
+                    onChange={event => setPassword(event.target.value)} 
+                    onKeyUp={submit}
+                />
                 
                 <button 
                     className="app-button" 
-                    onClick={() => connect(username)} 
-                    disabled={username.length < 1}
+                    onClick={() => connect(username, password)} 
+                    disabled={username.length < 1 || password.length < 1}
                 > 
                     Connect 
                 </button>

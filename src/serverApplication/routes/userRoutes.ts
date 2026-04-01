@@ -12,17 +12,18 @@ router
  * Create new user in database if username is not already taken.
  */
 async function registerUser(req: express.Request, res: express.Response): Promise<void> {
-    const userDetails: {username: string, password: string} = Object.assign(req.body);
-    const user: ChatUser | null = await User.findOne({username: userDetails.username});
+    const username: string = req.body.username;
+    const password: string = req.body.password;
+    const user: ChatUser | null = await User.findOne({username});
     if (user) {
         res.status(400).json({
             success: false,
-            message: `Username ${userDetails.username} is already in use. Choose a different username.`
+            message: `Username ${username} is already in use. Choose a different username.`
         });
     } else {
         const dbUser = new User({
-            username: userDetails.username,
-            password: userDetails.password
+            username,
+            password
         });
 
         await dbUser.save().then(doc => {

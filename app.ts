@@ -2,7 +2,7 @@ import { createServer } from 'node:https';
 import { readFileSync } from 'node:fs';
 import express from 'express';
 import { Server } from 'socket.io';
-import {checkUsername} from "./src/serverApplication/auth/auth.ts";
+import {login} from "./src/serverApplication/auth/auth.ts";
 import {initializeHomeEvents} from "./src/serverApplication/events/homeEvents.ts";
 import {initializeDmEvents} from "./src/serverApplication/events/dmEvents.ts";
 import {initializeGamesEvents} from "./src/serverApplication/events/gamesEvents.ts";
@@ -38,7 +38,7 @@ const io = new Server(expressServer, {
     }
 });
 
-checkUsername(io);
+login(io);
 initializeMainNamespaceEvents(io);
 initializeCommonEvents(io);
 initializeHomeEvents(io);

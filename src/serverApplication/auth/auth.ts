@@ -1,6 +1,5 @@
 import { Server } from "socket.io";
 import type { ISocket } from "../interfaces.js";
-import type{ ChatUser } from "../../types.js";
 import User from "../schemas/userSchema.js";
 
 /**
@@ -8,15 +7,20 @@ import User from "../schemas/userSchema.js";
  * The Socket instance is not actually connected when the middleware gets executed, which means that no disconnect event will be emitted 
  * if the connection eventually fails.
  */
-export function checkUsername(io: Server): void {
+export function login(io: Server): void {
     io.use(async (socket: ISocket, next) => {
         const username = socket.handshake.auth.username;
+        const password = socket.handshake.auth.password;
         socket.handshake.query.username = username;
 
-        const user: ChatUser | null = await User.findOne({username: username});
+        const user = await User.findOne({username});
         if (user) {
+            if (password != user.password) {
+                return next(new Error(`Wrong password.`));
+            }
+
             socket.userID = user.id;                    // Set permanent user ID on the socket (since socket IDs change every connection)
-            await User.updateOne({ id: user.id }, { online: true });
+            await User.updateOne({ username }, { online: true });
             return next();
         }
 
