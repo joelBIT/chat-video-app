@@ -16,7 +16,7 @@ export function initializeCommonEvents(io: Server): void {
             console.log(`connected username ${username}`);
 
             if (typeof username === "string") {
-                const user = getUserByUsername(username);
+                const user = await getUserByUsername(username);
                 if (user) {
                     namespace.rooms.forEach((room: Room) => {
                         if (isCommonRoom(room.id) || room.members.includes(user.id)) {      // Join rooms where the user is a member

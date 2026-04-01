@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { getByUsername } from "../services/userService";
+import { getUserByUsername } from "../services/userService";
 import { getPrivateConversation, hasConversationMessage, saveConversationForUser, saveMessage } from "../services/messageService";
 import type { Message, Room, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
@@ -53,7 +53,7 @@ async function joinPersonalRoom(socket: ISocket): Promise<void> {
     const username = socket.handshake.query.username;
 
     if (username && (typeof username === "string")) {
-        const user: ChatUser | null = await getByUsername(username);
+        const user: ChatUser | null = await getUserByUsername(username);
         if (user) {
             socket.join(user.id);
         }
