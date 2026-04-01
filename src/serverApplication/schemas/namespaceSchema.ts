@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { roomSchema } from './roomSchema';
 
 const namespaceSchema = new mongoose.Schema({
     _id: Number,
@@ -15,9 +14,6 @@ const namespaceSchema = new mongoose.Schema({
     image: {
         type: String,
         required: [true, "A namespace must have an icon in the UI"]
-    },
-    rooms: {
-        type: [roomSchema]
     }
 }, { timestamps: true });
 

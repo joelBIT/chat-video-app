@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { publicMessageSchema } from './publicMessageSchema';
 
 export const roomSchema = new mongoose.Schema({ 
     name: { 
@@ -16,8 +15,7 @@ export const roomSchema = new mongoose.Schema({
         required: [true, "A room is either public or private"],
         default: false
     },
-    members: [String],                  // A member string is a user's ID
-    history: [publicMessageSchema]
+    members: [String]                  // A member string is a user ID
 });
 
 const Room = mongoose.model('Room', roomSchema);

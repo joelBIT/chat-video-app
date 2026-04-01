@@ -12,25 +12,30 @@ import Room from "../schemas/roomSchema";
 export async function initializeHomeEvents(io: Server): Promise<void> {
     const generalRoom = new Room({
         name: 'General',
-        namespaceId: 0
+        namespaceId: NAMESPACE_ID_HOME
     });
+
+    await generalRoom.save();
     
     const supportRoom = new Room({
         name: 'Support',
-        namespaceId: 0
+        namespaceId: NAMESPACE_ID_HOME
     });
+
+    await supportRoom.save();
     
     const announcementsRoom = new Room({
         name: 'Announcements',
-        namespaceId: 0
+        namespaceId: NAMESPACE_ID_HOME
     });
+
+    await announcementsRoom.save();
     
     const homeNamespace = new Namespace({
         _id: NAMESPACE_ID_HOME,
         name: 'Home',
         endpoint: '/home',
-        image: 'home.svg',
-        rooms: [generalRoom, supportRoom, announcementsRoom]
+        image: 'home.svg'
     });
     
     await homeNamespace.save();

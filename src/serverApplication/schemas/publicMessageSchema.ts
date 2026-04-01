@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { userSchema } from './userSchema';
 
 /**
  * Public messages are messages sent a room (and anyone in that room can read the message). 
@@ -7,8 +6,12 @@ import { userSchema } from './userSchema';
  */
 export const publicMessageSchema = new mongoose.Schema({
     from: {
-        type: userSchema,
+        type: String,       // The user ID is used as identifier
         required: [true, "The message must be from a user"]
+    },
+    to: {
+        type: String,       // The room ID is used as identifier
+        required: [true, "The message must have a room ID as a recipient"]
     },
     text: {
         type: String,
