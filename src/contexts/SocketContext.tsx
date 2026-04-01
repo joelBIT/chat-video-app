@@ -11,7 +11,7 @@ export interface SocketContextProvider {
     isConnected: boolean;
     errorMessage: string;
     logout: () => void;
-    connect: (username: string) => void;
+    connect: (username: string, password: string) => void;
     updateUser: (updatedUser: ChatUser) => Promise<ActionState>;
 }
 
@@ -101,10 +101,10 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
     }
 
     /**
-     * Add username to the socket before connecting (usernames on the server should be unique).
+     * Add username and password to the socket before connecting (usernames on the server should be unique).
      */
-    function connect(username: string): void {
-        socket.auth = { username };
+    function connect(username: string, password: string): void {
+        socket.auth = { username, password };
         socket.io.opts.query = { username };
 
         socket.connect();

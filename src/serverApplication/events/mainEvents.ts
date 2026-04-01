@@ -1,9 +1,9 @@
 import { Server } from "socket.io";
 import { getDataForUser } from "../services/namespaceService";
-import { getAllUsers, getUserByID, getUserByUsername, saveUser, setOnlineStatusForUser } from "../services/userService";
 import type { ISocket } from "../interfaces";
 import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../utils";
 import type { ChatUser } from "../../types";
+import User from "../schemas/userSchema";
 
 /**
  * Initializes events for the main namespace ('/') only. The connected client receives data via the "namespaces" event. This data consists of
@@ -15,28 +15,32 @@ export function initializeMainNamespaceEvents(io: Server): void {
         console.log(`connected ${socket.id}`);
 
         const userID: string | undefined = socket.userID;
-        if (userID) {
-            socket.emit(NAMESPACES, getDataForUser(userID), getUserByID(userID), getAllUsers());          // Send back data to the connected client
-            io.except(socket.id).emit(USER_CONNECTED, getUserByID(userID));                                // Inform other clients that the user is online
+        const user: ChatUser | null = await User.findById(userID);
+        if (user) {
+            const users: ChatUser[] = await User.find({});
+            socket.emit(NAMESPACES, getDataForUser(user), user, users);          // Send back data to the connected client
+            io.except(socket.id).emit(USER_CONNECTED, user);                                // Inform other clients that the user is online
         }
 
-        socket.on(USER_UPDATED, (updatedUser: ChatUser, ackCallback) => {
-            const user = getUserByUsername(updatedUser.username);
+        socket.on(USER_UPDATED, async (updatedUser: ChatUser, ackCallback) => {
+            const user: ChatUser | null = await User.findOne({username: updatedUser.username});
             if (user && user.id !== updatedUser.id) {
                 ackCallback({ message: 'Username is already taken', success: false });      // Updated user may have a new username that already exists
-            } else {
-                saveUser(updatedUser);
+            } else if (user) {
+                await User.findOneAndUpdate({_id: user.id}, updatedUser);
                 io.except(socket.id).emit(USER_UPDATED, updatedUser);
                 ackCallback({ message: 'Profile updated', success: true });
             }
+            ackCallback({ message: `User ${updatedUser.username} not found`, success: false });
         });
 
         socket.on("disconnect", async reason => {
             console.log(`disconnect ${userID} due to ${reason}`);
             
             if (userID) {
-                setOnlineStatusForUser(userID, false);
-                io.emit(USER_DISCONNECTED, getUserByID(userID));
+                await User.updateOne({ _id: userID }, { online: false });
+                const user: ChatUser | null = await User.findById(userID);
+                io.emit(USER_DISCONNECTED, user);
             } else {
                 console.log(`Could not inform clients about disconnecting ${userID}`);
             }

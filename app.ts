@@ -2,18 +2,21 @@ import { createServer } from 'node:https';
 import { readFileSync } from 'node:fs';
 import express from 'express';
 import { Server } from 'socket.io';
-import {checkUsername} from "./src/serverApplication/auth/auth.ts";
+import {login} from "./src/serverApplication/auth/auth.ts";
 import {initializeHomeEvents} from "./src/serverApplication/events/homeEvents.ts";
 import {initializeDmEvents} from "./src/serverApplication/events/dmEvents.ts";
 import {initializeGamesEvents} from "./src/serverApplication/events/gamesEvents.ts";
 import {initializeCommonEvents} from "./src/serverApplication/events/commonEvents.ts";
 import {initializeMainNamespaceEvents} from "./src/serverApplication/events/mainEvents.ts";
 import {initializeWebRtcEvents} from "./src/serverApplication/events/webRtcEvents.ts";
+import userRouter from "./src/serverApplication/routes/userRoutes.ts";
 
 const app = express();
 app.use(express.static(import.meta.dirname + "/dist/"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
+
+app.use('/register', userRouter);
 
 app.all('/{*path}', async (req, res) => {
     res.redirect(`https://${req.get('host')}`);
@@ -23,7 +26,7 @@ const key = readFileSync('cert.key');
 const cert = readFileSync('cert.crt');
 const expressServer = createServer({key, cert}, app);
 
-const ORIGIN = process.env.NODE_ENV === 'production' ? process.env.URL as string : "https://localhost";
+const ORIGIN: string = process.env.NODE_ENV === 'production' ? process.env.URL as string : "https://localhost";
 
 // Create our socket.io server... it will listen to our express port
 const io = new Server(expressServer, {
@@ -35,7 +38,7 @@ const io = new Server(expressServer, {
     }
 });
 
-checkUsername(io);
+login(io);
 initializeMainNamespaceEvents(io);
 initializeCommonEvents(io);
 initializeHomeEvents(io);
