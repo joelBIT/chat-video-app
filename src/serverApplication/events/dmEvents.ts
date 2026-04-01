@@ -64,7 +64,7 @@ async function joinPersonalRoom(socket: ISocket): Promise<void> {
  * Create the "DMs" namespace if it does not exist.
  */
 async function createDatabaseCollection(): Promise<void> {
-    const exists = await Namespace.findOne({ name: 'DMs' });
+    const exists = await Namespace.exists({ name: 'DMs' });
     if (!exists) {
         const dmNamespace = new Namespace({
             _id: NAMESPACE_ID_DM,

@@ -2,7 +2,7 @@ import { Server } from "socket.io";
 import type { Message } from "../../types";
 import { saveMessage } from "../services/messageService";
 import type { ISocket } from "../interfaces";
-import { CHANGE_ROOM, CHAT_MESSAGE, NAMESPACE_HOME_ENDPOINT, NAMESPACE_ID_HOME, USER_JOINED } from "../utils";
+import { CHANGE_ROOM, CHAT_MESSAGE, NAMESPACE_HOME_ENDPOINT, NAMESPACE_ID_HOME, ROOM_NAME_ANNOUNCEMENTS, ROOM_NAME_GENERAL, ROOM_NAME_SUPPORT, USER_JOINED } from "../utils";
 import Namespace from "../schemas/namespaceSchema";
 import Room from "../schemas/roomSchema";
 
@@ -32,7 +32,7 @@ export async function initializeHomeEvents(io: Server): Promise<void> {
  * Create the "Home" namespace and the common rooms if the namespace does not exist.
  */
 async function createDatabaseCollections(): Promise<void> {
-    const exists = await Namespace.findOne({ name: 'Home' });
+    const exists = await Namespace.exists({ name: 'Home' });
     if (!exists) {
         const homeNamespace = new Namespace({
             _id: NAMESPACE_ID_HOME,
@@ -44,21 +44,21 @@ async function createDatabaseCollections(): Promise<void> {
         await homeNamespace.save();
 
         const generalRoom = new Room({
-            name: 'General',
+            name: ROOM_NAME_GENERAL,
             namespaceId: NAMESPACE_ID_HOME
         });
 
         await generalRoom.save();
         
         const supportRoom = new Room({
-            name: 'Support',
+            name: ROOM_NAME_SUPPORT,
             namespaceId: NAMESPACE_ID_HOME
         });
 
         await supportRoom.save();
         
         const announcementsRoom = new Room({
-            name: 'Announcements',
+            name: ROOM_NAME_ANNOUNCEMENTS,
             namespaceId: NAMESPACE_ID_HOME
         });
 

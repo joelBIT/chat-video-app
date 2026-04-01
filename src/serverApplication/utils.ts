@@ -40,6 +40,11 @@ export const ROOM_ID_SUPPORT = "1";
 export const ROOM_ID_ANNOUNCEMENTS = "2";
 export const ROOM_ID_LOBBY = "3";
 
+export const ROOM_NAME_GENERAL = "General";
+export const ROOM_NAME_SUPPORT = "Support";
+export const ROOM_NAME_ANNOUNCEMENTS = "Announcements";
+export const ROOM_NAME_LOBBY = "Lobby";
+
 export function isCommonRoom(roomID: string): boolean {
     return ["0", "1", "2", "3"].includes(roomID);
 }

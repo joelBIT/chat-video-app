@@ -1,6 +1,7 @@
 import express from 'express';
 import type { ChatUser } from '../../types';
 import User from '../schemas/userSchema';
+import { addUserToCommonRooms } from '../services/roomService';
 
 const router = express.Router();
 
@@ -36,6 +37,8 @@ async function registerUser(req: express.Request, res: express.Response): Promis
             await dbUser.save().then(doc => {
                 const createdUser: ChatUser = {username: doc.username, id: doc._id.toString(), online: doc.online, avatar: doc.avatar, inCall: doc.inCall};
                 
+                addUserToCommonRooms(createdUser);
+
                 res.status(201).json({
                     success: true,
                     message: `${doc.username} successfully registered.`,

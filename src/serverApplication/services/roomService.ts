@@ -1,7 +1,8 @@
 import crypto from "node:crypto";
-import type { Namespace, Room } from "../../types";
+import type { ChatUser, Namespace, Room } from "../../types";
 import namespaceStore from "../stores/NamespaceStore";
-import { NAMESPACE_ID_GAMES } from "../utils";
+import { NAMESPACE_ID_GAMES, ROOM_NAME_ANNOUNCEMENTS, ROOM_NAME_GENERAL, ROOM_NAME_LOBBY, ROOM_NAME_SUPPORT } from "../utils";
+import RoomSchema from "../schemas/roomSchema";
 
 /**
  * Add a newly created Game room. A random ID is created for the room.
@@ -29,6 +30,28 @@ export function addUserToRoom(userID: string, roomID: string, namespaceID: numbe
         }
     });
     namespaceStore.saveNamespace(namespace);
+}
+
+/**
+ * Add a new application user. All users are members of the 4 rooms "General", "Support", "Announcements", and "Lobby" so a new user
+ * must be added as member of these rooms.
+ */
+export async function addUserToCommonRooms(user: ChatUser): Promise<void> {
+    addUserToCommonRoom(user.id, ROOM_NAME_GENERAL);
+    addUserToCommonRoom(user.id, ROOM_NAME_SUPPORT);
+    addUserToCommonRoom(user.id, ROOM_NAME_ANNOUNCEMENTS);
+    addUserToCommonRoom(user.id, ROOM_NAME_LOBBY);
+}
+
+async function addUserToCommonRoom(userID: string, roomName: string): Promise<void> {
+    const response = await RoomSchema.findOne({ name: roomName }, 'members');
+    if (response && response.members) {
+        const roomMembers: String[] = response.members;
+        if (!roomMembers.includes(userID)) {
+            roomMembers.push(userID);
+            await RoomSchema.findOneAndUpdate({ name: roomName }, { members: roomMembers });
+        }
+    }
 }
 
 /**

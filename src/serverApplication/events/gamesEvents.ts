@@ -3,7 +3,7 @@ import { addUserToRoom, getRoomByID, isMember, removeUserFromRoom, saveGameRoom 
 import { saveMessage } from "../services/messageService";
 import type { Message, Room } from "../../types";
 import type { ISocket } from "../interfaces";
-import { CHANGE_ROOM, CHAT_MESSAGE, CREATE_ROOM, isCommonRoom, LEAVE_ROOM, NAMESPACE_GAMES_ENDPOINT, NAMESPACE_ID_GAMES, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../utils";
+import { CHANGE_ROOM, CHAT_MESSAGE, CREATE_ROOM, isCommonRoom, LEAVE_ROOM, NAMESPACE_GAMES_ENDPOINT, NAMESPACE_ID_GAMES, ROOM_NAME_LOBBY, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../utils";
 import RoomSchema from "../schemas/roomSchema";
 import Namespace from "../schemas/namespaceSchema";
 
@@ -57,7 +57,7 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
  * Create the "Games" namespace and the common "Lobby" room if the namespace does not exist.
  */
 async function createDatabaseCollections(): Promise<void> {
-    const exists = await Namespace.findOne({ name: 'Games' });
+    const exists = await Namespace.exists({ name: 'Games' });
     if (!exists) {
         const gamesNamespace = new Namespace({
             _id: NAMESPACE_ID_GAMES,
@@ -69,7 +69,7 @@ async function createDatabaseCollections(): Promise<void> {
         await gamesNamespace.save();
 
         const lobbyRoom = new RoomSchema({
-            name: 'Lobby',
+            name: ROOM_NAME_LOBBY,
             namespaceId: NAMESPACE_ID_GAMES
         });
 
