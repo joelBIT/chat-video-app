@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const userSchema = new mongoose.Schema({
+export const userSchema = new mongoose.Schema({
     username: { 
         type: String,
         required: [true, "A user must have a username"],
@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
-});
+}, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
 

@@ -17,7 +17,7 @@ export type Namespace = {
 
 export type Message = {
     from: ChatUser,
-    to: Room;           // In public message it is a chat room, and in private message 
+    to: Room;           // In public message it is a chat room, and in private message it is a user (the recipient)
     text: string,
     date: number
 }
@@ -34,6 +34,13 @@ export type ActionState = {
     message: string,
     success: boolean
 }
+
+
+
+
+ /***************
+ * WebRTC types *
+ ***************/
 
 export type Offer = {
     offererUserName: string,
