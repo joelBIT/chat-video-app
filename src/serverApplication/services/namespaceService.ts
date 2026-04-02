@@ -6,26 +6,45 @@ import NamespaceSchema from "../schemas/namespaceSchema";
 import RoomSchema from "../schemas/roomSchema";
 
 export async function getNamespaceByID(namespaceID: number): Promise<Namespace> {
-    const response = await NamespaceSchema.findById(namespaceID);
+    const response: Namespace | null = await NamespaceSchema.findById(namespaceID);
     if (response) {
-        const rooms: Room[] = await RoomSchema.find({ namespaceId: namespaceID });
-
-        const namespace: Namespace = {
-            id: namespaceID,
-            name: response.name,
-            image: response.image,
-            endpoint: response.endpoint,
-            rooms: rooms
-        }
-
-        return namespace;
+        return await mapNamespace(namespaceID, response);
     }
 
     throw new Error(`No namespace found for ID ${namespaceID}`);
 }
 
-export function getAllNamespaces(): Namespace[] {
-    return namespaceStore.getAllNamespaces();
+/**
+ * Maps a namespace response from the database to a namespace object used in the application.
+ */
+async function mapNamespace(namespaceID: number, source: Namespace): Promise<Namespace> {
+    const rooms: Room[] = await RoomSchema.find({ namespaceId: namespaceID });
+
+    const namespace: Namespace = {
+        id: namespaceID,
+        name: source.name,
+        image: source.image,
+        endpoint: source.endpoint,
+        rooms: rooms
+    }
+
+    return namespace;
+}
+
+export async function getAllNamespaces(): Promise<Namespace[]> {
+    const namespaces: Namespace[] | null = await NamespaceSchema.find({});
+    const result: Namespace[] = [];
+
+    for (let i = 0; i < namespaces.length; i++) {
+        const namespaceId = namespaces[i].id;
+        const namespace: Namespace | null = namespaces[i];
+        if (namespace && namespaceId) {
+            const mappedNamespace = await mapNamespace(namespaceId, namespace);
+            result.push(mappedNamespace);
+        }
+    }
+
+    return result;
 }
 
 /**
