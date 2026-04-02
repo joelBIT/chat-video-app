@@ -11,7 +11,7 @@ const offers: Offer[] = [];
  * Initializes events related to WebRTC. WebRTC is only used in namespace 1 (DMs).
  */
 export async function initializeWebRtcEvents(io: Server): Promise<void> {
-    const namespace: Namespace = getNamespaceByID(NAMESPACE_ID_DM);
+    const namespace: Namespace = await getNamespaceByID(NAMESPACE_ID_DM);
 
     io.of(namespace.endpoint).on("connection", async (socket: ISocket) => {
         socket.on(NEW_OFFER, async (fromUsername: string, toUsername: string, video: boolean, newOffer: RTCSessionDescriptionInit) => {

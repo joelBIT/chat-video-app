@@ -2,9 +2,26 @@ import namespaceStore from "../stores/NamespaceStore";
 import { getConversationsByUserID, getPrivateConversation } from "./messageService";
 import type { Namespace, Room, ChatUser } from "../../types";
 import { NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME } from "../utils";
+import NamespaceSchema from "../schemas/namespaceSchema";
+import RoomSchema from "../schemas/roomSchema";
 
-export function getNamespaceByID(namespaceID: number): Namespace {
-    return namespaceStore.findNamespaceByID(namespaceID);
+export async function getNamespaceByID(namespaceID: number): Promise<Namespace> {
+    const response = await NamespaceSchema.findById(namespaceID);
+    if (response) {
+        const rooms: Room[] = await RoomSchema.find({ namespaceId: namespaceID });
+
+        const namespace: Namespace = {
+            id: namespaceID,
+            name: response.name,
+            image: response.image,
+            endpoint: response.endpoint,
+            rooms: rooms
+        }
+
+        return namespace;
+    }
+
+    throw new Error(`No namespace found for ID ${namespaceID}`);
 }
 
 export function getAllNamespaces(): Namespace[] {
