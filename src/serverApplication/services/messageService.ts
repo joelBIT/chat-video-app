@@ -1,23 +1,31 @@
 import messageStore from "../stores/MessageStore";
-import namespaceStore from "../stores/NamespaceStore";
-import type { Message, Namespace, Room } from "../../types";
+import type { Message } from "../../types";
 import { NAMESPACE_ID_DM } from "../utils";
+import PersonalMessage from "../schemas/personalMessageSchema";
+import { PublicMessage } from "../schemas/publicMessageSchema";
 
 /**
- * Messages in personal conversations (DM) are stored in messageStore. The other messages are stored in respective room.
+ * Messages in personal conversations (DM) are stored in PersonalMessages. The other messages are stored in PublicMessages.
  */
-export function saveMessage(message: Message): void {
+export async function saveMessage(message: Message): Promise<void> {
     if (message.to.namespaceId === NAMESPACE_ID_DM) {
-        messageStore.saveMessage(message);
-    } else {
-        const namespace: Namespace = namespaceStore.findNamespaceByID(message.to.namespaceId);
-        namespace.rooms.forEach((room: Room) => {
-            if (room.id === message.to.id) {
-                room.history.push(message);
-            }
+        const newMessage = new PersonalMessage({
+            from: message.from,
+            to: message.to,
+            text: message.text,
+            date: message.date
         });
-        
-        namespaceStore.saveNamespace(namespace);
+            
+        await newMessage.save();
+    } else {
+        const newMessage = new PublicMessage({
+            from: message.from,
+            to: message.to,
+            text: message.text,
+            date: message.date
+        });
+            
+        await newMessage.save();
     }
 }
 
