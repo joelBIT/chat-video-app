@@ -3,7 +3,7 @@ import { getNamespaceByID } from "../services/namespaceService";
 import { ANSWER_RESPONSE, END_CALL, NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, RECEIVED_ICE_CANDIDATE_FROM_SERVER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, USER_UPDATED } from "../utils";
 import type { Namespace, Offer, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
-import { getUserByUsername, saveUser } from "../services/userService";
+import { getUserByUsername, updateUser } from "../services/userService";
 
 const offers: Offer[] = [];
 
@@ -11,11 +11,11 @@ const offers: Offer[] = [];
  * Initializes events related to WebRTC. WebRTC is only used in namespace 1 (DMs).
  */
 export async function initializeWebRtcEvents(io: Server): Promise<void> {
-    const namespace: Namespace = getNamespaceByID(NAMESPACE_ID_DM);
+    const namespace: Namespace = await getNamespaceByID(NAMESPACE_ID_DM);
 
     io.of(namespace.endpoint).on("connection", async (socket: ISocket) => {
-        socket.on(NEW_OFFER, (fromUsername: string, toUsername: string, video: boolean, newOffer: RTCSessionDescriptionInit) => {
-            const user: ChatUser | undefined = getUserByUsername(toUsername);
+        socket.on(NEW_OFFER, async (fromUsername: string, toUsername: string, video: boolean, newOffer: RTCSessionDescriptionInit) => {
+            const user: ChatUser | null = await getUserByUsername(toUsername);
             if (!user) {
                 console.log(`No user found for username ${toUsername}`);
                 return;
@@ -37,7 +37,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             socket.to(user.id).emit(NEW_OFFER_AWAITING, offer);
         });
 
-        socket.on(NEW_OFFER_CANCELLED, (callerUsername: string) => {
+        socket.on(NEW_OFFER_CANCELLED, async (callerUsername: string) => {
             const offer: Offer | undefined = offers.find((offer: Offer) => offer.offererUserName === callerUsername)
             if (!offer) {
                 console.log(`No offer found for username ${callerUsername}`);
@@ -48,7 +48,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             offers.length = 0;
             offers.push(...remainingOffers);
 
-            const recipient: ChatUser | undefined = getUserByUsername(offer.answererUserName);
+            const recipient: ChatUser | null = await getUserByUsername(offer.answererUserName);
             if (!recipient) {
                 console.log(`No user found for username ${offer.answererUserName}`);
                 return;
@@ -62,9 +62,9 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             updateUserStatus(io, username, false);
         });
 
-        socket.on(NEW_ANSWER, (sentOffer: Offer, ackFunction) => {
+        socket.on(NEW_ANSWER, async (sentOffer: Offer, ackFunction) => {
             // Emit this answer (sentOffer) back to CLIENT1. In order to do that, we need CLIENT1's id.
-            const user: ChatUser | undefined = getUserByUsername(sentOffer.offererUserName);
+            const user: ChatUser | null = await getUserByUsername(sentOffer.offererUserName);
             if (!user) {
                 console.log(`No user found for username ${sentOffer.offererUserName}`);
                 return;
@@ -86,7 +86,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             updateUserStatus(io, offer.answererUserName, true);
         });
 
-        socket.on(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, iceCandidateObject => {
+        socket.on(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, async iceCandidateObject => {
             const { didIOffer, iceUserName, iceCandidate } = iceCandidateObject;
 
             if (didIOffer) {
@@ -97,7 +97,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
                     // 1. When the answerer answers, all existing ice candidates are sent
                     // 2. Any candidates that come in after the offer has been answered, will be passed through
                     if (offer.answererUserName) {
-                        const user: ChatUser | undefined = getUserByUsername(offer.answererUserName);
+                        const user: ChatUser | null = await getUserByUsername(offer.answererUserName);
                         if (user) {
                             socket.to(user.id).emit(RECEIVED_ICE_CANDIDATE_FROM_SERVER, iceCandidate);
                         } else {
@@ -109,7 +109,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
                 // This ice candidate is coming from the answerer. Send to the offerer.
                 const offer: Offer | undefined = offers.find((offer: Offer) => offer.answererUserName === iceUserName);
                 if (offer) {
-                    const user: ChatUser | undefined = getUserByUsername(offer.offererUserName);
+                    const user: ChatUser | null = await getUserByUsername(offer.offererUserName);
                     if (user) {
                         socket.to(user.id).emit(RECEIVED_ICE_CANDIDATE_FROM_SERVER, iceCandidate);
                     } else {
@@ -124,14 +124,14 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
 /**
  * Update if a user is in a call or not, and inform application users about the state change.
  */
-function updateUserStatus(io: Server, username: string, inCall: boolean): void {
-    const user: ChatUser | undefined = getUserByUsername(username);
+async function updateUserStatus(io: Server, username: string, inCall: boolean): Promise<void> {
+    const user: ChatUser | null = await getUserByUsername(username);
     if (!user) {
         console.log(`No user found for username ${username}`);
         return;
     }
 
     user.inCall = inCall;
-    saveUser(user);
+    updateUser(user);
     io.emit(USER_UPDATED, user);      // Inform users that this user is in a call.
 }

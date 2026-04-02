@@ -1,74 +1,92 @@
-import crypto from "node:crypto";
-import type { Namespace, Room } from "../../types";
-import namespaceStore from "../stores/NamespaceStore";
-import { NAMESPACE_ID_GAMES } from "../utils";
+import type { ChatUser, Room } from "../../types";
+import { NAMESPACE_ID_GAMES, ROOM_NAME_ANNOUNCEMENTS, ROOM_NAME_GENERAL, ROOM_NAME_LOBBY, ROOM_NAME_SUPPORT } from "../utils";
+import RoomSchema from "../schemas/roomSchema";
 
 /**
- * Add a newly created Game room. A random ID is created for the room.
+ * Add a newly created Game room, if it does not already exist.
  *
  * @param room      the room to be persisted
  * @returns         the room with its new ID
  */
-export function saveGameRoom(room: Room): Room {
-    room.id = crypto.randomBytes(8).toString("hex");
-    const namespace: Namespace = namespaceStore.findNamespaceByID(NAMESPACE_ID_GAMES);
-    namespace.rooms.push(room);
-    namespaceStore.saveNamespace(namespace);
-    
-    return JSON.parse(JSON.stringify(room));
+export async function saveGameRoom(room: Room): Promise<Room> {
+    const exists = await RoomSchema.exists({ name: room.name });
+    if (!exists) {
+        const newRoom = new RoomSchema({
+            name: room.name,
+            namespaceId: NAMESPACE_ID_GAMES
+        });
+
+        const result = await newRoom.save();
+        const createdRoom: Room = Object.assign(result);
+        createdRoom.history = [];
+        return createdRoom;
+    }
+
+    throw new Error(`Room with name ${room.name} already exist`);
 }
 
 /**
  * Add a user to room if the user is not already a member of the room. 
  */
-export function addUserToRoom(userID: string, roomID: string, namespaceID: number): void {
-    const namespace: Namespace = namespaceStore.findNamespaceByID(namespaceID);
-    namespace.rooms.forEach((room: Room) => {
-        if (room.id === roomID && !room.members.includes(userID)) {
-            room.members.push(userID);
+export async function addUserToRoom(userID: string, roomID: string): Promise<void> {
+   await addUserToCommonRoom(userID, roomID);
+}
+
+/**
+ * Add a new application user. All users are members of the 4 rooms "General", "Support", "Announcements", and "Lobby" so a new user
+ * must be added as member of these rooms.
+ */
+export async function addUserToCommonRooms(user: ChatUser): Promise<void> {
+    addUserToCommonRoom(user.id, ROOM_NAME_GENERAL);
+    addUserToCommonRoom(user.id, ROOM_NAME_SUPPORT);
+    addUserToCommonRoom(user.id, ROOM_NAME_ANNOUNCEMENTS);
+    addUserToCommonRoom(user.id, ROOM_NAME_LOBBY);
+}
+
+async function addUserToCommonRoom(userID: string, roomName: string): Promise<void> {
+    const response = await RoomSchema.findOne({ name: roomName }, 'members');
+    if (response && response.members) {
+        const roomMembers: string[] = response.members;
+        if (!roomMembers.includes(userID)) {
+            roomMembers.push(userID);
+            await RoomSchema.findOneAndUpdate({ name: roomName }, { members: roomMembers });
         }
-    });
-    namespaceStore.saveNamespace(namespace);
+    }
 }
 
 /**
  * Remove a user from room if the user is a member of the room. 
  */
-export function removeUserFromRoom(userID: string, roomID: string, namespaceID: number): void {
-    const namespace: Namespace = namespaceStore.findNamespaceByID(namespaceID);
-    namespace.rooms.forEach((room: Room) => {
-        if (room.id === roomID && room.members.includes(userID)) {
-            const filteredMembers: string[] = room.members.filter((user: string) => user !== userID);
-            room.members = [];
-            room.members.push(...filteredMembers);
+export async function removeUserFromRoom(userID: string, roomID: string): Promise<void> {
+    const response = await RoomSchema.findById(roomID, 'members');
+    if (response && response.members) {
+        const roomMembers: string[] = response.members;
+        if (roomMembers && roomMembers.includes(userID)) {
+            const filteredMembers: string[] = roomMembers.filter((user: string) => user !== userID);
+            await RoomSchema.findOneAndUpdate({ _id: roomID }, { members: filteredMembers });
         }
-    });
-    namespaceStore.saveNamespace(namespace);
+    }
 }
 
-export function getRoomByID(roomID: string, namespaceID: number): Room {
-    const namespace: Namespace = namespaceStore.findNamespaceByID(namespaceID);
-    let matchingRoom: Room | undefined;
-    namespace.rooms.forEach((room: Room) => {
-        if (room.id === roomID) {
-            matchingRoom = room;
-        }
-    });
+export async function getRoomByID(roomID: string): Promise<Room> {
+    const room: Room | null = await RoomSchema.findById(roomID);
+    if (room) {
+        return room;
+    }
 
-    return JSON.parse(JSON.stringify(matchingRoom));
+    throw new Error(`No room with ID ${roomID} found`);
 }
 
 /**
  * @returns     true if userID is member of room with ID roomID
  */
-export function isMember(userID: string, roomID: string, namespaceID: number): boolean {
+export async function isMember(userID: string, roomID: string): Promise<boolean> {
     let isMember: boolean = false;
-    const namespace: Namespace = namespaceStore.findNamespaceByID(namespaceID);
-    namespace.rooms.forEach((room: Room) => {
-        if (room.id === roomID && room.members.includes(userID)) {
-            isMember = true;
-        }
-    });
+    const room: Room | null = await RoomSchema.findById(roomID);
+
+    if (room && room.id === roomID && room.members.includes(userID)) {
+        isMember = true;
+    }
 
     return isMember;
 }

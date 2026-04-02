@@ -1,16 +1,15 @@
 import mongoose from 'mongoose';
-import { userSchema } from './userSchema';
 
 /**
  * Personal messages are messages sent between two users in a private conversation (DM).
  */
 export const personalMessageSchema = new mongoose.Schema({
     from: {
-        type: userSchema,
-        required: [true, "The message must have a sender"]
+        type: String,       // The sender ID is used as identifier
+        required: [true, "A message must have a sender"]
     },
     to: {
-        type: userSchema,
+        type: String,       // The recipient ID is used as identifier
         required: [true, "A message must have a recipient"]
     },
     text: {
