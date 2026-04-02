@@ -14,10 +14,10 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
     await createDatabaseCollections();
 
     io.of(NAMESPACE_GAMES_ENDPOINT).on("connection", async (socket: ISocket) => {
-        socket.on(CREATE_ROOM, (room: Room, userID: string) => {
+        socket.on(CREATE_ROOM, async (room: Room, userID: string) => {
             room.members = [];
             room.members.push(userID);
-            const persistedRoom: Room = saveGameRoom(room);
+            const persistedRoom: Room = await saveGameRoom(room);
             socket.join(persistedRoom.id);
             
             // Send created room to clients so that the room appears in the room list in "Games".
@@ -37,11 +37,11 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
 
             if (!isCommonRoom(roomID) && !isRoomMember) {
                 // If changing to a custom game room that the client is not a member of, send back the room containing its message history.
-                const room = getRoomByID(roomID, NAMESPACE_ID_GAMES);
+                const room = await getRoomByID(roomID);
                 io.of(NAMESPACE_GAMES_ENDPOINT).to(socket.id).emit(UPDATE_CUSTOM_GAME_ROOM, room);
             }
 
-            addUserToRoom(userID, roomID, NAMESPACE_ID_GAMES);
+            await addUserToRoom(userID, roomID);
             io.of(NAMESPACE_GAMES_ENDPOINT).emit(USER_JOINED, roomID, userID, NAMESPACE_ID_GAMES);
         });
 
