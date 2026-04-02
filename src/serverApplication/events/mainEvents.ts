@@ -2,7 +2,7 @@ import { Server } from "socket.io";
 import { getDataForUser } from "../services/namespaceService";
 import type { ISocket } from "../interfaces";
 import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../utils";
-import type { ChatUser } from "../../types";
+import type { ChatUser, Namespace } from "../../types";
 import { getUserByUsername, getUserById, getUsers, setUserOnline, updateUser } from "../services/userService";
 
 /**
@@ -18,7 +18,8 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
         const user: ChatUser | null = await getUserById(userID);
         if (user) {
             const users: ChatUser[] = await getUsers();
-            socket.emit(NAMESPACES, getDataForUser(user), user, users);          // Send back data to the connected client
+            const namespaces: Namespace[] = await getDataForUser(user);
+            socket.emit(NAMESPACES, namespaces, user, users);          // Send back data to the connected client
             io.except(socket.id).emit(USER_CONNECTED, user);                     // Inform other clients that the user is online
         }
 

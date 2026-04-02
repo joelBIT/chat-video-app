@@ -33,8 +33,9 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
 
         socket.on(CHANGE_ROOM, async (roomID: string, userID: string) => {
             socket.join(roomID);
+            const isRoomMember = await isMember(userID, roomID);
 
-            if (!isCommonRoom(roomID) && !isMember(userID, roomID, NAMESPACE_ID_GAMES)) {
+            if (!isCommonRoom(roomID) && !isRoomMember) {
                 // If changing to a custom game room that the client is not a member of, send back the room containing its message history.
                 const room = getRoomByID(roomID, NAMESPACE_ID_GAMES);
                 io.of(NAMESPACE_GAMES_ENDPOINT).to(socket.id).emit(UPDATE_CUSTOM_GAME_ROOM, room);

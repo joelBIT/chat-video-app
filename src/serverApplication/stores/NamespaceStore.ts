@@ -26,10 +26,6 @@ class InMemoryNamespaceStore {
         throw new Error(`Could not retrieve namespace with id ${namespaceID}`);
     }
 
-    getAllNamespaces(): Namespace[] {
-        return this.namespaces.values().toArray() ?? [];
-    }
-
     saveNamespace(namespace: Namespace): void {
         this.namespaces.set(namespace.id, namespace);
     }

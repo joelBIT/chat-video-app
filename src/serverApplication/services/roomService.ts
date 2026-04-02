@@ -84,14 +84,13 @@ export function getRoomByID(roomID: string, namespaceID: number): Room {
 /**
  * @returns     true if userID is member of room with ID roomID
  */
-export function isMember(userID: string, roomID: string, namespaceID: number): boolean {
+export async function isMember(userID: string, roomID: string): Promise<boolean> {
     let isMember: boolean = false;
-    const namespace: Namespace = namespaceStore.findNamespaceByID(namespaceID);
-    namespace.rooms.forEach((room: Room) => {
-        if (room.id === roomID && room.members.includes(userID)) {
-            isMember = true;
-        }
-    });
+    const room: Room | null = await RoomSchema.findById(roomID);
+
+    if (room && room.id === roomID && room.members.includes(userID)) {
+        isMember = true;
+    }
 
     return isMember;
 }
