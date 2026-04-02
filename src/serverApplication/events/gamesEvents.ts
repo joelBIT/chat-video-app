@@ -45,9 +45,9 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
             io.of(NAMESPACE_GAMES_ENDPOINT).emit(USER_JOINED, roomID, userID, NAMESPACE_ID_GAMES);
         });
 
-        socket.on(LEAVE_ROOM, (roomID: string, userID: string) => {
+        socket.on(LEAVE_ROOM, async (roomID: string, userID: string) => {
             socket.leave(roomID);
-            removeUserFromRoom(userID, roomID, NAMESPACE_ID_GAMES);
+            await removeUserFromRoom(userID, roomID);
 
             io.of(NAMESPACE_GAMES_ENDPOINT).emit(USER_LEFT, roomID, userID, NAMESPACE_ID_GAMES);
         });

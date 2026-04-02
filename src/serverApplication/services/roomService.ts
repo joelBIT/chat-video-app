@@ -1,5 +1,4 @@
-import type { ChatUser, Namespace, Room } from "../../types";
-import namespaceStore from "../stores/NamespaceStore";
+import type { ChatUser, Room } from "../../types";
 import { NAMESPACE_ID_GAMES, ROOM_NAME_ANNOUNCEMENTS, ROOM_NAME_GENERAL, ROOM_NAME_LOBBY, ROOM_NAME_SUPPORT } from "../utils";
 import RoomSchema from "../schemas/roomSchema";
 
@@ -47,7 +46,7 @@ export async function addUserToCommonRooms(user: ChatUser): Promise<void> {
 async function addUserToCommonRoom(userID: string, roomName: string): Promise<void> {
     const response = await RoomSchema.findOne({ name: roomName }, 'members');
     if (response && response.members) {
-        const roomMembers: String[] = response.members;
+        const roomMembers: string[] = response.members;
         if (!roomMembers.includes(userID)) {
             roomMembers.push(userID);
             await RoomSchema.findOneAndUpdate({ name: roomName }, { members: roomMembers });
@@ -58,16 +57,15 @@ async function addUserToCommonRoom(userID: string, roomName: string): Promise<vo
 /**
  * Remove a user from room if the user is a member of the room. 
  */
-export function removeUserFromRoom(userID: string, roomID: string, namespaceID: number): void {
-    const namespace: Namespace = namespaceStore.findNamespaceByID(namespaceID);
-    namespace.rooms.forEach((room: Room) => {
-        if (room.id === roomID && room.members.includes(userID)) {
-            const filteredMembers: string[] = room.members.filter((user: string) => user !== userID);
-            room.members = [];
-            room.members.push(...filteredMembers);
+export async function removeUserFromRoom(userID: string, roomID: string): Promise<void> {
+    const response = await RoomSchema.findById(roomID, 'members');
+    if (response && response.members) {
+        const roomMembers: string[] = response.members;
+        if (roomMembers && roomMembers.includes(userID)) {
+            const filteredMembers: string[] = roomMembers.filter((user: string) => user !== userID);
+            await RoomSchema.findOneAndUpdate({ _id: roomID }, { members: filteredMembers });
         }
-    });
-    namespaceStore.saveNamespace(namespace);
+    }
 }
 
 export async function getRoomByID(roomID: string): Promise<Room> {
