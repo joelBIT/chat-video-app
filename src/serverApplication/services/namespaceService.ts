@@ -1,5 +1,4 @@
-import { getConversationsByUserID, getPrivateConversation } from "./messageService";
-import type { Namespace, Room, ChatUser } from "../../types";
+import type { Namespace, Room } from "../../types";
 import { NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME } from "../utils";
 import NamespaceSchema from "../schemas/namespaceSchema";
 import RoomSchema from "../schemas/roomSchema";
@@ -49,7 +48,7 @@ export async function getAllNamespaces(): Promise<Namespace[]> {
 /**
  * Send back namespaces with rooms, members and message history to a client when the client connects.
  */
-export async function getDataForUser(user: ChatUser): Promise<Namespace[]> {
+export async function getDataForUser(): Promise<Namespace[]> {
     const namespaces: Namespace[] = [];
 
     const homeNamespace: Namespace | null = await NamespaceSchema.findById(NAMESPACE_ID_HOME);
@@ -61,13 +60,6 @@ export async function getDataForUser(user: ChatUser): Promise<Namespace[]> {
     const dmNamespace: Namespace | null = await NamespaceSchema.findById(NAMESPACE_ID_DM);
     if (dmNamespace) {
         dmNamespace.rooms = [];
-
-        const conversations: string[] = getConversationsByUserID(user.id);
-        conversations.forEach((recipientID: string) => {
-            const room: Room = {id: recipientID, private: true, members: [user.id, recipientID], history: [], name: user.username, namespaceId: NAMESPACE_ID_DM};
-            room.history.push(...getPrivateConversation(user.id, recipientID));
-            dmNamespace.rooms.push(JSON.parse(JSON.stringify(room)));
-        });
 
         namespaces.push(dmNamespace);
     }

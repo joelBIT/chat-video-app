@@ -1,4 +1,3 @@
-import messageStore from "../stores/MessageStore";
 import type { Message } from "../../types";
 import { NAMESPACE_ID_DM } from "../utils";
 import PersonalMessage from "../schemas/personalMessageSchema";
@@ -34,12 +33,13 @@ export async function saveMessage(message: Message): Promise<void> {
  * The order of user1 and user2 are not important. All messages where these two users are
  * sender and receiver (in any order) will be retrieved.
  */
-export function getPrivateConversation(user1ID: string, user2ID: string): Message[] {
-    return messageStore.findConversationMessages(user1ID, user2ID);
+export async function getPrivateConversation(user1ID: string, user2ID: string): Promise<Message[]> {
+    const conversations: Message[] = await PersonalMessage.find({ "from": { user1ID, user2ID }, "to": { user1ID, user2ID } });
+    return conversations.filter(({ from, to }: Message) => (from.id === user1ID && to.id === user2ID) || (from.id === user2ID && to.id === user1ID));
 }
 
-export function getConversationsByUserID(userID: string): string[] {
-    return messageStore.findConversations(userID);
+export async function getConversationsByUserID(userID: string): Promise<string[]> {
+    return await PersonalMessage.find({ "from": { userID } }).distinct("to");
 }
 
 /**
@@ -50,14 +50,10 @@ export function getConversationsByUserID(userID: string): string[] {
  * @param senderID              is the client that initiates the conversation
  * @param recipientID           is the client that senderID wish to start a conversation with
  */
-export function saveConversationForUser(senderID: string, recipientID: string): void {
-    const senderConversations: string[] = messageStore.findConversations(senderID);
-    if (!senderConversations.includes(recipientID)) {
-        senderConversations.push(recipientID);
-        messageStore.saveConversations(senderID, senderConversations);
-    }
-}
-
-export function hasConversationMessage(user1ID: string, user2ID: string): boolean {
-    return messageStore.hasConversationMessage(user1ID, user2ID);
-}
+// export function saveConversationForUser(senderID: string, recipientID: string): void {
+//     const senderConversations: string[] = messageStore.findConversations(senderID);
+//     if (!senderConversations.includes(recipientID)) {
+//         senderConversations.push(recipientID);
+//         messageStore.saveConversations(senderID, senderConversations);           // TODO: Remove this code?
+//     }
+// }

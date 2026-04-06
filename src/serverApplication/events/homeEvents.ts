@@ -42,21 +42,30 @@ async function createDatabaseCollections(): Promise<void> {
         });
         
         await homeNamespace.save();
+    }
 
+    let roomExists = await Room.exists({ name: ROOM_NAME_GENERAL });
+    if (!roomExists) {
         const generalRoom = new Room({
             name: ROOM_NAME_GENERAL,
             namespaceId: NAMESPACE_ID_HOME
         });
 
         await generalRoom.save();
-        
+    }
+
+    roomExists = await Room.exists({ name: ROOM_NAME_SUPPORT });
+    if (!roomExists) {
         const supportRoom = new Room({
             name: ROOM_NAME_SUPPORT,
             namespaceId: NAMESPACE_ID_HOME
         });
 
         await supportRoom.save();
-        
+    }
+
+    roomExists = await Room.exists({ name: ROOM_NAME_ANNOUNCEMENTS });
+    if (!roomExists) {
         const announcementsRoom = new Room({
             name: ROOM_NAME_ANNOUNCEMENTS,
             namespaceId: NAMESPACE_ID_HOME
