@@ -62,10 +62,10 @@ export async function getDataForUser(user: ChatUser): Promise<Namespace[]> {
     if (dmNamespace) {
         dmNamespace.rooms = [];
 
-        const conversations: string[] = getConversationsByUserID(user.id);
-        conversations.forEach((recipientID: string) => {
+        const conversations: string[] = await getConversationsByUserID(user.id);        // TODO: Remove this part?
+        conversations.forEach(async (recipientID: string) => {
             const room: Room = {id: recipientID, private: true, members: [user.id, recipientID], history: [], name: user.username, namespaceId: NAMESPACE_ID_DM};
-            room.history.push(...getPrivateConversation(user.id, recipientID));
+            room.history.push(...(await getPrivateConversation(user.id, recipientID)));
             dmNamespace.rooms.push(JSON.parse(JSON.stringify(room)));
         });
 

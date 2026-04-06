@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { getUserByUsername } from "../services/userService";
-import { getPrivateConversation, hasConversationMessage, saveConversationForUser, saveMessage } from "../services/messageService";
+import { getPrivateConversation, saveMessage } from "../services/messageService";
 import type { Message, Room, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
 import { CREATE_ROOM, NAMESPACE_DM_ENDPOINT, NAMESPACE_ID_DM, PRIVATE_MESSAGE, UPDATE_ROOMS } from "../utils";
@@ -16,10 +16,10 @@ export async function initializeDmEvents(io: Server): Promise<void> {
     io.of(NAMESPACE_DM_ENDPOINT).on("connection", async (socket: ISocket) => {
         joinPersonalRoom(socket);
 
-        socket.on(CREATE_ROOM, (sender: ChatUser, recipient: ChatUser, ackCallback) => {
-            saveConversationForUser(sender.id, recipient.id);
+        socket.on(CREATE_ROOM, async (sender: ChatUser, recipient: ChatUser, ackCallback) => {
+            //saveConversationForUser(sender.id, recipient.id);     // TODO: Remove or replace?
 
-            const messages: Message[] = getPrivateConversation(sender.id, recipient.id);    // Get messages if conversation already exist
+            const messages: Message[] = await getPrivateConversation(sender.id, recipient.id);    // Get messages if conversation already exist
             const room: Room = {id: recipient.id, name: recipient.username, namespaceId: NAMESPACE_ID_DM, private: true, members: [sender.id, recipient.id], history: [...messages]};
         
             ackCallback({ room });      // Return the conversation (as a room) to the client.
@@ -30,9 +30,10 @@ export async function initializeDmEvents(io: Server): Promise<void> {
          * the recipient that a message has arrived.
          * If messages already exists, send the message to the recipient and return it to the sender.
          */
-        socket.on(PRIVATE_MESSAGE, (message: Message) => {
-            if (!hasConversationMessage(message.from.id, message.to.id)) {
-                saveConversationForUser(message.to.id, message.from.id);
+        socket.on(PRIVATE_MESSAGE, async (message: Message) => {
+            const conversations: Message[] = await getPrivateConversation(message.from.id, message.to.id);
+            if (conversations.length === 0) {
+                //saveConversationForUser(message.to.id, message.from.id);  // TODO: Remove this or replace?
                 // Send the room to the recipient if this is the first message ever sent in that conversation
                 const room: Room = {id: message.from.id, name: message.from.username, namespaceId: NAMESPACE_ID_DM, private: true, members: [message.from.id, message.to.id], history: []};
                 io.of(NAMESPACE_DM_ENDPOINT).to(message.to.id).emit(UPDATE_ROOMS, room);
