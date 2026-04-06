@@ -68,7 +68,10 @@ async function createDatabaseCollections(): Promise<void> {
         });
         
         await gamesNamespace.save();
+    }
 
+    const roomExists = await RoomSchema.exists({ name: ROOM_NAME_LOBBY });
+    if (!roomExists) {
         const lobbyRoom = new RoomSchema({
             name: ROOM_NAME_LOBBY,
             namespaceId: NAMESPACE_ID_GAMES
