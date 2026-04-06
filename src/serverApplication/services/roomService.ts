@@ -71,6 +71,7 @@ export async function removeUserFromRoom(userID: string, roomID: string): Promis
 export async function getRoomByID(roomID: string): Promise<Room> {
     const room: Room | null = await RoomSchema.findById(roomID);
     if (room) {
+        room.history = [];          // TODO: Add message history?
         return room;
     }
 

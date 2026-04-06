@@ -23,10 +23,32 @@ async function mapNamespace(namespaceID: number, source: Namespace): Promise<Nam
         name: source.name,
         image: source.image,
         endpoint: source.endpoint,
-        rooms: rooms
+        rooms: mapRooms(rooms)
     }
 
     return namespace;
+}
+
+/**
+ * Maps a room from the database to a room object used in the application.
+ */
+function mapRooms(rooms: Room[]): Room[] {
+    const mappedRooms: Room[] = [];
+
+    for (let i = 0; i < rooms.length; i++) {
+        const room: Room = {
+            id: rooms[i].id,
+            name: rooms[i].name,
+            namespaceId: rooms[i].namespaceId,
+            private: rooms[i].private,
+            members: rooms[i].members,
+            history: []
+        }
+
+        mappedRooms.push(room);
+    }
+
+    return mappedRooms;
 }
 
 export async function getAllNamespaces(): Promise<Namespace[]> {

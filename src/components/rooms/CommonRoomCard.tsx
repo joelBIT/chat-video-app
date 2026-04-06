@@ -2,7 +2,7 @@ import { type ReactElement } from "react";
 import { useRoom } from "../../hooks";
 import { isSelectedRoom } from "../../clientApplication/services/roomService";
 import type { Room } from "../../types";
-import { ROOM_ID_ANNOUNCEMENTS } from "../../serverApplication/utils";
+import { ROOM_NAME_ANNOUNCEMENTS } from "../../serverApplication/utils";
 
 import "./RoomCard.css";
 
@@ -13,10 +13,10 @@ export function CommonRoomCard({room}: {room: Room}): ReactElement {
     const { changeRoom } = useRoom();
 
     return (
-        <section className="namespace-room" onClick={() => changeRoom(room)}>
+        <section className="namespace-room" onClick={() => changeRoom(room)} key={room.id}>
             <section className="room-section">
                  {
-                    room.id === ROOM_ID_ANNOUNCEMENTS ?
+                    room.name === ROOM_NAME_ANNOUNCEMENTS ?
                         <img src={"/announcement.svg"} className="room-icon" />
                         :
                         <img src={"/grid.svg"} className="room-icon" />
