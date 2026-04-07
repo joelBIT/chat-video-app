@@ -19,7 +19,7 @@ export function Message({message}: {message: Message}): ReactElement {
             setAvatar(user.avatar);
             setUsername(user.username);
         }
-    }, [])
+    }, [message])
     
     return (
         <section className="message">
