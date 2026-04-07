@@ -22,12 +22,13 @@ export async function saveMessage(message: Message): Promise<void> {
  * sender and receiver (in any order) will be retrieved.
  */
 export async function getPrivateConversation(user1ID: string, user2ID: string): Promise<Message[]> {
-    const conversations: Message[] = await MessageModel.find({ "from": { user1ID, user2ID }, "to": { user1ID, user2ID }, "public": false });
-    return conversations.filter(({ from, to }: Message) => (from === user1ID && to === user2ID) || (from === user2ID && to === user1ID));
+    const conversations1: Message[] = await MessageModel.find({ "from": user1ID, "to": user2ID, "public": false });
+    const conversations2: Message[] = await MessageModel.find({ "from": user2ID, "to": user1ID, "public": false });
+    return [...conversations1, ...conversations2];
 }
 
 export async function getConversationsByUserID(userID: string): Promise<string[]> {
-    return await MessageModel.find({ "from": { userID }, "public": false }).distinct("to");
+    return await MessageModel.find({ "from": userID, "public": false }).distinct("to");
 }
 
 /**
