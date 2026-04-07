@@ -25,9 +25,9 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
         });
 
         socket.on(CHAT_MESSAGE, (message: Message) => {
-            if ([...socket.rooms].find((roomID: string) => roomID === message.to.id)) {     // Check if socket is member of room
+            if ([...socket.rooms].find((roomID: string) => roomID === message.to)) {     // Check if socket is member of room
                 saveMessage(message);
-                io.of(NAMESPACE_GAMES_ENDPOINT).to(message.to.id).emit(CHAT_MESSAGE, message);
+                io.of(NAMESPACE_GAMES_ENDPOINT).to(message.to).emit(CHAT_MESSAGE, message);
             }
         });
 

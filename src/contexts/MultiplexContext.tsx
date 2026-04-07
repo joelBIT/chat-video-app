@@ -129,7 +129,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
      */
     function onChatMessage(message: Message): void {
         saveMessage(message);
-        if (isSelectedRoom(message.to.id)) {
+        if (isSelectedRoom(message.to)) {
             changeSelectedRoom(JSON.parse(JSON.stringify(getSelectedRoom())));
         }
     }
@@ -140,10 +140,10 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
      */
     function onPrivateMessage(message: Message): void {
         saveConversationMessage(message);
-        if (isSelectedRoom(message.to.id) || isSelectedRoom(message.from.id)) {
+        if (isSelectedRoom(message.to) || isSelectedRoom(message.from)) {
             changeSelectedRoom(JSON.parse(JSON.stringify(getSelectedRoom())));
-        } else if (isSelectedNamespace(message.to.namespaceId)) {
-            changeNamespace(message.to.namespaceId);          // Update list of rooms in namespace "DMs" (id 1) in case of new room
+        } else if (isSelectedNamespace(NAMESPACE_ID_DM)) {
+            changeNamespace(NAMESPACE_ID_DM);          // Update list of rooms in namespace "DMs" (id 1) in case of new room
         }
     }
 

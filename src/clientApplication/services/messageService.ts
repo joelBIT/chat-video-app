@@ -7,9 +7,10 @@ import type { Message, Namespace, Room } from "../../types";
  * room's ID so that is why only "message.to.id" is used to find the room. 
  */
 export function saveMessage(message: Message): void {
-    const namespace: Namespace = namespaceStore.getNamespace(message.to.namespaceId);
+    const namespaceId: number = namespaceStore.getSelectedNamespaceId();
+    const namespace: Namespace = namespaceStore.getNamespace(namespaceId);
     namespace.rooms.forEach((room: Room) => {
-        if (room.id === message.to.id) {
+        if (room.id === message.to) {
             room.history.push(message);
         }
     });
@@ -24,7 +25,7 @@ export function saveMessage(message: Message): void {
 export function saveConversationMessage(message: Message): void {
     const namespace: Namespace = namespaceStore.getNamespace(NAMESPACE_ID_DM);
     namespace.rooms.forEach((room: Room) => {
-        if (room.id === message.from.id || room.id === message.to.id) {
+        if (room.id === message.from || room.id === message.to) {
             room.history.push(message);
         }
     });

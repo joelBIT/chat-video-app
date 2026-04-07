@@ -16,8 +16,8 @@ export type Namespace = {
 }
 
 export type Message = {
-    from: string,
-    to: string,
+    from: string,           // User ID of the sender
+    to: string,             // Room ID or user ID (DM) of the recipient
     public: boolean,        // true if the message was sent to a room, false if the message is sent in a private conversation between two users (DM).
     text: string,
     date: number

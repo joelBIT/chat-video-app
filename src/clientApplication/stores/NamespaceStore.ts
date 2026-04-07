@@ -42,6 +42,10 @@ class InMemoryNamespaceStore {
         this.selectedNamespaceId = namespaceID;
     }
 
+    getSelectedNamespaceId(): number {
+        return this.selectedNamespaceId;
+    }
+
     isSelectedNamespace(namespaceID: number): boolean {
         return namespaceID === this.selectedNamespaceId;
     }

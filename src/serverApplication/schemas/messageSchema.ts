@@ -5,8 +5,8 @@ import mongoose from 'mongoose';
  */
 export const messageSchema = new mongoose.Schema({
     from: {
-        type: String,       // The user ID of the sender is used as identifier
-        required: [true, "The message must be sent from a user and have a user ID"]
+        type: String,       // The user ID of the sender of the message
+        required: [true, "The message must be sent from a user with a supplied user ID"]
     },
     to: {
         type: String,       // The room ID (or recipient user ID) is used as identifier
