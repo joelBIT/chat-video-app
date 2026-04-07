@@ -26,7 +26,7 @@ export function RoomCard({room}: {room: Room}): ReactElement {
      * Return true if this room is a custom game room that the client is a member of.
      */
     function isRoomMember(): boolean {
-        return !isCommonRoom(room.id) && room.namespaceId === NAMESPACE_ID_GAMES && isMember(user.id, room.id);
+        return !isCommonRoom(room.name) && room.namespaceId === NAMESPACE_ID_GAMES && isMember(user.id, room.id);
     }
 
     return (

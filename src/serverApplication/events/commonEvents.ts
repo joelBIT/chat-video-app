@@ -19,7 +19,7 @@ export async function initializeCommonEvents(io: Server): Promise<void> {
                 const user = await getUserByUsername(username);
                 if (user) {
                     namespace.rooms.forEach((room: Room) => {
-                        if (isCommonRoom(room.id) || room.members.includes(user.id)) {      // Join rooms where the user is a member
+                        if (isCommonRoom(room.name) || room.members.includes(user.id)) {      // Join rooms where the user is a member
                             socket.join(room.id);
 
                             // inform clients about the connected user

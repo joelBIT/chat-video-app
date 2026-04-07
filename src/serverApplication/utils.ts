@@ -45,8 +45,8 @@ export const ROOM_NAME_SUPPORT = "Support";
 export const ROOM_NAME_ANNOUNCEMENTS = "Announcements";
 export const ROOM_NAME_LOBBY = "Lobby";
 
-export function isCommonRoom(roomID: string): boolean {
-    return ["0", "1", "2", "3"].includes(roomID);
+export function isCommonRoom(roomName: string): boolean {
+    return ["General", "Support", "Announcements", "Lobby"].includes(roomName);
 }
 
 export function isValidNamespace(namespaceID: number): boolean {
