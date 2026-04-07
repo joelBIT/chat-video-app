@@ -51,13 +51,14 @@ export async function addUserToCommonRooms(user: ChatUser): Promise<void> {
     addUserToCommonRoom(user.id, ROOM_NAME_LOBBY);
 }
 
-async function addUserToCommonRoom(userID: string, roomName: string): Promise<void> {
-    const response = await RoomSchema.findOne({ name: roomName }, 'members');
+async function addUserToCommonRoom(userID: string, roomID: string): Promise<void> {
+    const response = await RoomSchema.findById(roomID);
+
     if (response && response.members) {
         const roomMembers: string[] = response.members;
         if (!roomMembers.includes(userID)) {
             roomMembers.push(userID);
-            await RoomSchema.findOneAndUpdate({ name: roomName }, { members: roomMembers });
+            await RoomSchema.findOneAndUpdate({ _id: roomID }, { members: roomMembers });
         }
     }
 }
@@ -66,7 +67,8 @@ async function addUserToCommonRoom(userID: string, roomName: string): Promise<vo
  * Remove a user from room if the user is a member of the room. 
  */
 export async function removeUserFromRoom(userID: string, roomID: string): Promise<void> {
-    const response = await RoomSchema.findById(roomID, 'members');
+    const response = await RoomSchema.findById(roomID);
+
     if (response && response.members) {
         const roomMembers: string[] = response.members;
         if (roomMembers && roomMembers.includes(userID)) {
