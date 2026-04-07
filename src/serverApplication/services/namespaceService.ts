@@ -81,9 +81,10 @@ export async function getDataForUser(): Promise<Namespace[]> {
     
     const dmNamespace: Namespace | null = await NamespaceSchema.findById(NAMESPACE_ID_DM);
     if (dmNamespace) {
-        dmNamespace.rooms = [];
+        const mappedNamespace = await mapNamespace(NAMESPACE_ID_DM, dmNamespace);
+        mappedNamespace.rooms = [];         // TODO: Add active conversations?
 
-        namespaces.push(dmNamespace);
+        namespaces.push(mappedNamespace);
     }
 
     const gamesNamespace: Namespace | null = await NamespaceSchema.findById(NAMESPACE_ID_GAMES);
