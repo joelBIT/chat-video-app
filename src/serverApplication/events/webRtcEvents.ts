@@ -1,7 +1,6 @@
 import type { Server } from "socket.io";
-import { getNamespaceByID } from "../services/namespaceService";
-import { ANSWER_RESPONSE, END_CALL, NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, RECEIVED_ICE_CANDIDATE_FROM_SERVER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, USER_UPDATED } from "../utils";
-import type { Namespace, Offer, ChatUser } from "../../types";
+import { ANSWER_RESPONSE, END_CALL, NAMESPACE_DM_ENDPOINT, NEW_ANSWER, NEW_OFFER, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, RECEIVED_ICE_CANDIDATE_FROM_SERVER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, USER_UPDATED } from "../utils";
+import type { Offer, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
 import { getUserByUsername, updateUser } from "../services/userService";
 
@@ -11,9 +10,8 @@ const offers: Offer[] = [];
  * Initializes events related to WebRTC. WebRTC is only used in namespace 1 (DMs).
  */
 export async function initializeWebRtcEvents(io: Server): Promise<void> {
-    const namespace: Namespace = await getNamespaceByID(NAMESPACE_ID_DM);
 
-    io.of(namespace.endpoint).on("connection", async (socket: ISocket) => {
+    io.of(NAMESPACE_DM_ENDPOINT).on("connection", async (socket: ISocket) => {
         socket.on(NEW_OFFER, async (fromUsername: string, toUsername: string, video: boolean, newOffer: RTCSessionDescriptionInit) => {
             const user: ChatUser | null = await getUserByUsername(toUsername);
             if (!user) {
