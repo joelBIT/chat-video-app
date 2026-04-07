@@ -16,8 +16,9 @@ export type Namespace = {
 }
 
 export type Message = {
-    from: ChatUser,
-    to: Room;           // In public message it is a chat room, and in private message it is a user (the recipient)
+    from: string,
+    to: string,
+    public: boolean,        // true if the message was sent to a room, false if the message is sent in a private conversation between two users (DM).
     text: string,
     date: number
 }
