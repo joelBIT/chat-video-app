@@ -65,3 +65,7 @@ export function saveUser(user: ChatUser): void {
 export function getSignedOutUser(): ChatUser {
     return userStore.getSignedOutUser();
 }
+
+export function getUserByID(userID: string): ChatUser {
+    return userStore.getUserById(userID);
+}

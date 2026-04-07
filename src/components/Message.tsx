@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactElement } from "react";
 import Textarea from 'rc-textarea';
-import { useRoom } from "../hooks";
+import { getUserByID } from "../clientApplication/services/userService";
 import type { ChatUser, Message } from "../types";
 
 import "./Message.css";
@@ -11,10 +11,9 @@ import "./Message.css";
 export function Message({message}: {message: Message}): ReactElement {
     const [avatar, setAvatar] = useState<string>('');
     const [username, setUsername] = useState<string>('');
-    const { roomParticipants } = useRoom();
 
     useEffect(() => {
-        const user: ChatUser | undefined = roomParticipants.find((user: ChatUser) => user.id === message.from);
+        const user: ChatUser = getUserByID(message.from);
         if (user) {
             setAvatar(user.avatar);
             setUsername(user.username);
