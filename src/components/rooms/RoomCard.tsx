@@ -30,7 +30,7 @@ export function RoomCard({room}: {room: Room}): ReactElement {
     }
 
     return (
-        <section className="namespace-room" onClick={() => changeRoom(room)} key={room.id}>
+        <section className="namespace-room" onClick={() => changeRoom(room)}>
             <section className="room-section">
                 {
                     room.name === ROOM_NAME_LOBBY ?

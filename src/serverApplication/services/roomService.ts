@@ -80,9 +80,18 @@ export async function removeUserFromRoom(userID: string, roomID: string): Promis
 
 export async function getRoomByID(roomID: string): Promise<Room> {
     const room: Room | null = await RoomSchema.findById(roomID);
+
     if (room) {
-        room.history = [];          // TODO: Add message history?
-        return room;
+        const createdRoom: Room = {
+            id: room.id.toString(),
+            name: room.name,
+            namespaceId: room.namespaceId,
+            private: room.private,
+            members: room.members,
+            history: []                 // TODO: Add message history?
+        }
+
+        return createdRoom;
     }
 
     throw new Error(`No room with ID ${roomID} found`);
