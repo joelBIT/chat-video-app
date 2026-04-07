@@ -30,19 +30,19 @@ export async function initializeDmEvents(io: Server): Promise<void> {
          * the recipient that a message has arrived.
          * If messages already exists, send the message to the recipient and return it to the sender.
          */
-        socket.on(PRIVATE_MESSAGE, async (message: Message) => {
-            const conversations: Message[] = await getPrivateConversation(message.from.id, message.to.id);
+        socket.on(PRIVATE_MESSAGE, async (message: Message, username: string) => {
+            const conversations: Message[] = await getPrivateConversation(message.from, message.to);
             if (conversations.length === 0) {
                 //saveConversationForUser(message.to.id, message.from.id);  // TODO: Remove this or replace?
                 // Send the room to the recipient if this is the first message ever sent in that conversation
-                const room: Room = {id: message.from.id, name: message.from.username, namespaceId: NAMESPACE_ID_DM, private: true, members: [message.from.id, message.to.id], history: []};
-                io.of(NAMESPACE_DM_ENDPOINT).to(message.to.id).emit(UPDATE_ROOMS, room);
+                const room: Room = {id: message.from, name: username, namespaceId: NAMESPACE_ID_DM, private: true, members: [message.from, message.to], history: []};
+                io.of(NAMESPACE_DM_ENDPOINT).to(message.to).emit(UPDATE_ROOMS, room);
             }
 
             saveMessage(message);
             
             const messageCopy: Message = JSON.parse(JSON.stringify(message));          // Create deep copy of the message
-            io.of(NAMESPACE_DM_ENDPOINT).to(message.to.id).to(message.from.id).emit(PRIVATE_MESSAGE, messageCopy);
+            io.of(NAMESPACE_DM_ENDPOINT).to(message.to).to(message.from).emit(PRIVATE_MESSAGE, messageCopy);
         });
     });
 }

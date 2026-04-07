@@ -94,8 +94,8 @@ export function RoomProvider({ children }: { children: ReactNode }): ReactElemen
     /**
      * Create a new room in the "Games" namespace (id 2). The room ID is not set because the room will get a unique ID on the server when persisted.
      */
-    function createGameRoom(roomName: string, privateRoom: boolean): void {
-        const room: Room = {id: "", name: roomName, namespaceId: NAMESPACE_ID_GAMES, private: privateRoom, members: [], history: []};
+    function createGameRoom(roomName: string, isPrivateRoom: boolean): void {
+        const room: Room = {id: "", name: roomName, namespaceId: NAMESPACE_ID_GAMES, private: isPrivateRoom, members: [], history: []};
         multiplexSockets[NAMESPACE_ID_GAMES].emit(CREATE_ROOM, room, user.id);
     }
 
@@ -104,11 +104,12 @@ export function RoomProvider({ children }: { children: ReactNode }): ReactElemen
      */
     function sendMessage(text: string): void {
         if (selectedRoom) {
-            const message: Message = {text, from: user, to: selectedRoom, date: Date.now()};
-            if (isSelectedNamespace(NAMESPACE_ID_DM)) {
-                multiplexSockets[NAMESPACE_ID_DM].emit(PRIVATE_MESSAGE, message);
+            const isDirectMessage = isSelectedNamespace(NAMESPACE_ID_DM);
+            const message: Message = {text, from: user.id, to: selectedRoom.id, date: Date.now(), public: !isDirectMessage};
+            if (isDirectMessage) {
+                multiplexSockets[NAMESPACE_ID_DM].emit(PRIVATE_MESSAGE, message, user.username);
             } else {
-                multiplexSockets[message.to.namespaceId].emit(CHAT_MESSAGE, message);
+                multiplexSockets[selectedRoom.namespaceId].emit(CHAT_MESSAGE, message);
             }
         }
     }

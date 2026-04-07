@@ -1,31 +1,19 @@
 import type { Message } from "../../types";
-import { NAMESPACE_ID_DM } from "../utils";
-import PersonalMessage from "../schemas/personalMessageSchema";
-import { PublicMessage } from "../schemas/publicMessageSchema";
+import { MessageModel } from "../schemas/messageSchema";
 
 /**
- * Messages in personal conversations (DM) are stored in PersonalMessages. The other messages are stored in PublicMessages.
+ * Save message in database.
  */
 export async function saveMessage(message: Message): Promise<void> {
-    if (message.to.namespaceId === NAMESPACE_ID_DM) {
-        const newMessage = new PersonalMessage({
-            from: message.from,
-            to: message.to,
-            text: message.text,
-            date: message.date
-        });
-            
-        await newMessage.save();
-    } else {
-        const newMessage = new PublicMessage({
-            from: message.from,
-            to: message.to,
-            text: message.text,
-            date: message.date
-        });
-            
-        await newMessage.save();
-    }
+    const newMessage = new MessageModel({
+        from: message.from,
+        to: message.to,
+        public: message.public,
+        text: message.text,
+        date: message.date
+    });
+        
+    await newMessage.save();
 }
 
 /**
@@ -34,12 +22,12 @@ export async function saveMessage(message: Message): Promise<void> {
  * sender and receiver (in any order) will be retrieved.
  */
 export async function getPrivateConversation(user1ID: string, user2ID: string): Promise<Message[]> {
-    const conversations: Message[] = await PersonalMessage.find({ "from": { user1ID, user2ID }, "to": { user1ID, user2ID } });
-    return conversations.filter(({ from, to }: Message) => (from.id === user1ID && to.id === user2ID) || (from.id === user2ID && to.id === user1ID));
+    const conversations: Message[] = await MessageModel.find({ "from": { user1ID, user2ID }, "to": { user1ID, user2ID }, "public": false });
+    return conversations.filter(({ from, to }: Message) => (from === user1ID && to === user2ID) || (from === user2ID && to === user1ID));
 }
 
 export async function getConversationsByUserID(userID: string): Promise<string[]> {
-    return await PersonalMessage.find({ "from": { userID } }).distinct("to");
+    return await MessageModel.find({ "from": { userID }, "public": false }).distinct("to");
 }
 
 /**
