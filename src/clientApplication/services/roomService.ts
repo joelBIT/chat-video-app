@@ -6,7 +6,7 @@ import type { Namespace, Room } from "../../types";
  * A room may be "undefined" if the user is not active in a specific room at any given point in time.
  */
 export function getSelectedRoom(): Room | undefined {
-    let selectedRoom: Room | undefined = undefined;
+    let selectedRoom: Room | undefined;
     const selectedNamespace: Namespace | undefined = namespaceStore.getSelectedNamespace();
     if (selectedNamespace) {
         selectedNamespace.rooms.forEach((room: Room) => {
@@ -86,7 +86,7 @@ export function clearSelectedRoom(): void {
 }
 
 /**
- * @returns     a list (sorted by ID) of game rooms that the client is not a member of.
+ * @returns     a list of game rooms that the client is not a member of.
  */
 export function nonMemberGameRooms(userID: string): Room[] {
     const nonMemberRooms: Room[] = [];
@@ -97,11 +97,11 @@ export function nonMemberGameRooms(userID: string): Room[] {
         }
     });
 
-    return nonMemberRooms.sort((a: Room, b: Room) => a.id.localeCompare(b.id));
+    return nonMemberRooms;
 }
 
 /**
- * @returns     a list (sorted by ID) of game rooms that the client is a member of.
+ * @returns     a list of game rooms that the client is a member of.
  */
 export function memberGameRooms(userID: string): Room[] {
     const memberRooms: Room[] = [];
@@ -112,5 +112,5 @@ export function memberGameRooms(userID: string): Room[] {
         }
     });
 
-    return memberRooms.sort((a: Room, b: Room) => a.id.localeCompare(b.id));
+    return memberRooms;
 }

@@ -13,12 +13,20 @@ export async function saveGameRoom(room: Room): Promise<Room> {
     if (!exists) {
         const newRoom = new RoomSchema({
             name: room.name,
-            namespaceId: NAMESPACE_ID_GAMES
+            namespaceId: NAMESPACE_ID_GAMES,
+            private: room.private
         });
 
         const result = await newRoom.save();
-        const createdRoom: Room = Object.assign(result);
-        createdRoom.history = [];
+        const createdRoom: Room = {
+            id: result.id.toString(),
+            name: result.name,
+            namespaceId: result.namespaceId,
+            private: result.private,
+            members: [],
+            history: []
+        }
+
         return createdRoom;
     }
 
