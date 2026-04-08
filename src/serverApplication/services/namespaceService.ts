@@ -52,16 +52,13 @@ function mapRooms(rooms: Room[]): Room[] {
 }
 
 export async function getAllNamespaces(): Promise<Namespace[]> {
-    const namespaces: Namespace[] | null = await NamespaceSchema.find({});
+    const namespaces: Namespace[] = await NamespaceSchema.find({});
     const result: Namespace[] = [];
 
     for (let i = 0; i < namespaces.length; i++) {
-        const namespaceId = namespaces[i].id;
-        const namespace: Namespace | null = namespaces[i];
-        if (namespace && namespaceId) {
-            const mappedNamespace = await mapNamespace(namespaceId, namespace);
-            result.push(mappedNamespace);
-        }
+        const namespace: Namespace = namespaces[i];
+        const mappedNamespace = await mapNamespace(namespace.id, namespace);
+        result.push(mappedNamespace);
     }
 
     return result;

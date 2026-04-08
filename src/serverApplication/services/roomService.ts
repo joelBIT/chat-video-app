@@ -1,19 +1,19 @@
 import type { ChatUser, Room } from "../../types";
-import { NAMESPACE_ID_GAMES, ROOM_NAME_ANNOUNCEMENTS, ROOM_NAME_GENERAL, ROOM_NAME_LOBBY, ROOM_NAME_SUPPORT } from "../utils";
+import { ROOM_NAME_ANNOUNCEMENTS, ROOM_NAME_GENERAL, ROOM_NAME_LOBBY, ROOM_NAME_SUPPORT } from "../utils";
 import RoomSchema from "../schemas/roomSchema";
 
 /**
- * Add a newly created Game room, if it does not already exist.
+ * Add a newly created room, if it does not already exist.
  *
  * @param room      the room to be persisted
  * @returns         the room with its new ID
  */
-export async function saveGameRoom(room: Room): Promise<Room> {
+export async function saveRoom(room: Room): Promise<Room> {
     const exists = await RoomSchema.exists({ name: room.name });
     if (!exists) {
         const newRoom = new RoomSchema({
             name: room.name,
-            namespaceId: NAMESPACE_ID_GAMES,
+            namespaceId: room.namespaceId,
             private: room.private
         });
 

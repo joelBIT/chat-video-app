@@ -16,7 +16,7 @@ export async function initializeDmEvents(io: Server): Promise<void> {
     io.of(NAMESPACE_DM_ENDPOINT).on("connection", async (socket: ISocket) => {
         joinPersonalRoom(socket);
 
-        socket.on(CREATE_ROOM, async (sender: ChatUser, recipient: ChatUser, ackCallback) => {            
+        socket.on(CREATE_ROOM, async (sender: ChatUser, recipient: ChatUser, ackCallback) => {
             const remoteRoom: Room = {id: sender.id, name: sender.username, namespaceId: NAMESPACE_ID_DM, private: true, members: [sender.id, recipient.id], history: []};
             io.of(NAMESPACE_DM_ENDPOINT).to(recipient.id).emit(UPDATE_ROOMS, remoteRoom);
 

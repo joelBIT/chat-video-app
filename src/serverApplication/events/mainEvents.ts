@@ -53,7 +53,7 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
 }
 
 /**
- * Set all users to offline if the server restarts for some reason.
+ * Set all users as offline if the server restarts for some reason.
  */
 async function setAllUsersAsOffline(): Promise<void> {
     await User.updateMany({}, { online: false });

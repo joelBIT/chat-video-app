@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { addUserToRoom, getRoomByID, isMember, removeUserFromRoom, saveGameRoom } from "../services/roomService";
+import { addUserToRoom, getRoomByID, isMember, removeUserFromRoom, saveRoom } from "../services/roomService";
 import { saveMessage } from "../services/messageService";
 import type { Message, Room } from "../../types";
 import type { ISocket } from "../interfaces";
@@ -17,7 +17,7 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
         socket.on(CREATE_ROOM, async (room: Room, userID: string) => {
             room.members = [];
             room.members.push(userID);
-            const persistedRoom: Room = await saveGameRoom(room);
+            const persistedRoom: Room = await saveRoom(room);
             socket.join(persistedRoom.id);
             
             // Send created room to clients so that the room appears in the room list in "Games".
