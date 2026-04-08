@@ -107,7 +107,7 @@ export function RoomProvider({ children }: { children: ReactNode }): ReactElemen
             const isDirectMessage = isSelectedNamespace(NAMESPACE_ID_DM);
             const message: Message = {text, from: user.id, to: selectedRoom.id, date: Date.now(), public: !isDirectMessage};
             if (isDirectMessage) {
-                multiplexSockets[NAMESPACE_ID_DM].emit(PRIVATE_MESSAGE, message, user.username);
+                multiplexSockets[NAMESPACE_ID_DM].emit(PRIVATE_MESSAGE, message);
             } else {
                 multiplexSockets[selectedRoom.namespaceId].emit(CHAT_MESSAGE, message);
             }

@@ -16,8 +16,9 @@ export async function initializeDmEvents(io: Server): Promise<void> {
     io.of(NAMESPACE_DM_ENDPOINT).on("connection", async (socket: ISocket) => {
         joinPersonalRoom(socket);
 
-        socket.on(CREATE_ROOM, async (sender: ChatUser, recipient: ChatUser, ackCallback) => {
-            //saveConversationForUser(sender.id, recipient.id);     // TODO: Remove or replace?
+        socket.on(CREATE_ROOM, async (sender: ChatUser, recipient: ChatUser, ackCallback) => {            
+            const remoteRoom: Room = {id: sender.id, name: sender.username, namespaceId: NAMESPACE_ID_DM, private: true, members: [sender.id, recipient.id], history: []};
+            io.of(NAMESPACE_DM_ENDPOINT).to(recipient.id).emit(UPDATE_ROOMS, remoteRoom);
 
             const messages: Message[] = await getPrivateConversation(sender.id, recipient.id);    // Get messages if conversation already exist
             const room: Room = {id: recipient.id, name: recipient.username, namespaceId: NAMESPACE_ID_DM, private: true, members: [sender.id, recipient.id], history: [...messages]};
@@ -30,16 +31,7 @@ export async function initializeDmEvents(io: Server): Promise<void> {
          * the recipient that a message has arrived.
          * If messages already exists, send the message to the recipient and return it to the sender.
          */
-        socket.on(PRIVATE_MESSAGE, async (message: Message, username: string) => {
-            const conversations: Message[] = await getPrivateConversation(message.from, message.to);
-
-            if (conversations.length === 0) {
-                //saveConversationForUser(message.to.id, message.from.id);  // TODO: Remove this or replace?
-                // Send the room to the recipient if this is the first message ever sent in that conversation
-                const room: Room = {id: message.from, name: username, namespaceId: NAMESPACE_ID_DM, private: true, members: [message.from, message.to], history: []};
-                io.of(NAMESPACE_DM_ENDPOINT).to(message.to).emit(UPDATE_ROOMS, room);
-            }
-
+        socket.on(PRIVATE_MESSAGE, (message: Message) => {
             saveMessage(message);
             
             const messageCopy: Message = JSON.parse(JSON.stringify(message));          // Create deep copy of the message
