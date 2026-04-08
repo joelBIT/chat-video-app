@@ -80,10 +80,13 @@
         max-width: 1000px;
         height: 100%;
         max-height: 800px;
-        border: 1px solid var(--color-black);
-        border: none;
         margin-left: 1rem;
         margin-right: 1rem;
+
+        & .message:nth-child(even) {
+            backdrop-filter: brightness(0.8);
+            border-radius: 4px;
+        }
     }
 
     & #chat-message {
