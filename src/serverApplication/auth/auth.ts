@@ -19,6 +19,10 @@ export function login(io: Server): void {
                 return next(new Error(`Wrong password.`));
             }
 
+            if (user.online) {
+                return next(new Error(`User is already online.`));
+            }
+
             socket.userID = user.id;                    // Set permanent user ID on the socket (since socket IDs change every connection)
             await User.updateOne({ username }, { online: true });
             return next();
