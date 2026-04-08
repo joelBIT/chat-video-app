@@ -29,7 +29,7 @@ export default function ProfilePage(): ReactElement {
      */
     async function updateUserProfile(): Promise<void> {
         const updatedUser: ChatUser = { username: user.username, id: user.id, avatar: selectedAvatar, online: user.online, inCall: user.inCall };
-        const response = await updateUser(updatedUser);
+        const response: ActionState = await updateUser(updatedUser);
         if (response.success) {
             setUserInformation(updatedUser);
             saveUser(updatedUser);
