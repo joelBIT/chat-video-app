@@ -1,8 +1,8 @@
 import type { ChatUser, Message, Namespace, Room } from "../../types";
-import { NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME } from "../utils";
+import { isCommonRoom, NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME } from "../utils";
 import NamespaceSchema from "../schemas/namespaceSchema";
 import RoomSchema from "../schemas/roomSchema";
-import { getConversationsByUserID, getPrivateConversation } from "./messageService";
+import { getConversationsByUserID, getMessagesByRoomId, getPrivateConversation } from "./messageService";
 import { getUserById } from "./userService";
 
 export async function getNamespaceByID(namespaceID: number): Promise<Namespace> {
@@ -19,13 +19,14 @@ export async function getNamespaceByID(namespaceID: number): Promise<Namespace> 
  */
 async function mapNamespace(namespaceID: number, source: Namespace): Promise<Namespace> {
     const rooms: Room[] = await RoomSchema.find({ namespaceId: namespaceID });
+    const mappedRooms: Room[] = await mapRooms(rooms);
 
     const namespace: Namespace = {
         id: namespaceID,
         name: source.name,
         image: source.image,
         endpoint: source.endpoint,
-        rooms: mapRooms(rooms)
+        rooms: mappedRooms
     }
 
     return namespace;
@@ -34,17 +35,23 @@ async function mapNamespace(namespaceID: number, source: Namespace): Promise<Nam
 /**
  * Maps a room from the database to a room object used in the application.
  */
-function mapRooms(rooms: Room[]): Room[] {
+async function mapRooms(rooms: Room[]): Promise<Room[]> {
     const mappedRooms: Room[] = [];
 
     for (let i = 0; i < rooms.length; i++) {
+        const messages: Message[] = [];
+        if (isCommonRoom(rooms[i].name)) {          // Only retrieve message history for the common rooms
+            const roomMessages = await getMessagesByRoomId(rooms[i].id);
+            messages.push(...roomMessages);
+        }
+
         const room: Room = {
             id: rooms[i].id,
             name: rooms[i].name,
             namespaceId: rooms[i].namespaceId,
             private: rooms[i].private,
             members: rooms[i].members,
-            history: []
+            history: [...messages]
         }
 
         mappedRooms.push(room);

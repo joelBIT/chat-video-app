@@ -16,6 +16,14 @@ export async function saveMessage(message: Message): Promise<void> {
     await newMessage.save();
 }
 
+export async function getMessagesByRoomId(roomID: string): Promise<Message[]> {
+    const messages: Message[] = [];
+    const response = await MessageModel.find({ "to": roomID }).limit(50);
+    messages.push(...response);
+
+    return messages;
+}
+
 /**
  * Retrieve messages that have been made in a private conversation between two users.
  * The order of user1 and user2 are not important. All messages where these two users are
