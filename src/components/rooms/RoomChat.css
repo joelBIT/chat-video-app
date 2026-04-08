@@ -26,6 +26,11 @@
         max-height: 825px;
         padding-left: 1rem;
         padding-right: 1rem;
+
+        & .message:nth-child(even) {
+            backdrop-filter: brightness(0.8);
+            border-radius: 4px;
+        }
     }
 
     & #chat-message {
