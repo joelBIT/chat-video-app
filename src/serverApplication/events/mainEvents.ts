@@ -4,13 +4,16 @@ import type { ISocket } from "../interfaces";
 import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../utils";
 import type { ChatUser, Namespace } from "../../types";
 import { getUserByUsername, getUserById, getUsers, setUserOnline, updateUser } from "../services/userService";
+import User from "../schemas/userSchema";
 
 /**
  * Initializes events for the main namespace ('/') only. The connected client receives data via the "namespaces" event. This data consists of
  * getDataForUser (all namespaces containing existing rooms, message history, and room members), getUserByID (the connected user itself), and
  * getAllUsers (all application users and their metadata).
  */
-export async function initializeMainNamespaceEvents(io: Server): Promise<void> {    
+export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
+    await setAllUsersAsOffline();
+
     io.on("connection", async (socket: ISocket)  => {
         console.log(`connected ${socket.id}`);
 
@@ -47,4 +50,11 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
             }
         });
     });
+}
+
+/**
+ * Set all users to offline if the server restarts for some reason.
+ */
+async function setAllUsersAsOffline(): Promise<void> {
+    await User.updateMany({}, { online: false });
 }

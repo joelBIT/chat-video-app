@@ -43,7 +43,7 @@ export async function updateUser(updatedUser: ChatUser): Promise<void> {
 }
 
 export async function setUserOnline(userID: string, isOnline: boolean): Promise<void> {
-    await User.updateOne({ _id: userID }, { online: isOnline });
+    await User.findByIdAndUpdate(userID, { online: isOnline });
 }
 
 async function mapUser(userID: string): Promise<ChatUser> {
