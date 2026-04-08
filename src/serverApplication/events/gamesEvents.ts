@@ -41,7 +41,7 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
                 io.of(NAMESPACE_GAMES_ENDPOINT).to(socket.id).emit(UPDATE_CUSTOM_GAME_ROOM, room);
             }
 
-            await addUserToRoom(userID, roomID);
+            await addUserToRoom(userID, room.name);
             io.of(NAMESPACE_GAMES_ENDPOINT).emit(USER_JOINED, roomID, userID, NAMESPACE_ID_GAMES);
         });
 

@@ -32,6 +32,7 @@ export async function initializeDmEvents(io: Server): Promise<void> {
          */
         socket.on(PRIVATE_MESSAGE, async (message: Message, username: string) => {
             const conversations: Message[] = await getPrivateConversation(message.from, message.to);
+
             if (conversations.length === 0) {
                 //saveConversationForUser(message.to.id, message.from.id);  // TODO: Remove this or replace?
                 // Send the room to the recipient if this is the first message ever sent in that conversation

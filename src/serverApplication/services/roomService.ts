@@ -36,8 +36,8 @@ export async function saveGameRoom(room: Room): Promise<Room> {
 /**
  * Add a user to room if the user is not already a member of the room. 
  */
-export async function addUserToRoom(userID: string, roomID: string): Promise<void> {
-   await addUserToCommonRoom(userID, roomID);
+export async function addUserToRoom(userID: string, roomName: string): Promise<void> {
+   await addUserToCommonRoom(userID, roomName);
 }
 
 /**
@@ -51,14 +51,14 @@ export async function addUserToCommonRooms(user: ChatUser): Promise<void> {
     addUserToCommonRoom(user.id, ROOM_NAME_LOBBY);
 }
 
-async function addUserToCommonRoom(userID: string, roomID: string): Promise<void> {
-    const response = await RoomSchema.findById(roomID);
+async function addUserToCommonRoom(userID: string, roomName: string): Promise<void> {
+    const response = await RoomSchema.findOne({name: roomName});
 
     if (response && response.members) {
         const roomMembers: string[] = response.members;
         if (!roomMembers.includes(userID)) {
             roomMembers.push(userID);
-            await RoomSchema.findOneAndUpdate({ _id: roomID }, { members: roomMembers });
+            await RoomSchema.findOneAndUpdate({name: roomName}, { members: roomMembers });
         }
     }
 }
@@ -73,7 +73,7 @@ export async function removeUserFromRoom(userID: string, roomID: string): Promis
         const roomMembers: string[] = response.members;
         if (roomMembers && roomMembers.includes(userID)) {
             const filteredMembers: string[] = roomMembers.filter((user: string) => user !== userID);
-            await RoomSchema.findOneAndUpdate({ _id: roomID }, { members: filteredMembers });
+            await RoomSchema.findByIdAndUpdate(roomID, { members: filteredMembers });
         }
     }
 }
