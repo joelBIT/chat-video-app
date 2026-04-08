@@ -21,7 +21,7 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
         const user: ChatUser | null = await getUserById(userID);
         if (user) {
             const users: ChatUser[] = await getUsers();
-            const namespaces: Namespace[] = await getDataForUser();
+            const namespaces: Namespace[] = await getDataForUser(user.id);
             socket.emit(NAMESPACES, namespaces, user, users);          // Send back data to the connected client
             io.except(socket.id).emit(USER_CONNECTED, user);                     // Inform other clients that the user is online
         }

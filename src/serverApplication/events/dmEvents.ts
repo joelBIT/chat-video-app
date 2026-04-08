@@ -17,12 +17,11 @@ export async function initializeDmEvents(io: Server): Promise<void> {
         joinPersonalRoom(socket);
 
         socket.on(CREATE_ROOM, async (sender: ChatUser, recipient: ChatUser, ackCallback) => {
-            const remoteRoom: Room = {id: sender.id, name: sender.username, namespaceId: NAMESPACE_ID_DM, private: true, members: [sender.id, recipient.id], history: []};
+            const messages: Message[] = await getPrivateConversation(sender.id, recipient.id);    // Get messages if conversation already exist
+            const remoteRoom: Room = {id: sender.id, name: sender.username, namespaceId: NAMESPACE_ID_DM, private: true, members: [sender.id, recipient.id], history: [...messages]};
             io.of(NAMESPACE_DM_ENDPOINT).to(recipient.id).emit(UPDATE_ROOMS, remoteRoom);
 
-            const messages: Message[] = await getPrivateConversation(sender.id, recipient.id);    // Get messages if conversation already exist
             const room: Room = {id: recipient.id, name: recipient.username, namespaceId: NAMESPACE_ID_DM, private: true, members: [sender.id, recipient.id], history: [...messages]};
-        
             ackCallback({ room });      // Return the conversation (as a room) to the client.
         });
 
