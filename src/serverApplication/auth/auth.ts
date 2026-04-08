@@ -20,7 +20,7 @@ export function login(io: Server): void {
             }
 
             if (user.online) {
-                return next(new Error(`User is already online.`));
+                return next(new Error(`${user.username} is already online.`));
             }
 
             socket.userID = user.id;                    // Set permanent user ID on the socket (since socket IDs change every connection)
