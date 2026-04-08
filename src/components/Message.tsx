@@ -27,6 +27,11 @@ export function Message({message}: {message: Message}): ReactElement {
             <section className="message-content">
                 <div className="message-metadata">
                     <h5 className="message-sender"> {username} </h5>
+                    
+                    <p className="message-date"> 
+                        {new Date(message.date).toLocaleDateString("en-US", {weekday: "long", year: "numeric", month: "long", day: "numeric"})} 
+                    </p>
+
                     <p className="message-date"> {new Date(message.date).toLocaleTimeString()} </p> 
                 </div>
 
