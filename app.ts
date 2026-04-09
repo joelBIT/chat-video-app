@@ -22,6 +22,16 @@ app.all('/{*path}', async (req, res) => {
     res.redirect(`https://${req.get('host')}`);
 });
 
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.log(err.stack);
+    err.statusCode = err.statusCode || 500;
+
+    res.status(err.statusCode).json({
+        success: err.success || false,
+        message: err.message
+    });
+});
+
 const key = readFileSync('cert.key');
 const cert = readFileSync('cert.crt');
 const expressServer = createServer({key, cert}, app);

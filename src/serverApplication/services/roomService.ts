@@ -1,6 +1,7 @@
 import type { ChatUser, Room } from "../../types";
 import { ROOM_NAME_ANNOUNCEMENTS, ROOM_NAME_GENERAL, ROOM_NAME_LOBBY, ROOM_NAME_SUPPORT } from "../utils";
 import RoomSchema from "../schemas/roomSchema";
+import { AppError } from "../errors/AppError";
 
 /**
  * Add a newly created room, if it does not already exist.
@@ -29,7 +30,7 @@ export async function saveRoom(room: Room): Promise<Room> {
         return createdRoom;
     }
 
-    throw new Error(`Room with name ${room.name} already exist`);
+    throw new AppError(`Room with name ${room.name} already exist`, 400);
 }
 
 /**
@@ -93,7 +94,7 @@ export async function getRoomByID(roomID: string): Promise<Room> {
         return createdRoom;
     }
 
-    throw new Error(`No room with ID ${roomID} found`);
+    throw new AppError(`No room with ID ${roomID} found`, 404);
 }
 
 /**

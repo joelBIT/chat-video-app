@@ -32,17 +32,20 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
         });
 
         socket.on(CHANGE_ROOM, async (roomID: string, userID: string) => {
-            socket.join(roomID);
-            const isRoomMember: boolean = await isMember(userID, roomID);
+            try {
+                const room: Room = await getRoomByID(roomID);
+                const isRoomMember: boolean = await isMember(userID, roomID);
+                if (!isCommonRoom(room.name) && !isRoomMember) {
+                    // If changing to a custom game room that the client is not a member of, send back the room containing its message history.
+                    io.of(NAMESPACE_GAMES_ENDPOINT).to(socket.id).emit(UPDATE_CUSTOM_GAME_ROOM, room);
+                }
 
-            const room: Room = await getRoomByID(roomID);
-            if (!isCommonRoom(room.name) && !isRoomMember) {
-                // If changing to a custom game room that the client is not a member of, send back the room containing its message history.
-                io.of(NAMESPACE_GAMES_ENDPOINT).to(socket.id).emit(UPDATE_CUSTOM_GAME_ROOM, room);
+                socket.join(roomID);
+                await addUserToRoom(userID, room.name);
+                io.of(NAMESPACE_GAMES_ENDPOINT).emit(USER_JOINED, roomID, userID, NAMESPACE_ID_GAMES);
+            } catch (error: any) {
+                console.log(error);
             }
-
-            await addUserToRoom(userID, room.name);
-            io.of(NAMESPACE_GAMES_ENDPOINT).emit(USER_JOINED, roomID, userID, NAMESPACE_ID_GAMES);
         });
 
         socket.on(LEAVE_ROOM, async (roomID: string, userID: string) => {
