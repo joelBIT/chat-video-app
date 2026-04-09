@@ -16,8 +16,8 @@ export async function initializeCommonEvents(io: Server): Promise<void> {
             console.log(`connected username ${username}`);
 
             if (typeof username === "string") {
-                const user = await getUserByUsername(username);
-                if (user) {
+                try {
+                    const user = await getUserByUsername(username);
                     namespace.rooms.forEach((room: Room) => {
                         if (isCommonRoom(room.name) || room.members.includes(user.id)) {      // Join rooms where the user is a member
                             socket.join(room.id);
@@ -26,6 +26,8 @@ export async function initializeCommonEvents(io: Server): Promise<void> {
                             io.of(namespace.endpoint).to(room.id).emit(USER_JOINED, room.id, user.id, room.namespaceId);
                         }
                     });
+                } catch (error) {
+                    console.log(error);
                 }
             } else {
                 console.log(`Could not inform clients about connecting ${username}`);

@@ -48,9 +48,7 @@ async function joinPersonalRoom(socket: ISocket): Promise<void> {
     if (username && (typeof username === "string")) {
         try {
             const user: ChatUser = await getUserByUsername(username);
-            if (user) {
-                socket.join(user.id);
-            }
+            socket.join(user.id);
         } catch (error) {
             console.log(error);
         }

@@ -65,21 +65,25 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
  * Create the "Games" namespace and the common "Lobby" room if the namespace does not exist.
  */
 async function createDatabaseCollections(): Promise<void> {
-    const exists = await Namespace.exists({ name: 'Games' });
-    if (!exists) {
-        await Namespace.create({
-            _id: NAMESPACE_ID_GAMES,
-            name: 'Games',
-            endpoint: NAMESPACE_GAMES_ENDPOINT,
-            image: 'games.svg'
-        });
-    }
+    try {
+        const exists = await Namespace.exists({ name: 'Games' });
+        if (!exists) {
+            await Namespace.create({
+                _id: NAMESPACE_ID_GAMES,
+                name: 'Games',
+                endpoint: NAMESPACE_GAMES_ENDPOINT,
+                image: 'games.svg'
+            });
+        }
 
-    const roomExists = await RoomSchema.exists({ name: ROOM_NAME_LOBBY });
-    if (!roomExists) {
-        await RoomSchema.create({
-            name: ROOM_NAME_LOBBY,
-            namespaceId: NAMESPACE_ID_GAMES
-        });
+        const roomExists = await RoomSchema.exists({ name: ROOM_NAME_LOBBY });
+        if (!roomExists) {
+            await RoomSchema.create({
+                name: ROOM_NAME_LOBBY,
+                namespaceId: NAMESPACE_ID_GAMES
+            });
+        }
+    } catch (error) {
+        console.log(error);
     }
 }

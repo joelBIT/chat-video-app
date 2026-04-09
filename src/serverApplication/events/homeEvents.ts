@@ -32,37 +32,41 @@ export async function initializeHomeEvents(io: Server): Promise<void> {
  * Create the "Home" namespace and the common rooms if the namespace does not exist.
  */
 async function createDatabaseCollections(): Promise<void> {
-    const exists = await Namespace.exists({ name: 'Home' });
-    if (!exists) {
-        await Namespace.create({
-            _id: NAMESPACE_ID_HOME,
-            name: 'Home',
-            endpoint: NAMESPACE_HOME_ENDPOINT,
-            image: 'home.svg'
-        });
-    }
+    try {
+        const exists = await Namespace.exists({ name: 'Home' });
+        if (!exists) {
+            await Namespace.create({
+                _id: NAMESPACE_ID_HOME,
+                name: 'Home',
+                endpoint: NAMESPACE_HOME_ENDPOINT,
+                image: 'home.svg'
+            });
+        }
 
-    let roomExists = await Room.exists({ name: ROOM_NAME_GENERAL });
-    if (!roomExists) {
-        await Room.create({
-            name: ROOM_NAME_GENERAL,
-            namespaceId: NAMESPACE_ID_HOME
-        });
-    }
+        let roomExists = await Room.exists({ name: ROOM_NAME_GENERAL });
+        if (!roomExists) {
+            await Room.create({
+                name: ROOM_NAME_GENERAL,
+                namespaceId: NAMESPACE_ID_HOME
+            });
+        }
 
-    roomExists = await Room.exists({ name: ROOM_NAME_SUPPORT });
-    if (!roomExists) {
-        await Room.create({
-            name: ROOM_NAME_SUPPORT,
-            namespaceId: NAMESPACE_ID_HOME
-        });
-    }
+        roomExists = await Room.exists({ name: ROOM_NAME_SUPPORT });
+        if (!roomExists) {
+            await Room.create({
+                name: ROOM_NAME_SUPPORT,
+                namespaceId: NAMESPACE_ID_HOME
+            });
+        }
 
-    roomExists = await Room.exists({ name: ROOM_NAME_ANNOUNCEMENTS });
-    if (!roomExists) {
-        await Room.create({
-            name: ROOM_NAME_ANNOUNCEMENTS,
-            namespaceId: NAMESPACE_ID_HOME
-        });
+        roomExists = await Room.exists({ name: ROOM_NAME_ANNOUNCEMENTS });
+        if (!roomExists) {
+            await Room.create({
+                name: ROOM_NAME_ANNOUNCEMENTS,
+                namespaceId: NAMESPACE_ID_HOME
+            });
+        }
+    } catch (error) {
+        console.log(error);
     }
 }
