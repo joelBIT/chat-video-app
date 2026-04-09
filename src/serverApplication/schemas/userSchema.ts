@@ -4,15 +4,18 @@ export const userSchema = new mongoose.Schema({
     username: { 
         type: String,
         required: [true, "A user must have a username"],
-        unique: true
+        unique: true,
+        trim: true
     },
     password: {
         type: String,
-        required: [true, "A user must have a password"]
+        required: [true, "A user must have a password"],
+        trim: true
     },
     avatar: {
         type: String,
-        default: "mario.png"
+        default: "mario.png",
+        trim: true
     },
     inCall: {
         type: Boolean,

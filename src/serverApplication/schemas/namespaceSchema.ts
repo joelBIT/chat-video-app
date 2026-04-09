@@ -5,15 +5,18 @@ const namespaceSchema = new mongoose.Schema({
     name: { 
         type: String,
         required: [true, "A namespace must have a name"],
-        unique: true
+        unique: true,
+        trim: true
     },
     endpoint: {
         type: String,
-        required: [true, "A namespace must have an endpoint used by Socket.io"]
+        required: [true, "A namespace must have an endpoint used by Socket.io"],
+        trim: true
     },
     image: {
         type: String,
-        required: [true, "A namespace must have an icon in the UI"]
+        required: [true, "A namespace must have an icon in the UI"],
+        trim: true
     }
 }, { timestamps: true });
 

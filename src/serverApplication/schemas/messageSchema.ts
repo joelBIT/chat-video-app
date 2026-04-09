@@ -6,11 +6,13 @@ import mongoose from 'mongoose';
 export const messageSchema = new mongoose.Schema({
     from: {
         type: String,       // The user ID of the sender of the message
-        required: [true, "The message must be sent from a user with a supplied user ID"]
+        required: [true, "The message must be sent from a user with a supplied user ID"],
+        trim: true
     },
     to: {
         type: String,       // The room ID (or recipient user ID) is used as identifier
-        required: [true, "The message must have a recipient ID"]
+        required: [true, "The message must have a recipient ID"],
+        trim: true
     },
     public: {
         type: Boolean,
@@ -19,7 +21,8 @@ export const messageSchema = new mongoose.Schema({
     },
     text: {
         type: String,
-        required: [true, "Message must contain text"]
+        required: [true, "Message must contain text"],
+        trim: true
     },
     date: {
         type: Number,

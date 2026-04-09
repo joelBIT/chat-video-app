@@ -4,7 +4,8 @@ export const roomSchema = new mongoose.Schema({
     name: { 
         type: String,
         required: [true, "A room must have a name"],
-        unique: true
+        unique: true,
+        trim: true
     },
     namespaceId: {
         type: Number,
