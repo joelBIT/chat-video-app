@@ -52,14 +52,18 @@ export async function addUserToCommonRooms(user: ChatUser): Promise<void> {
 }
 
 async function addUserToCommonRoom(userID: string, roomName: string): Promise<void> {
-    const response = await RoomSchema.findOne({name: roomName});
+    try {
+        const response = await RoomSchema.findOne({name: roomName});
 
-    if (response && response.members) {
-        const roomMembers: string[] = response.members;
-        if (!roomMembers.includes(userID)) {
-            roomMembers.push(userID);
-            await RoomSchema.findOneAndUpdate({name: roomName}, { members: roomMembers });
+        if (response && response.members) {
+            const roomMembers: string[] = response.members;
+            if (!roomMembers.includes(userID)) {
+                roomMembers.push(userID);
+                await RoomSchema.findOneAndUpdate({name: roomName}, { members: roomMembers });
+            }
         }
+    } catch (error) {
+        console.log(error);
     }
 }
 
@@ -67,14 +71,18 @@ async function addUserToCommonRoom(userID: string, roomName: string): Promise<vo
  * Remove a user from room if the user is a member of the room. 
  */
 export async function removeUserFromRoom(userID: string, roomID: string): Promise<void> {
-    const response = await RoomSchema.findById(roomID);
+    try {
+        const response = await RoomSchema.findById(roomID);
 
-    if (response && response.members) {
-        const roomMembers: string[] = response.members;
-        if (roomMembers && roomMembers.includes(userID)) {
-            const filteredMembers: string[] = roomMembers.filter((user: string) => user !== userID);
-            await RoomSchema.findByIdAndUpdate(roomID, { members: filteredMembers });
+        if (response && response.members) {
+            const roomMembers: string[] = response.members;
+            if (roomMembers && roomMembers.includes(userID)) {
+                const filteredMembers: string[] = roomMembers.filter((user: string) => user !== userID);
+                await RoomSchema.findByIdAndUpdate(roomID, { members: filteredMembers });
+            }
         }
+    } catch (error) {
+        console.log(error);
     }
 }
 

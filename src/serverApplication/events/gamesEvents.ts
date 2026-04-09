@@ -15,13 +15,17 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
 
     io.of(NAMESPACE_GAMES_ENDPOINT).on("connection", async (socket: ISocket) => {
         socket.on(CREATE_ROOM, async (room: Room, userID: string) => {
-            room.members = [];
-            room.members.push(userID);
-            const persistedRoom: Room = await saveRoom(room);
-            socket.join(persistedRoom.id);
-            
-            // Send created room to clients so that the room appears in the room list in "Games".
-            io.of(NAMESPACE_GAMES_ENDPOINT).emit(UPDATE_ROOMS, persistedRoom);
+            try {
+                room.members = [];
+                room.members.push(userID);
+                const persistedRoom: Room = await saveRoom(room);
+                socket.join(persistedRoom.id);
+                
+                // Send created room to clients so that the room appears in the room list in "Games".
+                io.of(NAMESPACE_GAMES_ENDPOINT).emit(UPDATE_ROOMS, persistedRoom);
+            } catch (error) {
+                console.log(error);
+            }
         });
 
         socket.on(CHAT_MESSAGE, (message: Message) => {

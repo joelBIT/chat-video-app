@@ -40,6 +40,7 @@ async function mapRooms(rooms: Room[]): Promise<Room[]> {
 
     for (let i = 0; i < rooms.length; i++) {
         const messages: Message[] = [];
+
         if (isCommonRoom(rooms[i].name)) {          // Only retrieve message history for the common rooms
             const roomMessages = await getMessagesByRoomId(rooms[i].id);
             messages.push(...roomMessages);
@@ -61,13 +62,18 @@ async function mapRooms(rooms: Room[]): Promise<Room[]> {
 }
 
 export async function getAllNamespaces(): Promise<Namespace[]> {
-    const namespaces: Namespace[] = await NamespaceSchema.find({});
     const result: Namespace[] = [];
 
-    for (let i = 0; i < namespaces.length; i++) {
-        const namespace: Namespace = namespaces[i];
-        const mappedNamespace = await mapNamespace(namespace.id, namespace);
-        result.push(mappedNamespace);
+    try {
+        const namespaces: Namespace[] = await NamespaceSchema.find({});
+
+        for (let i = 0; i < namespaces.length; i++) {
+            const namespace: Namespace = namespaces[i];
+            const mappedNamespace = await mapNamespace(namespace.id, namespace);
+            result.push(mappedNamespace);
+        }
+    } catch (error) {
+        console.log(error);
     }
 
     return result;
@@ -79,43 +85,47 @@ export async function getAllNamespaces(): Promise<Namespace[]> {
 export async function getDataForUser(userID: string): Promise<Namespace[]> {
     const namespaces: Namespace[] = [];
 
-    const homeNamespace: Namespace | null = await NamespaceSchema.findById(NAMESPACE_ID_HOME);
-    if (homeNamespace) {
-        const mappedNamespace = await mapNamespace(NAMESPACE_ID_HOME, homeNamespace);
-        namespaces.push(mappedNamespace);
-    }
-    
-    const dmNamespace: Namespace | null = await NamespaceSchema.findById(NAMESPACE_ID_DM);
-    if (dmNamespace) {
-        const mappedNamespace = await mapNamespace(NAMESPACE_ID_DM, dmNamespace);
-        mappedNamespace.rooms = [];         // In DM namespace a room is a conversation
-        const conversations: string[] = await getConversationsByUserID(userID);
+    try {
+        const homeNamespace: Namespace | null = await NamespaceSchema.findById(NAMESPACE_ID_HOME);
+        if (homeNamespace) {
+            const mappedNamespace = await mapNamespace(NAMESPACE_ID_HOME, homeNamespace);
+            namespaces.push(mappedNamespace);
+        }
+        
+        const dmNamespace: Namespace | null = await NamespaceSchema.findById(NAMESPACE_ID_DM);
+        if (dmNamespace) {
+            const mappedNamespace = await mapNamespace(NAMESPACE_ID_DM, dmNamespace);
+            mappedNamespace.rooms = [];         // In DM namespace a room is a conversation
+            const conversations: string[] = await getConversationsByUserID(userID);
 
-        for (let i = 0; i < conversations.length; i++) {
-            const user: ChatUser | null = await getUserById(conversations[i]);
+            for (let i = 0; i < conversations.length; i++) {
+                const user: ChatUser | null = await getUserById(conversations[i]);
 
-            if (user) {
-                const messages: Message[] = await getPrivateConversation(userID, user.id);
-                const room: Room = {
-                    id: user.id,
-                    name: user.username,
-                    namespaceId: NAMESPACE_ID_DM,
-                    private: true,
-                    members: [user.id, userID],
-                    history: [...messages]
+                if (user) {
+                    const messages: Message[] = await getPrivateConversation(userID, user.id);
+                    const room: Room = {
+                        id: user.id,
+                        name: user.username,
+                        namespaceId: NAMESPACE_ID_DM,
+                        private: true,
+                        members: [user.id, userID],
+                        history: [...messages]
+                    }
+
+                    mappedNamespace.rooms.push(room);
                 }
-
-                mappedNamespace.rooms.push(room);
             }
+
+            namespaces.push(mappedNamespace);
         }
 
-        namespaces.push(mappedNamespace);
-    }
-
-    const gamesNamespace: Namespace | null = await NamespaceSchema.findById(NAMESPACE_ID_GAMES);
-    if (gamesNamespace) {
-        const mappedNamespace = await mapNamespace(NAMESPACE_ID_GAMES, gamesNamespace);
-        namespaces.push(mappedNamespace);
+        const gamesNamespace: Namespace | null = await NamespaceSchema.findById(NAMESPACE_ID_GAMES);
+        if (gamesNamespace) {
+            const mappedNamespace = await mapNamespace(NAMESPACE_ID_GAMES, gamesNamespace);
+            namespaces.push(mappedNamespace);
+        }
+    } catch (error) {
+        console.log(error);
     }
 
     return namespaces;
