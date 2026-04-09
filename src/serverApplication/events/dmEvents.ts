@@ -46,9 +46,13 @@ async function joinPersonalRoom(socket: ISocket): Promise<void> {
     const username = socket.handshake.query.username;
 
     if (username && (typeof username === "string")) {
-        const user: ChatUser | null = await getUserByUsername(username);
-        if (user) {
-            socket.join(user.id);
+        try {
+            const user: ChatUser = await getUserByUsername(username);
+            if (user) {
+                socket.join(user.id);
+            }
+        } catch (error) {
+            console.log(error);
         }
     }
 }
@@ -57,13 +61,17 @@ async function joinPersonalRoom(socket: ISocket): Promise<void> {
  * Create the "DMs" namespace if it does not exist.
  */
 async function createDatabaseCollection(): Promise<void> {
-    const exists = await Namespace.exists({ name: 'DMs' });
-    if (!exists) {
-        await Namespace.create({
-            _id: NAMESPACE_ID_DM,
-            name: 'DMs',
-            endpoint: NAMESPACE_DM_ENDPOINT,
-            image: 'dm.svg'
-        });
+    try {
+        const exists = await Namespace.exists({ name: 'DMs' });
+        if (!exists) {
+            await Namespace.create({
+                _id: NAMESPACE_ID_DM,
+                name: 'DMs',
+                endpoint: NAMESPACE_DM_ENDPOINT,
+                image: 'dm.svg'
+            });
+        }
+    } catch (error) {
+        console.log(error);
     }
 }

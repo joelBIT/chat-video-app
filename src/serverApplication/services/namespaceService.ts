@@ -5,15 +5,6 @@ import RoomSchema from "../schemas/roomSchema";
 import { getConversationsByUserID, getMessagesByRoomId, getPrivateConversation } from "./messageService";
 import { getUserById } from "./userService";
 
-export async function getNamespaceByID(namespaceID: number): Promise<Namespace> {
-    const response: Namespace | null = await NamespaceSchema.findById(namespaceID);
-    if (response) {
-        return await mapNamespace(namespaceID, response);
-    }
-
-    throw new Error(`No namespace found for ID ${namespaceID}`);
-}
-
 /**
  * Maps a namespace response from the database to a namespace object used in the application.
  */

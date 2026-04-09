@@ -16,25 +16,32 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
 
     io.on("connection", async (socket: ISocket)  => {
         console.log(`connected ${socket.id}`);
-
         const userID: string | undefined = socket.userID as string;
-        const user: ChatUser | null = await getUserById(userID);
-        if (user) {
+
+        try {
+            const user: ChatUser = await getUserById(userID);
             const users: ChatUser[] = await getUsers();
             const namespaces: Namespace[] = await getDataForUser(user.id);
-            socket.emit(NAMESPACES, namespaces, user, users);          // Send back data to the connected client
-            io.except(socket.id).emit(USER_CONNECTED, user);                     // Inform other clients that the user is online
+            socket.emit(NAMESPACES, namespaces, user, users);                   // Send back data to the connected client
+            io.except(socket.id).emit(USER_CONNECTED, user);                    // Inform other clients that the user is online
+        } catch (error) {
+            console.log(error);
         }
 
         socket.on(USER_UPDATED, async (updatedUser: ChatUser, ackCallback) => {
-            const user: ChatUser | null = await getUserByUsername(updatedUser.username);
-            if (user && user.id !== updatedUser.id) {
-                ackCallback({ message: 'Username is already taken', success: false });      // Updated user may have a new username that already exists
-            } else if (user) {
-                updateUser(updatedUser);
-                io.except(socket.id).emit(USER_UPDATED, updatedUser);
-                ackCallback({ message: 'Profile updated', success: true });
+            try {
+                const user: ChatUser = await getUserByUsername(updatedUser.username);
+                if (user.id !== updatedUser.id) {
+                    ackCallback({ message: 'Username is already taken', success: false });      // Updated user may have a new username that already exists
+                } else {
+                    updateUser(updatedUser);
+                    io.except(socket.id).emit(USER_UPDATED, updatedUser);
+                    ackCallback({ message: 'Profile updated', success: true });
+                }
+            } catch (error) {
+                console.log(error);
             }
+            
             ackCallback({ message: `User ${updatedUser.username} not found`, success: false });
         });
 
@@ -43,8 +50,13 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
             
             if (userID) {
                 await setUserOnline(userID, false);
-                const user: ChatUser | null = await getUserById(userID);
-                io.emit(USER_DISCONNECTED, user);
+
+                try {
+                    const user: ChatUser = await getUserById(userID);
+                    io.emit(USER_DISCONNECTED, user);
+                } catch (error) {
+                    console.log(error);
+                }
             } else {
                 console.log(`Could not inform clients about disconnecting ${userID}`);
             }
@@ -56,5 +68,9 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
  * Set all users as offline if the server restarts for some reason.
  */
 async function setAllUsersAsOffline(): Promise<void> {
-    await User.updateMany({}, { online: false });
+    try {
+        await User.updateMany({}, { online: false });
+    } catch (error) {
+        console.log(error);
+    }
 }
