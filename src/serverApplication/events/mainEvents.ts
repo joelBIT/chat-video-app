@@ -31,6 +31,7 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
         socket.on(USER_UPDATED, async (updatedUser: ChatUser, ackCallback) => {
             try {
                 const user: ChatUser = await getUserByUsername(updatedUser.username);
+
                 if (user.id !== updatedUser.id) {
                     ackCallback({ message: 'Username is already taken', success: false });      // Updated user may have a new username that already exists
                 } else {
@@ -49,16 +50,13 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
             console.log(`disconnect ${userID} due to ${reason}`);
             
             if (userID) {
-                await setUserOnline(userID, false);
-
                 try {
+                    await setUserOnline(userID, false);
                     const user: ChatUser = await getUserById(userID);
                     io.emit(USER_DISCONNECTED, user);
                 } catch (error) {
                     console.log(error);
                 }
-            } else {
-                console.log(`Could not inform clients about disconnecting ${userID}`);
             }
         });
     });

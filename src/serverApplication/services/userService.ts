@@ -65,17 +65,9 @@ export async function getUsers(): Promise<ChatUser[]> {
 }
 
 export async function updateUser(updatedUser: ChatUser): Promise<void> {
-    try {
-        await User.findOneAndUpdate({_id: updatedUser.id}, updatedUser);
-    } catch (error) {
-        console.log(error);
-    }
+    await User.findOneAndUpdate({_id: updatedUser.id}, updatedUser);
 }
 
 export async function setUserOnline(userID: string, isOnline: boolean): Promise<void> {
-    try {
-        await User.findByIdAndUpdate(userID, { online: isOnline });
-    } catch (error) {
-        console.log(error);
-    }
+    await User.findByIdAndUpdate(userID, { online: isOnline });
 }
