@@ -59,13 +59,11 @@ async function joinPersonalRoom(socket: ISocket): Promise<void> {
 async function createDatabaseCollection(): Promise<void> {
     const exists = await Namespace.exists({ name: 'DMs' });
     if (!exists) {
-        const dmNamespace = new Namespace({
+        await Namespace.create({
             _id: NAMESPACE_ID_DM,
             name: 'DMs',
             endpoint: NAMESPACE_DM_ENDPOINT,
             image: 'dm.svg'
         });
-            
-        await dmNamespace.save();
     }
 }

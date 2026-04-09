@@ -5,15 +5,13 @@ import { MessageModel } from "../schemas/messageSchema";
  * Save message in database.
  */
 export async function saveMessage(message: Message): Promise<void> {
-    const newMessage = new MessageModel({
+    await MessageModel.create({
         from: message.from,
         to: message.to,
         public: message.public,
         text: message.text,
         date: message.date
     });
-        
-    await newMessage.save();
 }
 
 export async function getMessagesByRoomId(roomID: string): Promise<Message[]> {

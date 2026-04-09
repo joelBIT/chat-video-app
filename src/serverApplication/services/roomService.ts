@@ -11,13 +11,12 @@ import RoomSchema from "../schemas/roomSchema";
 export async function saveRoom(room: Room): Promise<Room> {
     const exists = await RoomSchema.exists({ name: room.name });
     if (!exists) {
-        const newRoom = new RoomSchema({
+        const result = await RoomSchema.create({
             name: room.name,
             namespaceId: room.namespaceId,
             private: room.private
         });
 
-        const result = await newRoom.save();
         const createdRoom: Room = {
             id: result.id.toString(),
             name: result.name,

@@ -34,43 +34,35 @@ export async function initializeHomeEvents(io: Server): Promise<void> {
 async function createDatabaseCollections(): Promise<void> {
     const exists = await Namespace.exists({ name: 'Home' });
     if (!exists) {
-        const homeNamespace = new Namespace({
+        await Namespace.create({
             _id: NAMESPACE_ID_HOME,
             name: 'Home',
             endpoint: NAMESPACE_HOME_ENDPOINT,
             image: 'home.svg'
         });
-        
-        await homeNamespace.save();
     }
 
     let roomExists = await Room.exists({ name: ROOM_NAME_GENERAL });
     if (!roomExists) {
-        const generalRoom = new Room({
+        await Room.create({
             name: ROOM_NAME_GENERAL,
             namespaceId: NAMESPACE_ID_HOME
         });
-
-        await generalRoom.save();
     }
 
     roomExists = await Room.exists({ name: ROOM_NAME_SUPPORT });
     if (!roomExists) {
-        const supportRoom = new Room({
+        await Room.create({
             name: ROOM_NAME_SUPPORT,
             namespaceId: NAMESPACE_ID_HOME
         });
-
-        await supportRoom.save();
     }
 
     roomExists = await Room.exists({ name: ROOM_NAME_ANNOUNCEMENTS });
     if (!roomExists) {
-        const announcementsRoom = new Room({
+        await Room.create({
             name: ROOM_NAME_ANNOUNCEMENTS,
             namespaceId: NAMESPACE_ID_HOME
         });
-
-        await announcementsRoom.save();
     }
 }

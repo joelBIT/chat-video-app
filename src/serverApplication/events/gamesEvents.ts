@@ -60,23 +60,19 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
 async function createDatabaseCollections(): Promise<void> {
     const exists = await Namespace.exists({ name: 'Games' });
     if (!exists) {
-        const gamesNamespace = new Namespace({
+        await Namespace.create({
             _id: NAMESPACE_ID_GAMES,
             name: 'Games',
             endpoint: NAMESPACE_GAMES_ENDPOINT,
             image: 'games.svg'
         });
-        
-        await gamesNamespace.save();
     }
 
     const roomExists = await RoomSchema.exists({ name: ROOM_NAME_LOBBY });
     if (!roomExists) {
-        const lobbyRoom = new RoomSchema({
+        await RoomSchema.create({
             name: ROOM_NAME_LOBBY,
             namespaceId: NAMESPACE_ID_GAMES
         });
-
-        await lobbyRoom.save();
     }
 }
