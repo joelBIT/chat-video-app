@@ -23,28 +23,27 @@ export async function registerUser(req: express.Request, res: express.Response):
                 message: `Username ${username} is already in use. Choose a different username.`
             });
         } else {
-            const dbUser = new User({
-                username,
-                password
-            });
+            try {
+                const newUser = await User.create({
+                    username,
+                    password
+                });
 
-            await dbUser.save().then(doc => {
-                const createdUser: ChatUser = {username: doc.username, id: doc._id.toString(), online: doc.online, avatar: doc.avatar, inCall: doc.inCall};
-                
+                const createdUser: ChatUser = {username: newUser.username, id: newUser._id.toString(), online: newUser.online, avatar: newUser.avatar, inCall: newUser.inCall};
                 addUserToCommonRooms(createdUser);
 
                 res.status(201).json({
                     success: true,
-                    message: `${doc.username} successfully registered.`,
+                    message: `${newUser.username} successfully registered.`,
                     data: createdUser
                 });
-            }).catch(error => {
+            } catch (error) {
                 console.log(error);
                 res.status(500).json({
                     success: false,
                     message: "An error occurred during registration."
                 });
-            });
+            }
         }
     }
 }

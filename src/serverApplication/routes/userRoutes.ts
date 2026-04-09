@@ -7,5 +7,4 @@ router
     .route('/')
     .post(checkBody, registerUser);
 
-
 export default router;
