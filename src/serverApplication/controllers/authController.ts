@@ -13,38 +13,43 @@ export async function registerUser(req: express.Request, res: express.Response):
     if (password !== passwordRepeat) {
         res.status(400).json({
             success: false,
-            message: "Passwords do not match"
+            message: "Passwords do not match."
         });
-    } else {
-        const user: ChatUser | null = await User.findOne({username});
-        if (user) {
-            res.status(400).json({
-                success: false,
-                message: `Username ${username} is already in use. Choose a different username.`
-            });
-        } else {
-            try {
-                const newUser = await User.create({
-                    username,
-                    password
-                });
 
-                const createdUser: ChatUser = {username: newUser.username, id: newUser._id.toString(), online: newUser.online, avatar: newUser.avatar, inCall: newUser.inCall};
-                addUserToCommonRooms(createdUser);
+        return;
+    }
 
-                res.status(201).json({
-                    success: true,
-                    message: `${newUser.username} successfully registered.`,
-                    data: createdUser
-                });
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({
-                    success: false,
-                    message: "An error occurred during registration."
-                });
-            }
-        }
+    const user: ChatUser | null = await User.findOne({username});
+    if (user) {
+        res.status(400).json({
+            success: false,
+            message: `Username ${username} is already in use. Choose a different username.`
+        });
+
+        return;
+    }
+
+    try {
+        const newUser = await User.create({
+            username,
+            password
+        });
+
+        const createdUser: ChatUser = {username: newUser.username, id: newUser._id.toString(), online: newUser.online, avatar: newUser.avatar, inCall: newUser.inCall};
+        addUserToCommonRooms(createdUser);
+
+        res.status(201).json({
+            success: true,
+            message: `${newUser.username} successfully registered.`,
+            data: createdUser
+        });
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: "An error occurred during registration."
+        });
     }
 }
 
