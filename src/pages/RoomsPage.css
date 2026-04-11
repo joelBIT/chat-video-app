@@ -2,3 +2,12 @@
     display: flex;
     flex-direction: row;
 }
+
+#roomsPage:has(.inCall-lock-room) {
+    & #namespaceMenu,
+    & #roomList,
+    & #conversationList {
+        filter: brightness(0.3);
+        pointer-events: none;
+    }
+}

@@ -1,14 +1,15 @@
-import { type ReactElement, useEffect, useRef, useState } from "react";
+import { type ReactElement, useRef, useState } from "react";
 import { useMultiplex, useRoom, useUser } from "../../hooks";
 import { Message } from "..";
 import { getSelectedRoom } from "../../clientApplication/services/roomService";
-import { call, localStream, remoteStream } from "../../clientApplication/services/webRtcService";
+import { call } from "../../clientApplication/services/webRtcService";
 import type { Message as MessageType } from "../../types";
 
 import "./DmRoom.css";
 
 /**
- * A DM room chat where a user may write messages to another user directly. An active WebRTC call is ended if room is changed.
+ * A DM room chat where a user may write messages to another user directly. An initiated or active WebRTC call locks the room by disabling menu links
+ * so that a user must stay in the room during the call.
  */
 export function DmRoom(): ReactElement {
     const [isCalling, setIsCalling] = useState<boolean>(false);
@@ -17,34 +18,7 @@ export function DmRoom(): ReactElement {
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const { selectedRoom, sendMessage } = useRoom();
     const { user } = useUser();
-    const { incomingCall, activeCall, recipientUsername, answerCall, hangup } = useMultiplex();
-
-    useEffect(() => {
-        if (activeCall || isCalling) {
-            if (selectedRoom?.name && selectedRoom?.name !== recipientUsername) {
-                setIsCalling(false);
-                endCall();
-            } else if (selectedRoom?.name === recipientUsername) {
-                setTimeout(addVideoStream, 800);
-            }
-        }
-    }, [selectedRoom]);
-
-    /**
-     * If navigating away from the Call room and back to it, add the streams to the newly rendered video elements to
-     * continue the streaming conversation.
-     */
-    async function addVideoStream(): Promise<void> {
-        const localVideo = localVideoRef.current;
-        if (localVideo) {
-            localVideo.srcObject = localStream;
-        }
-
-        const remoteVideo = remoteVideoRef.current;
-        if (remoteVideo) {
-            remoteVideo.srcObject = remoteStream;
-        }
-    }
+    const { incomingCall, activeCall, answerCall, hangup } = useMultiplex();
 
     /**
      * Send a DM to another user.
@@ -81,7 +55,7 @@ export function DmRoom(): ReactElement {
     }
     
     return (
-        <section id="dmRoom">
+        <section id="dmRoom" className={activeCall || isCalling ? "inCall-lock-room" : ""}>
             <section className="dmRoom-header">
                 {
                     activeCall || isCalling ? <button className="app-button" onClick={endCall}> Hangup </button> 
