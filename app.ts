@@ -10,6 +10,7 @@ import {initializeCommonEvents} from "./src/serverApplication/events/commonEvent
 import {initializeMainNamespaceEvents} from "./src/serverApplication/events/mainEvents.ts";
 import {initializeWebRtcEvents} from "./src/serverApplication/events/webRtcEvents.ts";
 import userRouter from "./src/serverApplication/routes/userRoutes.ts";
+import type { ActionState } from './src/types.ts';
 
 const app = express();
 app.use(express.static(import.meta.dirname + "/dist/"));
@@ -26,10 +27,12 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
     console.log(err.stack);
     err.statusCode = err.statusCode || 500;
 
-    res.status(err.statusCode).json({
+    const response: ActionState = {
         success: err.success || false,
         message: err.message
-    });
+    }
+
+    res.status(err.statusCode).json(response);
 });
 
 const key = readFileSync('cert.key');

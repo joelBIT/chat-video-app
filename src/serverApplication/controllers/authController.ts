@@ -5,7 +5,7 @@ import { addUserToCommonRooms } from '../services/roomService';
 import { AppError } from '../errors/AppError';
 
 /**
- * Create new user in database if username is not already taken.
+ * Create new user in database if username is available.
  */
 export async function registerUser(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
     const username: string = req.body.username;
