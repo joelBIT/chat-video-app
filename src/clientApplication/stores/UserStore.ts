@@ -25,6 +25,18 @@ class InMemoryUserStore {
         throw new Error(`No user found with id ${userID}`);
     }
 
+    getUserByUsername(username: string): ChatUser {
+        const users: ChatUser[] = this.users.values().toArray();
+
+        for (let i = 0; i < users.length; i++) {
+            if (users[i].username === username) {
+                return users[i];
+            }
+        }
+        
+        throw new Error(`No user found with username ${username}`);
+    }
+
     /**
      * Store all users of the application (does not matter which rooms they are member of). This function is executed when the client
      * connects to the server and retrieves a list of all application users.

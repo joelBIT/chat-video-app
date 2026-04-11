@@ -3,6 +3,7 @@ import { useMultiplex, useRoom, useUser } from "../../hooks";
 import { Message } from "..";
 import { getSelectedRoom } from "../../clientApplication/services/roomService";
 import { call } from "../../clientApplication/services/webRtcService";
+import { getUserByUsername } from "../../clientApplication/services/userService";
 import type { Message as MessageType } from "../../types";
 
 import "./DmRoom.css";
@@ -46,6 +47,22 @@ export function DmRoom(): ReactElement {
         setIsCalling(false);
     }
 
+    /**
+     * It should not be possible to call users that are offline.
+     * 
+     * @returns true if the remote user is online, false otherwise.
+     */
+    function isOnline(): boolean {
+        const username: string | undefined = getSelectedRoom()?.name;
+        if (username) {
+            try {
+                return getUserByUsername(username).online;
+            } catch (error) { }
+        }
+        
+        return false;
+    }
+
     if (!selectedRoom) {
         return (
             <main id="dmRoom">
@@ -56,37 +73,44 @@ export function DmRoom(): ReactElement {
     
     return (
         <section id="dmRoom" className={activeCall || isCalling ? "inCall-lock-room" : ""}>
-            <section className="dmRoom-header">
-                {
-                    activeCall || isCalling ? <button className="app-button" onClick={endCall}> Hangup </button> 
-                    : 
-                    incomingCall ? <button className="app-button" onClick={answerCall}> Answer </button> // TODO: Make incoming call a modal -> Answer/Deny
-                    :
-                    <section className="chat-buttons">
-                        <article className="communication-button" onClick={() => callUser(false)}>
-                            <img 
-                                src="/audio.svg" 
-                                alt="Audio chat icon" 
-                                title="Call User" 
-                                className="button__icon" 
-                            />
+            {
+                isOnline() ?
+                    <section id="dmRoom-header">
+                        {
+                            activeCall || isCalling ? <button className="app-button" onClick={endCall}> Hangup </button> 
+                            : 
+                            incomingCall ? <button className="app-button" onClick={answerCall}> Answer </button> // TODO: Make incoming call a modal -> Answer/Deny
+                            :
+                            <section className="chat-buttons">
+                                <article className="communication-button" onClick={() => callUser(false)}>
+                                    <img 
+                                        src="/audio.svg" 
+                                        alt="Audio chat icon" 
+                                        title="Call User" 
+                                        className="button__icon" 
+                                    />
 
-                            <h2 className="button__label"> Audio </h2>
-                        </article>
+                                    <h2 className="button__label"> Audio </h2>
+                                </article>
 
-                        <article className="communication-button" onClick={() => callUser(true)}>
-                            <img 
-                                src="/video.svg" 
-                                alt="Video chat icon" 
-                                title="Video conference" 
-                                className="button__icon" 
-                            />
+                                <article className="communication-button" onClick={() => callUser(true)}>
+                                    <img 
+                                        src="/video.svg" 
+                                        alt="Video chat icon" 
+                                        title="Video conference" 
+                                        className="button__icon" 
+                                    />
 
-                            <h2 className="button__label"> Video </h2>
-                        </article>
+                                    <h2 className="button__label"> Video </h2>
+                                </article>
+                            </section>
+                        }
                     </section>
-                }
-            </section>
+                :
+                    <section id="dmRoom-header">
+                        <p className="dmRoom-header__text"> {selectedRoom.name} is not online </p>
+                    </section>
+            }
 
             <section id="videos" className={isCalling || activeCall ? "show-videos" : "hide-videos"}>
                 <video id="local-video" className="video-player" ref={localVideoRef} autoPlay playsInline />

@@ -69,3 +69,7 @@ export function getSignedOutUser(): ChatUser {
 export function getUserByID(userID: string): ChatUser {
     return userStore.getUserById(userID);
 }
+
+export function getUserByUsername(username: string): ChatUser {
+    return userStore.getUserByUsername(username);
+}
