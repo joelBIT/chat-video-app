@@ -3,8 +3,7 @@ import { ANSWER_RESPONSE, END_CALL, NAMESPACE_DM_ENDPOINT, NEW_ANSWER, NEW_OFFER
 import type { Offer, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
 import { getUserByUsername, updateUser } from "../services/userService";
-
-const offers: Offer[] = [];
+import { deleteOfferByOffererUsername, getOfferByAnswererUsername, getOfferByOffererUsername, saveOffer } from "../services/webRtcService";
 
 /**
  * Initializes events related to WebRTC. WebRTC is only used in namespace 1 (DMs).
@@ -22,7 +21,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
                 answererIceCandidates: [],
                 video
             };
-            offers.push(offer);
+            saveOffer(offer);
 
             updateUserStatus(io, fromUsername, true);
 
@@ -34,19 +33,11 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             }
         });
 
-        socket.on(NEW_OFFER_CANCELLED, async (callerUsername: string) => {
-            const offer: Offer | undefined = offers.find((offer: Offer) => offer.offererUserName === callerUsername)
-            if (!offer) {
-                console.log(`No offer found for username ${callerUsername}`);
-                return;
-            }
-
-            const remainingOffers: Offer[] = offers.filter((offer: Offer) => offer.offererUserName !== callerUsername);
-            offers.length = 0;
-            offers.push(...remainingOffers);
+        socket.on(NEW_OFFER_CANCELLED, async (callerUsername: string, recipientUsername: string) => {
+            await deleteOfferByOffererUsername(callerUsername);
 
             try {
-                const recipient: ChatUser = await getUserByUsername(offer.answererUserName);
+                const recipient: ChatUser = await getUserByUsername(recipientUsername);
                 socket.to(recipient.id).emit(NEW_OFFER_CANCELLED, callerUsername);
             } catch (error) {
                 console.log(error);
@@ -61,13 +52,8 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
 
         socket.on(NEW_ANSWER, async (sentOffer: Offer, ackFunction) => {
             // Emit this answer (sentOffer) back to CLIENT1. In order to do that, we need CLIENT1's id.
-            const offer: Offer | undefined = offers.find((offer: Offer) => offer.offererUserName === sentOffer.offererUserName);
-            if (!offer) {
-                console.log("No offer to update");
-                return;
-            }
-
             try {
+                const offer: Offer = await getOfferByOffererUsername(sentOffer.offererUserName);
                 const user: ChatUser = await getUserByUsername(sentOffer.offererUserName);
                 const socketIdToAnswer: string = user.id;
 
@@ -87,21 +73,28 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             const { didIOffer, iceUserName, iceCandidate } = iceCandidateObject;
 
             if (didIOffer) {
-                // This ice candidate is coming from the offerer. Send to the answerer
-                const offer: Offer | undefined = offers.find((offer: Offer) => offer.offererUserName === iceUserName);
-                if (offer) {
+                try {
+                    // This ice candidate is coming from the offerer. Send to the answerer
+                    const offer: Offer = await getOfferByOffererUsername(iceUserName);
                     offer.offerIceCandidates.push(iceCandidate);
+
                     // 1. When the answerer answers, all existing ice candidates are sent
                     // 2. Any candidates that come in after the offer has been answered, will be passed through
                     if (offer.answererUserName) {
                         await emitIceCandidate(socket, offer.answererUserName, iceCandidate);
                     }
+                } catch (error) {
+                    console.log(error);
                 }
             } else {
-                // This ice candidate is coming from the answerer. Send to the offerer.
-                const offer: Offer | undefined = offers.find((offer: Offer) => offer.answererUserName === iceUserName);
-                if (offer) {
-                    await emitIceCandidate(socket, offer.offererUserName, iceCandidate);
+                try {
+                    // This ice candidate is coming from the answerer. Send to the offerer.
+                    const offer: Offer = await getOfferByAnswererUsername(iceUserName);
+                    if (offer) {
+                        await emitIceCandidate(socket, offer.offererUserName, iceCandidate);
+                    }
+                } catch (error) {
+                    console.log(error);
                 }
             }
         })

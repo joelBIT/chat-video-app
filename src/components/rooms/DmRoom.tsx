@@ -63,8 +63,12 @@ export function DmRoom(): ReactElement {
     }
 
     function endCall(): void {
-        hangup(isCalling, user.username);
-        setIsCalling(false);
+        const remoteUsername: string | undefined = getSelectedRoom()?.name;
+        if (remoteUsername) {
+            hangup(isCalling, user.username, remoteUsername);
+            setIsCalling(false);
+        }
+        
     }
 
     if (!selectedRoom) {
