@@ -2,13 +2,13 @@ import { type ReactElement, useEffect, useRef, useState } from "react";
 import { useMultiplex, useRoom, useUser } from "../../hooks";
 import { Message } from "..";
 import { getSelectedRoom } from "../../clientApplication/services/roomService";
-import { call, localStream, remoteStream } from "../../clientApplication/webRTC";
+import { call, localStream, remoteStream } from "../../clientApplication/services/webRtcService";
 import type { Message as MessageType } from "../../types";
 
 import "./DmRoom.css";
 
 /**
- * A DM room chat where a user may write messages to another user directly.
+ * A DM room chat where a user may write messages to another user directly. An active WebRTC call is ended if room is changed.
  */
 export function DmRoom(): ReactElement {
     const [isCalling, setIsCalling] = useState<boolean>(false);
@@ -17,13 +17,18 @@ export function DmRoom(): ReactElement {
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const { selectedRoom, sendMessage } = useRoom();
     const { user } = useUser();
-    const { incomingCall, activeCall, answerCall, hangup } = useMultiplex();
+    const { incomingCall, activeCall, recipientUsername, answerCall, hangup } = useMultiplex();
 
     useEffect(() => {
         if (activeCall || isCalling) {
-            setTimeout(addVideoStream, 800);
+            if (selectedRoom?.name && selectedRoom?.name !== recipientUsername) {
+                setIsCalling(false);
+                endCall();
+            } else if (selectedRoom?.name === recipientUsername) {
+                setTimeout(addVideoStream, 800);
+            }
         }
-    }, []);
+    }, [selectedRoom]);
 
     /**
      * If navigating away from the Call room and back to it, add the streams to the newly rendered video elements to
@@ -63,12 +68,8 @@ export function DmRoom(): ReactElement {
     }
 
     function endCall(): void {
-        const remoteUsername: string | undefined = getSelectedRoom()?.name;
-        if (remoteUsername) {
-            hangup(isCalling, user.username, remoteUsername);
-            setIsCalling(false);
-        }
-        
+        hangup(isCalling, user.username);
+        setIsCalling(false);
     }
 
     if (!selectedRoom) {
@@ -118,6 +119,16 @@ export function DmRoom(): ReactElement {
 
                 <video id="remote-video" className="video-player" ref={remoteVideoRef} autoPlay playsInline />
             </section>
+
+            {
+                activeCall ?
+                    <p className="audio-call__text"> In a call with {getSelectedRoom()?.name} </p>
+                    :
+                    isCalling ?
+                        <p className="audio-call__text"> Calling {getSelectedRoom()?.name}... </p>
+                            :
+                            <></>
+            }
 
             <section id="message-area" className="scrollable">
                 {

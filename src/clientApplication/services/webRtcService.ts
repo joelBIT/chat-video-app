@@ -1,6 +1,6 @@
-import { multiplexSockets } from "../socket-client";
-import { NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER } from "../serverApplication/utils";
-import type { Offer } from "../types";
+import { multiplexSockets } from "../../socket-client";
+import { NAMESPACE_ID_DM, NEW_ANSWER, NEW_OFFER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER } from "../../serverApplication/utils";
+import type { Offer } from "../../types";
 
 /**
  * The client will send a request to a STUN server on the Internet who will reply with the 

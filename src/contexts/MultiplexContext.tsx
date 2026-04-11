@@ -6,7 +6,7 @@ import { getSelectedRoom, isSelectedRoom, removeRoom, saveRoom } from "../client
 import { addUserToRoom, getUsersInSelectedRoom, removeUserFromRoom } from "../clientApplication/services/userService";
 import { saveConversationMessage, saveMessage } from "../clientApplication/services/messageService";
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
-import { addAnswer, addNewIceCandidate, answerOffer, closeVideoCall } from "../clientApplication/webRTC";
+import { addAnswer, addNewIceCandidate, answerOffer, closeVideoCall } from "../clientApplication/services/webRtcService";
 import type { Message, Namespace, Offer, Room } from "../types";
 import { ANSWER_RESPONSE, CHAT_MESSAGE, END_CALL, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../serverApplication/utils";
 
@@ -14,8 +14,9 @@ export interface MultiplexContextProvider {
     connectMultiplexSockets: (namespaces: Namespace[]) => void;
     incomingCall: boolean;
     activeCall: boolean;
+    recipientUsername: string;
     answerCall: () => Promise<void>;
-    hangup: (isCalling: boolean, callerUsername: string, recipientUsername: string) => void;
+    hangup: (isCalling: boolean, callerUsername: string) => void;
     disconnectMultiplexSockets: () => void;
 }
 
@@ -30,6 +31,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     const [incomingCall, setIncomingCall] = useState<boolean>(false);
     const [activeCall, setActiveCall] = useState<boolean>(false);
     const [offers, setOffers] = useState<Offer[]>([]);
+    const [recipientUsername, setRecipientUsername] = useState<string>('');
     const { setRoomParticipants, changeNamespace, changeSelectedRoom } = useRoom();
 
     /**
@@ -161,6 +163,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     async function answerCall(): Promise<void> {
         setIncomingCall(false);
         await answerOffer(offers[0]);
+        setRecipientUsername(offers[0].offererUserName);
         setActiveCall(true);
     }
 
@@ -169,16 +172,19 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
      * the call has been cancelled so the remote user cannot answer a call that does not exist. The 'isCalling' parameter being false 
      * means a user leaves an ongoing active call.
      */
-    function hangup(isCalling: boolean, username: string, recipientUsername: string): void {
+    function hangup(isCalling: boolean, username: string): void {
         closeVideoCall();
         setIncomingCall(false);
         setActiveCall(false);
+        setOffers([]);
         
         if (isCalling) {
             multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER_CANCELLED, username, recipientUsername);
         } else {
             multiplexSockets[NAMESPACE_ID_DM].emit(END_CALL, username);
         }
+
+        setRecipientUsername('');
     }
 
     /**
@@ -187,16 +193,19 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     function onNewOfferAwaiting(offer: Offer): void {
         setIncomingCall(true);
         setOffers([...offers, offer]);
+        setRecipientUsername(offer.offererUserName);
     }
 
     function onNewOfferCancelled(callerUsername: string): void {
         const remainingOffers: Offer[] = offers.filter((offer: Offer) => offer.offererUserName !== callerUsername);
         setOffers([...remainingOffers]);
+        setRecipientUsername('');
         setIncomingCall(false);
     }
 
     function onAnswerResponse(answer: Offer): void {
         addAnswer(answer);
+        setRecipientUsername(answer.answererUserName)
         setActiveCall(true);
     }
 
@@ -205,7 +214,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     }
 
     return (
-        <MultiplexContext.Provider value={{ incomingCall, activeCall, connectMultiplexSockets, disconnectMultiplexSockets, answerCall, hangup }}>
+        <MultiplexContext.Provider value={{ incomingCall, activeCall, recipientUsername, connectMultiplexSockets, disconnectMultiplexSockets, answerCall, hangup }}>
             { children }
         </MultiplexContext.Provider>
     );
