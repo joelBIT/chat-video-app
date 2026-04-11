@@ -110,3 +110,9 @@
         }
     }
 }
+
+#dmRoom:has(.show-videos) {
+    & #message-area {
+        max-height: 300px;
+    }
+}

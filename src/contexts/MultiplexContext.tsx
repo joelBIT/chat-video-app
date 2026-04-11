@@ -15,7 +15,7 @@ export interface MultiplexContextProvider {
     incomingCall: boolean;
     activeCall: boolean;
     answerCall: () => Promise<void>;
-    hangup: (isCalling: boolean, callerUsername: string) => void;
+    hangup: (isCalling: boolean, callerUsername: string, recipientUsername: string) => void;
     disconnectMultiplexSockets: () => void;
 }
 
@@ -169,13 +169,13 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
      * the call has been cancelled so the remote user cannot answer a call that does not exist. The 'isCalling' parameter being false 
      * means a user leaves an ongoing active call.
      */
-    function hangup(isCalling: boolean, username: string): void {
+    function hangup(isCalling: boolean, username: string, recipientUsername: string): void {
         closeVideoCall();
         setIncomingCall(false);
         setActiveCall(false);
         
         if (isCalling) {
-            multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER_CANCELLED, username);
+            multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER_CANCELLED, username, recipientUsername);
         } else {
             multiplexSockets[NAMESPACE_ID_DM].emit(END_CALL, username);
         }
