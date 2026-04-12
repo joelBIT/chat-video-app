@@ -1,10 +1,11 @@
 import { Server } from "socket.io";
-import { getPrivateConversation, saveMessage } from "../services/messageService";
+import { getPrivateConversation } from "../services/messageService";
 import type { Message, Room, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
 import { CREATE_ROOM, NAMESPACE_DM_ENDPOINT, NAMESPACE_ID_DM, PRIVATE_MESSAGE, UPDATE_ROOMS } from "../utils";
 import Namespace from "../schemas/namespaceSchema";
 import { findUserByUsername } from "../dao/userDAO";
+import { saveMessage } from "../dao/messageDAO";
 
 /**
  * Initialize events that are specific to the "DMs" namespace (id 1).

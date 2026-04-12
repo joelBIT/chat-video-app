@@ -2,8 +2,9 @@ import type { ChatUser, Message, Namespace, Room } from "../../types";
 import { isCommonRoom, NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME } from "../utils";
 import NamespaceSchema from "../schemas/namespaceSchema";
 import RoomSchema from "../schemas/roomSchema";
-import { getConversationsByUserID, getMessagesByRoomId, getPrivateConversation } from "./messageService";
 import { findUserById } from "../dao/userDAO";
+import { getConversationsByUserID, getMessagesByRoomId } from "../dao/messageDAO";
+import { getPrivateConversation } from "./messageService";
 
 /**
  * Maps a namespace response from the database to a namespace object used in the application.

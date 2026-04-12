@@ -1,10 +1,10 @@
 import { Server } from "socket.io";
 import type { Message } from "../../types";
-import { saveMessage } from "../services/messageService";
 import type { ISocket } from "../interfaces";
 import { CHANGE_ROOM, CHAT_MESSAGE, NAMESPACE_HOME_ENDPOINT, NAMESPACE_ID_HOME, ROOM_NAME_ANNOUNCEMENTS, ROOM_NAME_GENERAL, ROOM_NAME_SUPPORT, USER_JOINED } from "../utils";
 import Namespace from "../schemas/namespaceSchema";
 import Room from "../schemas/roomSchema";
+import { saveMessage } from "../dao/messageDAO";
 
 /**
  * Initialize events that are specific to the "Home" namespace.
