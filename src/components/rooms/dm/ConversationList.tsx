@@ -1,7 +1,7 @@
 import { type ReactElement } from "react";
-import { getSelectedNamespaceRooms } from "../../clientApplication/services/roomService";
-import { DmCard } from "..";
-import type { Room } from "../../types";
+import { getSelectedNamespaceRooms } from "../../../clientApplication/services/roomService";
+import { DmCard } from "./DmCard";
+import type { Room } from "../../../types";
 
 import "./ConversationList.css";
 

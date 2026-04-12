@@ -1,10 +1,10 @@
 import { type ReactElement, useRef, useState } from "react";
-import { useMultiplex, useRoom, useUser } from "../../hooks";
-import { Message } from "..";
-import { getSelectedRoom } from "../../clientApplication/services/roomService";
-import { call } from "../../clientApplication/services/webRtcService";
-import { getUserByUsername } from "../../clientApplication/services/userService";
-import type { Message as MessageType } from "../../types";
+import { useMultiplex, useRoom, useUser } from "../../../hooks";
+import { Message } from "../..";
+import { getSelectedRoom } from "../../../clientApplication/services/roomService";
+import { call } from "../../../clientApplication/services/webRtcService";
+import { getUserByUsername } from "../../../clientApplication/services/userService";
+import type { Message as MessageType } from "../../../types";
 
 import "./DmRoom.css";
 
