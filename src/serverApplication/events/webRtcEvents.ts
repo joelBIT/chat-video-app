@@ -2,7 +2,7 @@ import type { Server } from "socket.io";
 import { ANSWER_RESPONSE, END_CALL, NAMESPACE_DM_ENDPOINT, NEW_ANSWER, NEW_OFFER, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, RECEIVED_ICE_CANDIDATE_FROM_SERVER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, USER_UPDATED } from "../utils";
 import type { Offer, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
-import { deleteOfferByOffererUsername, getOfferByAnswererUsername, getOfferByOffererUsername, saveOffer } from "../services/webRtcService";
+import { deleteOfferByOffererUsername, getOfferByAnswererUsername, getOfferByOffererUsername, saveOffer } from "../dao/webRtcDAO";
 import { findUserByUsername, updateUser } from "../dao/userDAO";
 
 /**
