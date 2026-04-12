@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { getAllNamespaces } from "../services/namespaceService";
+import { getAllNamespaces } from "../dao/namespaceDAO";
 import { findUserByUsername } from "../dao/userDAO";
 import type { Namespace, Room } from "../../types";
 import type { ISocket } from "../interfaces";

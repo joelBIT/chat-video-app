@@ -10,16 +10,7 @@ export async function saveMessage(message: Message): Promise<void> {
 }
 
 export async function getMessagesByRoomId(roomID: string): Promise<Message[]> {
-    const messages: Message[] = [];
-
-    try {
-        const response = await MessageModel.find({ "to": roomID }).limit(50);
-        messages.push(...response);
-    } catch (error) {
-        console.log(error);
-    }
-
-    return messages;
+    return await MessageModel.find({ "to": roomID }).limit(50);
 }
 
 /**
@@ -33,11 +24,5 @@ export async function getConversationMessages(fromUserID: string, toUserID: stri
  * Returns a list of usernames of those users that userID has had a conversation with (sent messages to).
  */
 export async function getConversationsByUserID(userID: string): Promise<string[]> {
-    try {
-        return await MessageModel.find({ "from": userID, "public": false }).distinct("to");
-    } catch (error) {
-        console.log(error);
-    }
-
-    return [];
+    return await MessageModel.find({ "from": userID, "public": false }).distinct("to");
 }
