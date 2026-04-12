@@ -23,6 +23,51 @@ export async function saveRoom(room: Room): Promise<Room> {
     throw new AppError(`Room with name ${room.name} already exist`, 400);
 }
 
+export async function addUserToRoom(userID: string, roomName: string): Promise<void> {
+    try {
+        const response = await RoomSchema.findOne({name: roomName});
+
+        if (response && response.members) {
+            const roomMembers: string[] = response.members;
+            if (!roomMembers.includes(userID)) {
+                roomMembers.push(userID);
+                await RoomSchema.findOneAndUpdate({name: roomName}, { members: roomMembers });
+            }
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+/**
+ * Remove a user from room if the user is a member of the room. 
+ */
+export async function removeUserFromRoom(userID: string, roomID: string): Promise<void> {
+    try {
+        const response = await RoomSchema.findById(roomID);
+
+        if (response && response.members) {
+            const roomMembers: string[] = response.members;
+            if (roomMembers && roomMembers.includes(userID)) {
+                const filteredMembers: string[] = roomMembers.filter((user: string) => user !== userID);
+                await RoomSchema.findByIdAndUpdate(roomID, { members: filteredMembers });
+            }
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function getRoomByID(roomID: string): Promise<Room> {
+    const room: Room | null = await RoomSchema.findById(roomID);
+
+    if (room) {
+        return mapDatabaseRoom(room);
+    }
+
+    throw new AppError(`No room with ID ${roomID} found`, 404);
+}
+
 /**
  * Map a database room object to a Room object used by the chat application.
  */
