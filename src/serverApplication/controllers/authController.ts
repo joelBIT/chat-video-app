@@ -2,7 +2,7 @@ import express from 'express';
 import type { ChatUser } from '../../types';
 import { addUserToCommonRooms } from '../services/roomService';
 import { AppError } from '../errors/AppError';
-import { createUser, findUserByUsername } from '../dao/user';
+import { createUser, findUserByUsername } from '../dao/userDAO';
 
 /**
  * Create new user in database if username is available.

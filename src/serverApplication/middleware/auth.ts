@@ -1,8 +1,10 @@
 import { Server } from "socket.io";
 import express from 'express';
-import type { ISocket } from "../interfaces.js";
-import User from "../schemas/userSchema.js";
-import { AppError } from "../errors/AppError.js";
+import type { ISocket } from "../interfaces";
+import User from "../schemas/userSchema";
+import { AppError } from "../errors/AppError";
+import { findUserByUsername, isCorrectPassword } from "../dao/userDAO";
+import type { ChatUser } from "../../types";
 
 /**
  * Check if password matches username. Return an error if that is not the case. Connected usernames must be unique.
@@ -15,12 +17,13 @@ export function login(io: Server): void {
         const password = socket.handshake.auth.password;
         socket.handshake.query.username = username;
 
-        const user = await User.findOne({username});
-        if (user) {
-            if (password != user.password) {
-                return next(new Error(`Wrong password.`));
-            }
+        const isValidCredentials: boolean = await isCorrectPassword({username, password});
+        if (!isValidCredentials) {
+            return next(new Error(`Wrong password.`));
+        }
 
+        try {
+            const user: ChatUser = await findUserByUsername(username);
             if (user.online) {
                 return next(new Error(`${user.username} is already online.`));
             }
@@ -28,6 +31,8 @@ export function login(io: Server): void {
             socket.userID = user.id;                    // Set permanent user ID on the socket (since socket IDs change every connection)
             await User.updateOne({ username }, { online: true });
             return next();
+        } catch (error) {
+            console.log(error);
         }
 
         return next(new Error(`Could not sign in ${username}.`));

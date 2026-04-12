@@ -1,7 +1,7 @@
 import User from '../schemas/userSchema';
 import type { ChatUser } from '../../types';
 
-interface UserAttributes {
+interface Credentials {
     username: string,
     password: string
 }
@@ -9,8 +9,8 @@ interface UserAttributes {
 /**
  * Create a new user in the database and return the newly created user as a ChatUser.
  */
-export async function createUser(attributes: UserAttributes): Promise<ChatUser> {
-    const newUser = await User.create(attributes);
+export async function createUser(credentials: Credentials): Promise<ChatUser> {
+    const newUser = await User.create(credentials);
     const createdUser: ChatUser = {username: newUser.username, id: newUser._id.toString(), online: newUser.online, avatar: newUser.avatar, inCall: newUser.inCall};
     
     return createdUser;
@@ -23,4 +23,8 @@ export async function findUserByUsername(username: string): Promise<ChatUser> {
     }
 
     return user;
+}
+
+export async function isCorrectPassword(credentials: Credentials): Promise<boolean> {
+    return await User.findOne(credentials) ?? false;
 }

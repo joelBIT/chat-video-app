@@ -1,5 +1,5 @@
 import type { ChatUser } from "../../types";
-import { findUserByUsername } from "../dao/user";
+import { findUserByUsername } from "../dao/userDAO";
 import User from "../schemas/userSchema";
 
 /**
