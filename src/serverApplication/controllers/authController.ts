@@ -1,6 +1,6 @@
 import express from 'express';
 import type { ChatUser } from '../../types';
-import { addUserToCommonRooms } from '../services/roomService';
+import { addUserToCommonRooms } from '../services/userService';
 import { AppError } from '../errors/AppError';
 import { createUser, findUserByUsername } from '../dao/userDAO';
 
@@ -28,7 +28,7 @@ export async function registerUser(req: express.Request, res: express.Response, 
             password
         })
 
-        addUserToCommonRooms(newUser);
+        addUserToCommonRooms(newUser.id);
 
         res.status(201).json({
             success: true,
