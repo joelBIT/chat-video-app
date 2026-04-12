@@ -17,12 +17,37 @@ export async function createUser(credentials: Credentials): Promise<ChatUser> {
 }
 
 export async function findUserByUsername(username: string): Promise<ChatUser> {
-    const user: ChatUser | null = await User.findOne({username});
+    const user = await User.findOne({username});
     if (!user) {
         throw new Error(`Could not find user with username ${username}`);
     }
 
-    return user;
+    return mapDatabaseUser(user);
+}
+
+export async function findUserById(userID: string): Promise<ChatUser> {
+    const user = await User.findById(userID);
+    if (!user) {
+        throw new Error(`Could not find user with ID ${userID}`);
+    }
+
+    return mapDatabaseUser(user);
+}
+
+export async function getAllUsers(): Promise<ChatUser[]> {
+    const mappedUsers: ChatUser[] = [];
+
+    try {
+        const users = await User.find({});
+        for (let i = 0; i < users.length; i++) {
+            const mappedUser: ChatUser = mapDatabaseUser(users[i]);
+            mappedUsers.push(mappedUser);
+        }
+    } catch (error) {
+        console.log(error);
+    }
+
+    return mappedUsers;
 }
 
 export async function isCorrectPassword(credentials: Credentials): Promise<boolean> {
@@ -31,4 +56,19 @@ export async function isCorrectPassword(credentials: Credentials): Promise<boole
 
 export async function updateOnlineStatus(username: string, online: boolean): Promise<void> {
     await User.updateOne({ username }, { online });
+}
+
+/**
+ * Map a database user object to a ChatUser object used by the chat application.
+ */
+function mapDatabaseUser(user: any): ChatUser {
+    const mappedUser: ChatUser = {
+        id: user._id.toString(),
+        username: user.username,
+        avatar: user.avatar,
+        inCall: user.inCall,
+        online: user.online
+    }
+
+    return mappedUser;
 }

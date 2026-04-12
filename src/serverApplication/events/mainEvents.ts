@@ -3,8 +3,9 @@ import { getDataForUser } from "../services/namespaceService";
 import type { ISocket } from "../interfaces";
 import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../utils";
 import type { ChatUser, Namespace } from "../../types";
-import { getUserByUsername, getUserById, getUsers, setUserOnline, updateUser } from "../services/userService";
+import { getUserByUsername, getUserById, setUserOnline, updateUser } from "../services/userService";
 import User from "../schemas/userSchema";
+import { getAllUsers } from "../dao/userDAO";
 
 /**
  * Initializes events for the main namespace ('/') only. The connected client receives data via the "namespaces" event. This data consists of
@@ -20,7 +21,7 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
 
         try {
             const user: ChatUser = await getUserById(userID);
-            const users: ChatUser[] = await getUsers();
+            const users: ChatUser[] = await getAllUsers();
             const namespaces: Namespace[] = await getDataForUser(user.id);
             socket.emit(NAMESPACES, namespaces, user, users);                   // Send back data to the connected client
             io.except(socket.id).emit(USER_CONNECTED, user);                    // Inform other clients that the user is online
