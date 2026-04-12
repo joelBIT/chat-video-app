@@ -11,9 +11,7 @@ interface Credentials {
  */
 export async function createUser(credentials: Credentials): Promise<ChatUser> {
     const newUser = await User.create(credentials);
-    const createdUser: ChatUser = {username: newUser.username, id: newUser._id.toString(), online: newUser.online, avatar: newUser.avatar, inCall: newUser.inCall};
-    
-    return createdUser;
+    return mapDatabaseUser(newUser);
 }
 
 export async function findUserByUsername(username: string): Promise<ChatUser> {
@@ -40,8 +38,7 @@ export async function getAllUsers(): Promise<ChatUser[]> {
     try {
         const users = await User.find({});
         for (let i = 0; i < users.length; i++) {
-            const mappedUser: ChatUser = mapDatabaseUser(users[i]);
-            mappedUsers.push(mappedUser);
+            mappedUsers.push(mapDatabaseUser(users[i]));
         }
     } catch (error) {
         console.log(error);
@@ -66,13 +63,11 @@ export async function getHashedPasswordForUsername(username: string): Promise<st
  * Map a database user object to a ChatUser object used by the chat application.
  */
 function mapDatabaseUser(user: any): ChatUser {
-    const mappedUser: ChatUser = {
+    return {
         id: user._id.toString(),
         username: user.username,
         avatar: user.avatar,
         inCall: user.inCall,
         online: user.online
     }
-
-    return mappedUser;
 }
