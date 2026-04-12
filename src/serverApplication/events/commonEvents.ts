@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { getAllNamespaces } from "../services/namespaceService";
-import { getUserByUsername } from "../services/userService";
+import { findUserByUsername } from "../dao/userDAO";
 import type { Namespace, Room } from "../../types";
 import type { ISocket } from "../interfaces";
 import { isCommonRoom, USER_JOINED } from "../utils";
@@ -17,7 +17,7 @@ export async function initializeCommonEvents(io: Server): Promise<void> {
 
             if (typeof username === "string") {
                 try {
-                    const user = await getUserByUsername(username);
+                    const user = await findUserByUsername(username);
                     namespace.rooms.forEach((room: Room) => {
                         if (isCommonRoom(room.name) || room.members.includes(user.id)) {      // Join rooms where the user is a member
                             socket.join(room.id);

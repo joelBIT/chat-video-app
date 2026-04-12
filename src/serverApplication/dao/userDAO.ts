@@ -58,6 +58,10 @@ export async function updateOnlineStatus(username: string, online: boolean): Pro
     await User.updateOne({ username }, { online });
 }
 
+export async function updateUser(updatedUser: ChatUser): Promise<void> {
+    await User.findOneAndUpdate({_id: updatedUser.id}, updatedUser);
+}
+
 /**
  * Map a database user object to a ChatUser object used by the chat application.
  */

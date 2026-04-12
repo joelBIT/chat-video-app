@@ -3,9 +3,8 @@ import { getDataForUser } from "../services/namespaceService";
 import type { ISocket } from "../interfaces";
 import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../utils";
 import type { ChatUser, Namespace } from "../../types";
-import { getUserByUsername, getUserById, setUserOnline, updateUser } from "../services/userService";
 import User from "../schemas/userSchema";
-import { getAllUsers } from "../dao/userDAO";
+import { findUserById, findUserByUsername, getAllUsers, updateOnlineStatus, updateUser } from "../dao/userDAO";
 
 /**
  * Initializes events for the main namespace ('/') only. The connected client receives data via the "namespaces" event. This data consists of
@@ -20,7 +19,7 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
         const userID: string | undefined = socket.userID as string;
 
         try {
-            const user: ChatUser = await getUserById(userID);
+            const user: ChatUser = await findUserById(userID);
             const users: ChatUser[] = await getAllUsers();
             const namespaces: Namespace[] = await getDataForUser(user.id);
             socket.emit(NAMESPACES, namespaces, user, users);                   // Send back data to the connected client
@@ -31,7 +30,7 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
 
         socket.on(USER_UPDATED, async (updatedUser: ChatUser, ackCallback) => {
             try {
-                const user: ChatUser = await getUserByUsername(updatedUser.username);
+                const user: ChatUser = await findUserByUsername(updatedUser.username);
 
                 if (user.id !== updatedUser.id) {
                     ackCallback({ message: 'Username is already taken', success: false });      // Updated user may have a new username that already exists
@@ -52,8 +51,9 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
             
             if (userID) {
                 try {
-                    await setUserOnline(userID, false);
-                    const user: ChatUser = await getUserById(userID);
+                    const user: ChatUser = await findUserById(userID);
+                    await updateOnlineStatus(user.username, false);
+                    user.online = false;
                     io.emit(USER_DISCONNECTED, user);
                 } catch (error) {
                     console.log(error);
