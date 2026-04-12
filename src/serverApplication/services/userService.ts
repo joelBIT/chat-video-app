@@ -1,24 +1,12 @@
 import type { ChatUser } from "../../types";
+import { findUserByUsername } from "../dao/user";
 import User from "../schemas/userSchema";
 
 /**
  * Thus function may return undefined if a user has not been created yet.
  */
 export async function getUserByUsername(username: string): Promise<ChatUser> {
-    const user = await User.findOne({username});
-    if (user) {
-        const mappedUser: ChatUser = {
-            id: user._id.toString(),
-            username: user.username,
-            avatar: user.avatar,
-            inCall: user.inCall,
-            online: user.online
-        }
-
-        return mappedUser;
-    }
-    
-    throw new Error(`Could not find user with username ${username}`);
+    return await findUserByUsername(username);
 }
 
 export async function getUserById(userID: string): Promise<ChatUser> {

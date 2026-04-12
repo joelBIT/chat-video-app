@@ -1,5 +1,6 @@
 import express from 'express';
-import { checkBody, registerUser } from '../controllers/authController';
+import { registerUser } from '../controllers/authController';
+import { checkBody } from '../middleware/auth';
 
 const router = express.Router();
 

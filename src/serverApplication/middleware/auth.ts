@@ -1,6 +1,8 @@
 import { Server } from "socket.io";
+import express from 'express';
 import type { ISocket } from "../interfaces.js";
 import User from "../schemas/userSchema.js";
+import { AppError } from "../errors/AppError.js";
 
 /**
  * Check if password matches username. Return an error if that is not the case. Connected usernames must be unique.
@@ -30,4 +32,15 @@ export function login(io: Server): void {
 
         return next(new Error(`Could not sign in ${username}.`));
     });
+}
+
+/**
+ * Check if POST body contains required username and password properties. Only execute the registerUser function if properties exist.
+ */
+export function checkBody(req: express.Request, _res: express.Response, next: express.NextFunction): void {
+    if (!req.body.username || !req.body.password) {
+        next(new AppError("Username and password must be supplied.", 400));
+    }
+
+    next();
 }
