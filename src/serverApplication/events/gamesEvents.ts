@@ -1,12 +1,12 @@
 import { Server } from "socket.io";
-import { addUserToRoom, isMember } from "../services/roomService";
+import { addUserToRoom, isMember, removeUserFromRoom } from "../services/roomService";
 import { saveMessage } from "../services/messageService";
 import type { Message, Room } from "../../types";
 import type { ISocket } from "../interfaces";
 import { CHANGE_ROOM, CHAT_MESSAGE, CREATE_ROOM, isCommonRoom, LEAVE_ROOM, NAMESPACE_GAMES_ENDPOINT, NAMESPACE_ID_GAMES, ROOM_NAME_LOBBY, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../utils";
 import RoomSchema from "../schemas/roomSchema";
 import Namespace from "../schemas/namespaceSchema";
-import { getRoomByID, removeUserFromRoom, saveRoom } from "../dao/roomDAO";
+import { getRoomByID, saveRoom } from "../dao/roomDAO";
 
 /**
  * Initialize events that are specific to the "Games" namespace (id 2).

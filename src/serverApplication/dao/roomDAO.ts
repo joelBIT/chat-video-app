@@ -37,25 +37,6 @@ export async function getRoomByRoomName(roomName: string): Promise<Room> {
     throw new AppError(`No room with name ${roomName} found`, 404);
 }
 
-/**
- * Remove a user from room if the user is a member of the room. 
- */
-export async function removeUserFromRoom(userID: string, roomID: string): Promise<void> {
-    try {
-        const response = await RoomSchema.findById(roomID);
-
-        if (response && response.members) {
-            const roomMembers: string[] = response.members;
-            if (roomMembers && roomMembers.includes(userID)) {
-                const filteredMembers: string[] = roomMembers.filter((user: string) => user !== userID);
-                await RoomSchema.findByIdAndUpdate(roomID, { members: filteredMembers });
-            }
-        }
-    } catch (error) {
-        console.log(error);
-    }
-}
-
 export async function getRoomByID(roomID: string): Promise<Room> {
     const room: Room | null = await RoomSchema.findById(roomID);
 

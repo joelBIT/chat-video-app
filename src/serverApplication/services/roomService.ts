@@ -20,6 +20,9 @@ export async function isMember(userID: string, roomID: string): Promise<boolean>
     return isMember;
 }
 
+/**
+ * Add a user to a room if the user is not already a member of the room. 
+ */
 export async function addUserToRoom(userID: string, roomName: string): Promise<void> {
     try {
         const room: Room = await getRoomByRoomName(roomName);
@@ -27,6 +30,22 @@ export async function addUserToRoom(userID: string, roomName: string): Promise<v
         if (!roomMembers.includes(userID)) {
             roomMembers.push(userID);
             await updateRoomMembers(roomName, roomMembers);
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+/**
+ * Remove a user from room if the user is a member of the room. 
+ */
+export async function removeUserFromRoom(userID: string, roomID: string): Promise<void> {
+    try {
+        const room: Room = await getRoomByID(roomID);
+        const roomMembers: string[] = room.members;
+        if (roomMembers.includes(userID)) {
+            const filteredMembers: string[] = roomMembers.filter((user: string) => user !== userID);
+            await updateRoomMembers(room.name, filteredMembers);
         }
     } catch (error) {
         console.log(error);
