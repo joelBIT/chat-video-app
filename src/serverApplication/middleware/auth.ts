@@ -2,7 +2,8 @@ import { Server } from "socket.io";
 import express from 'express';
 import type { ISocket } from "../interfaces";
 import { AppError } from "../errors/AppError";
-import { findUserByUsername, isCorrectPassword, updateOnlineStatus } from "../dao/userDAO";
+import { isCorrectPassword } from "../services/userService";
+import { findUserByUsername, updateOnlineStatus } from "../dao/userDAO";
 import type { ChatUser } from "../../types";
 
 /**
@@ -16,7 +17,7 @@ export function login(io: Server): void {
         const password = socket.handshake.auth.password;
         socket.handshake.query.username = username;
 
-        const isValidCredentials: boolean = await isCorrectPassword({username, password});
+        const isValidCredentials: boolean = await isCorrectPassword(username, password);
         if (!isValidCredentials) {
             return next(new Error(`Wrong password.`));
         }

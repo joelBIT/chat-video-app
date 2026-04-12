@@ -50,16 +50,16 @@ export async function getAllUsers(): Promise<ChatUser[]> {
     return mappedUsers;
 }
 
-export async function isCorrectPassword(credentials: Credentials): Promise<boolean> {
-    return await User.findOne(credentials) ?? false;
-}
-
 export async function updateOnlineStatus(username: string, online: boolean): Promise<void> {
     await User.updateOne({ username }, { online });
 }
 
 export async function updateUser(updatedUser: ChatUser): Promise<void> {
     await User.findOneAndUpdate({_id: updatedUser.id}, updatedUser);
+}
+
+export async function getHashedPasswordForUsername(username: string): Promise<string> {
+    return (await User.findOne({username}))?.password ?? "";
 }
 
 /**

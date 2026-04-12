@@ -15,11 +15,13 @@ export async function registerUser(req: express.Request, res: express.Response, 
         next(new AppError("Passwords do not match.", 400));
     }
 
-    const user: ChatUser | null = await findUserByUsername(username);
-    if (user) {
-        next(new AppError(`Username ${username} is already in use. Choose a different username.`, 400));
-    }
-
+    try {
+        const user: ChatUser = await findUserByUsername(username);
+        if (user) {
+            next(new AppError(`Username ${username} is already in use. Choose a different username.`, 400));
+        }
+    } catch (error) { /** The user does not exist. Create a new user */ }
+    
     try {
         const newUser = await createUser({
             username,
