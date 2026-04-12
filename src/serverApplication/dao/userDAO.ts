@@ -28,3 +28,7 @@ export async function findUserByUsername(username: string): Promise<ChatUser> {
 export async function isCorrectPassword(credentials: Credentials): Promise<boolean> {
     return await User.findOne(credentials) ?? false;
 }
+
+export async function updateOnlineStatus(username: string, online: boolean): Promise<void> {
+    await User.updateOne({ username }, { online });
+}

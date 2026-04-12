@@ -1,9 +1,8 @@
 import { Server } from "socket.io";
 import express from 'express';
 import type { ISocket } from "../interfaces";
-import User from "../schemas/userSchema";
 import { AppError } from "../errors/AppError";
-import { findUserByUsername, isCorrectPassword } from "../dao/userDAO";
+import { findUserByUsername, isCorrectPassword, updateOnlineStatus } from "../dao/userDAO";
 import type { ChatUser } from "../../types";
 
 /**
@@ -29,7 +28,7 @@ export function login(io: Server): void {
             }
 
             socket.userID = user.id;                    // Set permanent user ID on the socket (since socket IDs change every connection)
-            await User.updateOne({ username }, { online: true });
+            await updateOnlineStatus(username, true);
             return next();
         } catch (error) {
             console.log(error);
