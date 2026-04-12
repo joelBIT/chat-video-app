@@ -1,5 +1,7 @@
 import type { Room } from "../../types";
+import { getMessagesByRoomId } from "../dao/messageDAO";
 import { getRoomByID, getRoomByRoomName, updateRoomMembers } from "../dao/roomDAO";
+import { isCommonRoom } from "../utils";
 
 /**
  * @returns     true if userID is member of room with ID roomID
@@ -50,4 +52,22 @@ export async function removeUserFromRoom(userID: string, roomID: string): Promis
     } catch (error) {
         console.log(error);
     }
+}
+
+/**
+ * Adds message history to supplied rooms.
+ */
+export async function addMessageHistoryToRooms(rooms: Room[]): Promise<Room[]> {
+    for (let i = 0; i < rooms.length; i++) {
+        if (isCommonRoom(rooms[i].name)) {          // Only retrieve message history for the common rooms
+            try {
+                const roomMessages = await getMessagesByRoomId(rooms[i].id);
+                rooms[i].history.push(...roomMessages);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
+
+    return rooms;
 }

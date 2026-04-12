@@ -47,6 +47,17 @@ export async function getRoomByID(roomID: string): Promise<Room> {
     throw new AppError(`No room with ID ${roomID} found`, 404);
 }
 
+export async function getRoomsInNamespace(namespaceId: number): Promise<Room[]> {
+    const mappedRooms: Room[] = [];
+    const rooms = await RoomSchema.find({ namespaceId });
+
+    for (let i = 0; i < rooms.length; i++) {
+        mappedRooms.push(mapDatabaseRoom(rooms[i]));
+    }
+
+    return mappedRooms;
+}
+
 /**
  * Map a database room object to a Room object used by the chat application.
  */
