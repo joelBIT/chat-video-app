@@ -23,20 +23,18 @@ export async function saveRoom(room: Room): Promise<Room> {
     throw new AppError(`Room with name ${room.name} already exist`, 400);
 }
 
-export async function addUserToRoom(userID: string, roomName: string): Promise<void> {
-    try {
-        const response = await RoomSchema.findOne({name: roomName});
+export async function updateRoomMembers(roomName: string, roomMembers: string[]): Promise<void> {
+    await RoomSchema.findOneAndUpdate({name: roomName}, { members: roomMembers });
+}
 
-        if (response && response.members) {
-            const roomMembers: string[] = response.members;
-            if (!roomMembers.includes(userID)) {
-                roomMembers.push(userID);
-                await RoomSchema.findOneAndUpdate({name: roomName}, { members: roomMembers });
-            }
-        }
-    } catch (error) {
-        console.log(error);
+export async function getRoomByRoomName(roomName: string): Promise<Room> {
+    const room: Room | null = await RoomSchema.findOne({name: roomName});
+
+    if (room) {
+        return mapDatabaseRoom(room);
     }
+
+    throw new AppError(`No room with name ${roomName} found`, 404);
 }
 
 /**

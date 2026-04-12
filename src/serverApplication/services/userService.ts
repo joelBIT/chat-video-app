@@ -1,7 +1,7 @@
-import { addUserToRoom } from '../dao/roomDAO';
 import { getHashedPasswordForUsername } from '../dao/userDAO';
 import { ROOM_NAME_ANNOUNCEMENTS, ROOM_NAME_GENERAL, ROOM_NAME_LOBBY, ROOM_NAME_SUPPORT } from '../utils';
 import { PasswordManager } from '../utils/passwordManager';
+import { addUserToRoom } from './roomService';
 
 export async function isCorrectPassword(username: string, password: string): Promise<boolean> {
     try {
