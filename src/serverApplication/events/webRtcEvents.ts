@@ -2,8 +2,8 @@ import type { Server } from "socket.io";
 import { ANSWER_RESPONSE, END_CALL, NAMESPACE_DM_ENDPOINT, NEW_ANSWER, NEW_OFFER, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, RECEIVED_ICE_CANDIDATE_FROM_SERVER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, USER_UPDATED } from "../utils";
 import type { Offer, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
-import { getUserByUsername, updateUser } from "../services/userService";
 import { deleteOfferByOffererUsername, getOfferByAnswererUsername, getOfferByOffererUsername, saveOffer } from "../services/webRtcService";
+import { findUserByUsername, updateUser } from "../dao/userDAO";
 
 /**
  * Initializes events related to WebRTC. WebRTC is only used in namespace 1 (DMs).
@@ -26,7 +26,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             updateUserStatus(io, fromUsername, true);
 
             try {
-                const user: ChatUser = await getUserByUsername(toUsername);
+                const user: ChatUser = await findUserByUsername(toUsername);
                 socket.to(user.id).emit(NEW_OFFER_AWAITING, offer);
             } catch (error) {
                 console.log(error);
@@ -37,7 +37,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             await deleteOfferByOffererUsername(callerUsername);
 
             try {
-                const recipient: ChatUser = await getUserByUsername(recipientUsername);
+                const recipient: ChatUser = await findUserByUsername(recipientUsername);
                 socket.to(recipient.id).emit(NEW_OFFER_CANCELLED, callerUsername);
             } catch (error) {
                 console.log(error);
@@ -54,7 +54,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             // Emit this answer (sentOffer) back to CLIENT1. In order to do that, we need CLIENT1's id.
             try {
                 const offer: Offer = await getOfferByOffererUsername(sentOffer.offererUserName);
-                const user: ChatUser = await getUserByUsername(sentOffer.offererUserName);
+                const user: ChatUser = await findUserByUsername(sentOffer.offererUserName);
                 const socketIdToAnswer: string = user.id;
 
                 // Send back to the answerer all the iceCandidates we have already collected
@@ -103,7 +103,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
 
 async function emitIceCandidate(socket: ISocket, username: string, iceCandidate: RTCLocalIceCandidateInit): Promise<void> {
     try {
-        const user: ChatUser = await getUserByUsername(username);
+        const user: ChatUser = await findUserByUsername(username);
         socket.to(user.id).emit(RECEIVED_ICE_CANDIDATE_FROM_SERVER, iceCandidate);
     } catch (error) {
         console.log(error);
@@ -115,7 +115,7 @@ async function emitIceCandidate(socket: ISocket, username: string, iceCandidate:
  */
 async function updateUserStatus(io: Server, username: string, inCall: boolean): Promise<void> {
     try {
-        const user: ChatUser = await getUserByUsername(username);
+        const user: ChatUser = await findUserByUsername(username);
         user.inCall = inCall;
         updateUser(user);
         io.emit(USER_UPDATED, user);      // Inform users that this user is in a call.

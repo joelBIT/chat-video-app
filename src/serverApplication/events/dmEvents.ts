@@ -1,10 +1,10 @@
 import { Server } from "socket.io";
-import { getUserByUsername } from "../services/userService";
 import { getPrivateConversation, saveMessage } from "../services/messageService";
 import type { Message, Room, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
 import { CREATE_ROOM, NAMESPACE_DM_ENDPOINT, NAMESPACE_ID_DM, PRIVATE_MESSAGE, UPDATE_ROOMS } from "../utils";
 import Namespace from "../schemas/namespaceSchema";
+import { findUserByUsername } from "../dao/userDAO";
 
 /**
  * Initialize events that are specific to the "DMs" namespace (id 1).
@@ -47,7 +47,7 @@ async function joinPersonalRoom(socket: ISocket): Promise<void> {
 
     if (username && (typeof username === "string")) {
         try {
-            const user: ChatUser = await getUserByUsername(username);
+            const user: ChatUser = await findUserByUsername(username);
             socket.join(user.id);
         } catch (error) {
             console.log(error);

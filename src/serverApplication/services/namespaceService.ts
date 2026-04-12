@@ -3,7 +3,7 @@ import { isCommonRoom, NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME } 
 import NamespaceSchema from "../schemas/namespaceSchema";
 import RoomSchema from "../schemas/roomSchema";
 import { getConversationsByUserID, getMessagesByRoomId, getPrivateConversation } from "./messageService";
-import { getUserById } from "./userService";
+import { findUserById } from "../dao/userDAO";
 
 /**
  * Maps a namespace response from the database to a namespace object used in the application.
@@ -90,7 +90,7 @@ export async function getDataForUser(userID: string): Promise<Namespace[]> {
             const conversations: string[] = await getConversationsByUserID(userID);
 
             for (let i = 0; i < conversations.length; i++) {
-                const user: ChatUser | null = await getUserById(conversations[i]);
+                const user: ChatUser | null = await findUserById(conversations[i]);
 
                 if (user) {
                     const messages: Message[] = await getPrivateConversation(userID, user.id);
