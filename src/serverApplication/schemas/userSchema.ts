@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { Password } from '../services/passwordService';
+import { PasswordManager } from '../utils/passwordManager';
 
 export const userSchema = new mongoose.Schema({
     username: { 
@@ -30,7 +30,7 @@ export const userSchema = new mongoose.Schema({
 
 userSchema.pre('save', async function() {
     if (this.isModified('password')) {
-        this.password = await Password.toHash(this.get('password'));
+        this.password = await PasswordManager.toHash(this.get('password'));
     }
 });
 

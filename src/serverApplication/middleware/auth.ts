@@ -19,7 +19,7 @@ export function login(io: Server): void {
 
         const isValidCredentials: boolean = await isCorrectPassword(username, password);
         if (!isValidCredentials) {
-            return next(new Error(`Wrong password.`));
+            return next(new Error("Invalid credentials."));
         }
 
         try {
