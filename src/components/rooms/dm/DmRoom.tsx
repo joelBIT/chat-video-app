@@ -17,7 +17,7 @@ export function DmRoom(): ReactElement {
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const { selectedRoom, sendMessage } = useRoom();
     const { user } = useUser();
-    const { incomingCall, activeCall, isCalling, initiateCall, answerCall, hangup } = useMultiplex();
+    const { incomingCall, activeCall, isCalling, remoteUsername, initiateCall, answerCall, hangup } = useMultiplex();
 
     /**
      * Send a DM to another user.
@@ -55,6 +55,22 @@ export function DmRoom(): ReactElement {
         return false;
     }
 
+    /**
+     * It should not be possible to call users that are already in a call.
+     * 
+     * @returns true if the remote user is in a call, false otherwise.
+     */
+    function isInACall(): boolean {
+        const username: string | undefined = getSelectedRoom()?.name;
+        if (username && (username !== remoteUsername)) {            // Only a user who is a participant in the call may hangup. Other users are shown text.
+            try {
+                return getUserByUsername(username).inCall;
+            } catch (error) { }
+        }
+        
+        return false;
+    }
+
     if (!selectedRoom) {
         return (
             <main id="dmRoom">
@@ -66,6 +82,11 @@ export function DmRoom(): ReactElement {
     return (
         <section id="dmRoom" className={activeCall || isCalling ? "inCall-lock-room" : ""}>
             {
+                isInACall() ? 
+                    <section id="dmRoom-header">
+                        <p className="dmRoom-header__text"> {selectedRoom.name} is in a call </p>
+                    </section>
+                    :
                 isOnline() ?
                     <section id="dmRoom-header">
                         {
