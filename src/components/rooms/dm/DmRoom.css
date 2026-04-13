@@ -8,49 +8,6 @@
     background-color: var(--color-background-light);
     border-top: 1px solid var(--color-border);
 
-    & #dmRoom-header {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        width: 100%;
-        height: 50px;
-        border-bottom: 1px solid var(--color-border);
-        padding: 0.5rem;
-
-        & .chat-buttons {
-            display: flex;
-            gap: 1.5rem;
-
-            & .communication-button {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 0.3rem;
-                cursor: pointer;
-
-                & .button__icon {
-                    width: 20px;
-                }
-
-                & .button__label {
-                    font-family: "LINE Seed JP", sans-serif;
-                    font-size: 0.7rem;
-                    color: var(--color-white);
-                }
-            }
-        }
-
-        & .app-button {
-            align-self: center;
-        }
-
-        & .dmRoom-header__text {
-            font-family: 'LINE Seed JP';
-            font-size: 1.1rem;
-            color: var(--color-white);
-        }
-    }
-
     & #videos {
         gap: 1rem;
         padding: 1rem;

@@ -7,6 +7,7 @@ export * from "./rooms/CommonRoomCard";
 export * from "./rooms/dm/ConversationList";
 export * from "./rooms/dm/DmCard";
 export * from "./rooms/dm/DmRoom";
+export * from "./rooms/dm/RoomHeader";
 export * from "./rooms/RoomCard";
 export * from "./rooms/RoomChat";
 export * from "./rooms/RoomList";
