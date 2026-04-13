@@ -2,9 +2,7 @@ import { Server } from "socket.io";
 import { addUserToRoom, isMember, removeUserFromRoom } from "../services/roomService";
 import type { Message, Room } from "../../types";
 import type { ISocket } from "../interfaces";
-import { CHANGE_ROOM, CHAT_MESSAGE, CREATE_ROOM, isCommonRoom, LEAVE_ROOM, NAMESPACE_GAMES_ENDPOINT, NAMESPACE_ID_GAMES, ROOM_NAME_LOBBY, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../utils/constants";
-import RoomSchema from "../schemas/roomSchema";
-import Namespace from "../schemas/namespaceSchema";
+import { CHANGE_ROOM, CHAT_MESSAGE, CREATE_ROOM, isCommonRoom, LEAVE_ROOM, NAMESPACE_GAMES_ENDPOINT, NAMESPACE_ID_GAMES, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../utils/constants";
 import { getRoomByID, saveRoom } from "../dao/roomDAO";
 import { saveMessage } from "../dao/messageDAO";
 
@@ -12,8 +10,7 @@ import { saveMessage } from "../dao/messageDAO";
  * Initialize events that are specific to the "Games" namespace (id 2).
  */
 export async function initializeGamesEvents(io: Server): Promise<void> {
-    await createDatabaseCollections();
-
+    
     io.of(NAMESPACE_GAMES_ENDPOINT).on("connection", async (socket: ISocket) => {
         socket.on(CREATE_ROOM, async (room: Room, userID: string) => {
             try {
@@ -60,31 +57,4 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
             io.of(NAMESPACE_GAMES_ENDPOINT).emit(USER_LEFT, roomID, userID, NAMESPACE_ID_GAMES);
         });
     });
-}
-
-/**
- * Create the "Games" namespace and the common "Lobby" room if the namespace does not exist.
- */
-async function createDatabaseCollections(): Promise<void> {
-    try {
-        const exists = await Namespace.exists({ name: 'Games' });
-        if (!exists) {
-            await Namespace.create({
-                _id: NAMESPACE_ID_GAMES,
-                name: 'Games',
-                endpoint: NAMESPACE_GAMES_ENDPOINT,
-                image: 'games.svg'
-            });
-        }
-
-        const roomExists = await RoomSchema.exists({ name: ROOM_NAME_LOBBY });
-        if (!roomExists) {
-            await RoomSchema.create({
-                name: ROOM_NAME_LOBBY,
-                namespaceId: NAMESPACE_ID_GAMES
-            });
-        }
-    } catch (error) {
-        console.log(error);
-    }
 }

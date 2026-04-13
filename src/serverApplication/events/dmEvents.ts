@@ -3,7 +3,6 @@ import { getPrivateConversation } from "../services/messageService";
 import type { Message, Room, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
 import { CREATE_ROOM, NAMESPACE_DM_ENDPOINT, NAMESPACE_ID_DM, PRIVATE_MESSAGE, UPDATE_ROOMS } from "../utils/constants";
-import Namespace from "../schemas/namespaceSchema";
 import { findUserByUsername } from "../dao/userDAO";
 import { saveMessage } from "../dao/messageDAO";
 
@@ -12,7 +11,6 @@ import { saveMessage } from "../dao/messageDAO";
  * Private conversations are always in namespace 1 (DMs). Private conversations includes two (and only two) users in a private chat.
  */
 export async function initializeDmEvents(io: Server): Promise<void> {
-    await createDatabaseCollection();
 
     io.of(NAMESPACE_DM_ENDPOINT).on("connection", async (socket: ISocket) => {
         joinPersonalRoom(socket);
@@ -53,24 +51,5 @@ async function joinPersonalRoom(socket: ISocket): Promise<void> {
         } catch (error) {
             console.log(error);
         }
-    }
-}
-
-/**
- * Create the "DMs" namespace if it does not exist.
- */
-async function createDatabaseCollection(): Promise<void> {
-    try {
-        const exists = await Namespace.exists({ name: 'DMs' });
-        if (!exists) {
-            await Namespace.create({
-                _id: NAMESPACE_ID_DM,
-                name: 'DMs',
-                endpoint: NAMESPACE_DM_ENDPOINT,
-                image: 'dm.svg'
-            });
-        }
-    } catch (error) {
-        console.log(error);
     }
 }
