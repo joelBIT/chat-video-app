@@ -1,5 +1,5 @@
 import { getHashedPasswordForUsername } from '../dao/userDAO';
-import { ROOM_NAME_ANNOUNCEMENTS, ROOM_NAME_GENERAL, ROOM_NAME_LOBBY, ROOM_NAME_SUPPORT } from '../utils';
+import { ROOM_NAME_ANNOUNCEMENTS, ROOM_NAME_GENERAL, ROOM_NAME_LOBBY, ROOM_NAME_SUPPORT } from '../utils/constants';
 import { PasswordManager } from '../utils/passwordManager';
 import { addUserToRoom } from './roomService';
 

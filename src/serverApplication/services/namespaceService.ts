@@ -1,5 +1,5 @@
 import type { ChatUser, Message, Namespace, Room } from "../../types";
-import { NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME } from "../utils";
+import { NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME } from "../utils/constants";
 import { findUserById } from "../dao/userDAO";
 import { getConversationsByUserID } from "../dao/messageDAO";
 import { getPrivateConversation } from "./messageService";

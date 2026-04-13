@@ -1,9 +1,9 @@
 import { type ReactElement } from "react";
 import { redirect } from "react-router";
-import { useRoom, useSocket } from "../hooks";
+import { useMultiplex, useRoom, useSocket } from "../hooks";
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
-import { ConversationList, DmRoom, NamespaceMenu, RoomChat, RoomList, UserList } from "../components";
-import { HOME_URL, NAMESPACE_ID_DM } from "../serverApplication/utils";
+import { AnswerCallModal, ConversationList, DmRoom, NamespaceMenu, RoomChat, RoomList, UserList } from "../components";
+import { HOME_URL, NAMESPACE_ID_DM } from "../serverApplication/utils/constants";
 
 import "./RoomsPage.css";
 
@@ -13,6 +13,7 @@ import "./RoomsPage.css";
 export default function RoomsPage(): ReactElement {
     const { isConnected } = useSocket();
     const { roomParticipants } = useRoom();
+    const { incomingCall, answerCall, denyCall } = useMultiplex();
 
     if (!isConnected) {
         redirect(HOME_URL);
@@ -24,6 +25,10 @@ export default function RoomsPage(): ReactElement {
                 <NamespaceMenu />
                 <ConversationList />
                 <DmRoom />
+
+                {
+                    incomingCall ? <AnswerCallModal answerCall={answerCall} denyCall={denyCall} /> : <></>
+                }
             </main>
         )
     }

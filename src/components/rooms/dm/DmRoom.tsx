@@ -2,7 +2,6 @@ import { type ReactElement, useRef, useState } from "react";
 import { useMultiplex, useRoom, useUser } from "../../../hooks";
 import { Message } from "../..";
 import { getSelectedRoom } from "../../../clientApplication/services/roomService";
-import { call } from "../../../clientApplication/services/webRtcService";
 import { getUserByUsername } from "../../../clientApplication/services/userService";
 import type { Message as MessageType } from "../../../types";
 
@@ -13,13 +12,12 @@ import "./DmRoom.css";
  * so that a user must stay in the room during the call.
  */
 export function DmRoom(): ReactElement {
-    const [isCalling, setIsCalling] = useState<boolean>(false);
     const [message, setMessage] = useState<string>('');
     const localVideoRef = useRef<HTMLVideoElement>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const { selectedRoom, sendMessage } = useRoom();
     const { user } = useUser();
-    const { incomingCall, activeCall, answerCall, hangup } = useMultiplex();
+    const { incomingCall, activeCall, isCalling, initiateCall, answerCall, hangup } = useMultiplex();
 
     /**
      * Send a DM to another user.
@@ -37,14 +35,8 @@ export function DmRoom(): ReactElement {
     function callUser(video: boolean): void {
         const remoteUsername: string | undefined = getSelectedRoom()?.name;
         if (remoteUsername) {
-            call(user.username, remoteUsername, video);
-            setIsCalling(true);
+            initiateCall(user.username, remoteUsername, video);
         }
-    }
-
-    function endCall(): void {
-        hangup(isCalling, user.username);
-        setIsCalling(false);
     }
 
     /**
@@ -77,7 +69,7 @@ export function DmRoom(): ReactElement {
                 isOnline() ?
                     <section id="dmRoom-header">
                         {
-                            activeCall || isCalling ? <button className="app-button" onClick={endCall}> Hangup </button> 
+                            activeCall || isCalling ? <button className="app-button" onClick={() => hangup(user.username)}> Hangup </button> 
                             : 
                             incomingCall ? <button className="app-button" onClick={answerCall}> Answer </button> // TODO: Make incoming call a modal -> Answer/Deny
                             :

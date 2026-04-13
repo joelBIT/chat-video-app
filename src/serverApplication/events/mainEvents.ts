@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import { getDataForUser } from "../services/namespaceService";
 import type { ISocket } from "../interfaces";
-import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../utils";
+import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../utils/constants";
 import type { ChatUser, Namespace } from "../../types";
 import User from "../schemas/userSchema";
 import { findUserById, findUserByUsername, getAllUsers, updateOnlineStatus, updateUser } from "../dao/userDAO";

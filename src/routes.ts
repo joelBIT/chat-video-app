@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router";
-import { HOME_URL, PROFILE_URL, ROOMS_URL } from "./serverApplication/utils";
+import { HOME_URL, PROFILE_URL, ROOMS_URL } from "./serverApplication/utils/constants";
 import { App } from "./App";
 import LandingPage from "./pages/LandingPage";
 import RoomsPage from "./pages/RoomsPage";
