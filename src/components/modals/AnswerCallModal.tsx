@@ -39,7 +39,7 @@ export function AnswerCallModal({ answerCall, denyCall }: { answerCall: () => vo
 
     return (
         <dialog id="answerCallModal" ref={dialogRef}>
-            <h1 className='answerCallModal__title'> Incoming Call </h1>
+            <h1 className='answerCallModal__title'> Incoming call from {remoteUsername} </h1>
 
             <section className='answerCallModal__buttons'>
                 <button onClick={denyCall} className="app-button"> Hangup </button>
