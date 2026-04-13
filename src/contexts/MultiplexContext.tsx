@@ -18,7 +18,8 @@ export interface MultiplexContextProvider {
     remoteUsername: string;                 // Username of the remote user in a call/offer
     answerCall: () => Promise<void>;
     denyCall: () => void;
-    hangup: (callerUsername: string) => void;
+    hangup: (username: string) => void;
+    cancelOffer: (callerUsername: string, remoteUsername: string) => void;
     initiateCall: (callerUsername: string, remoteUsername: string, video: boolean) => void;
     disconnectMultiplexSockets: () => void;
 }
@@ -181,8 +182,6 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
      */
     function denyCall(): void {
         setIncomingCall(false);
-        console.log("DENY")
-        console.log(offers[0].answererUserName)
         multiplexSockets[NAMESPACE_ID_DM].emit(DENY_CALL, offers[0].offererUserName, offers[0].answererUserName);
         setOffers([]);
     }
@@ -201,16 +200,17 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     function hangup(username: string): void {
         closeVideoCall();
         setIncomingCall(false);
-        setIsCalling(false);
         setActiveCall(false);
         setOffers([]);
-        
-        if (isCalling) {
-            multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER_CANCELLED, username, remoteUsername);
-        } else {
-            multiplexSockets[NAMESPACE_ID_DM].emit(END_CALL, username);
-        }
+        multiplexSockets[NAMESPACE_ID_DM].emit(END_CALL, username);
+        setRemoteUsername('');
+    }
 
+    function cancelOffer(username: string, remoteUsername: string): void {
+        closeVideoCall();
+        setIsCalling(false);
+        setOffers([]);
+        multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER_CANCELLED, username, remoteUsername);
         setRemoteUsername('');
     }
 
@@ -256,7 +256,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     }
 
     return (
-        <MultiplexContext.Provider value={{ incomingCall, activeCall, isCalling, remoteUsername, connectMultiplexSockets, disconnectMultiplexSockets, answerCall, denyCall, initiateCall, hangup }}>
+        <MultiplexContext.Provider value={{ incomingCall, activeCall, isCalling, remoteUsername, connectMultiplexSockets, disconnectMultiplexSockets, cancelOffer, answerCall, denyCall, initiateCall, hangup }}>
             { children }
         </MultiplexContext.Provider>
     );

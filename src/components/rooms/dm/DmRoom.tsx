@@ -14,7 +14,7 @@ export function DmRoom(): ReactElement {
     const localVideoRef = useRef<HTMLVideoElement>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const { selectedRoom, sendMessage } = useRoom();
-    const { activeCall, isCalling, hangup } = useMultiplex();
+    const { activeCall, isCalling, hangup, cancelOffer } = useMultiplex();
     const { user } = useUser();
 
     /**
@@ -55,7 +55,7 @@ export function DmRoom(): ReactElement {
                 isCalling ?
                     <section className="call-text__section">
                         <p className="call__text"> Calling {selectedRoom.name}... </p>
-                        <button className="app-button" onClick={() => hangup(user.username)}> Hangup </button> 
+                        <button className="app-button" onClick={() => cancelOffer(user.username, selectedRoom.name)}> Hangup </button> 
                     </section>
                 :
                 <></>
