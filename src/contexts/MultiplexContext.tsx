@@ -196,9 +196,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     }
 
     /**
-     * The 'isCalling' parameter is true if the call has not been answered yet. In this case, the remote user must be informed that
-     * the call has been cancelled so the remote user cannot answer a call that does not exist. The 'isCalling' parameter being false 
-     * means a user leaves an ongoing active call.
+     * End a call or withdraw an offer (depending on the isCalling boolean).
      */
     function hangup(username: string): void {
         closeVideoCall();

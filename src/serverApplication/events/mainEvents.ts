@@ -64,11 +64,11 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
 }
 
 /**
- * Set all users as offline if the server restarts for some reason.
+ * Set all users as offline and as not 'inCall' if the server restarts for some reason.
  */
 async function setAllUsersAsOffline(): Promise<void> {
     try {
-        await User.updateMany({}, { online: false });
+        await User.updateMany({}, { online: false, inCall: false });
     } catch (error) {
         console.log(error);
     }

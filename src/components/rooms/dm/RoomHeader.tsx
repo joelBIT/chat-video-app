@@ -1,40 +1,25 @@
-import type { ReactElement } from "react";
-import { useMultiplex, useRoom, useUser } from "../../../hooks";
+import { useState, type ReactElement } from "react";
+import { useMultiplex, useUser } from "../../../hooks";
 import { getSelectedRoom } from "../../../clientApplication/services/roomService";
 import { getUserByUsername } from "../../../clientApplication/services/userService";
+import type { ChatUser } from "../../../types";
 
 import "./RoomHeader.css";
 
 /**
- * Header in DM rooms that is used for Web RTC calls (call, hangup) and showing user status (in a call, offline).
+ * Header in DM rooms that is used for Web RTC calls (audio, video) and showing user status (in a call, offline).
+ * It should not be possible to call users that are offline. It should not be possible to call users that are already in a call.
  */
 export function RoomHeader(): ReactElement {
+    const [remoteUser] = useState<ChatUser>(getUserByUsername(getSelectedRoom()?.name as string));
     const { user } = useUser();
-    const { selectedRoom } = useRoom();
-    const { activeCall, isCalling, remoteUsername, initiateCall, hangup } = useMultiplex();
+    const { activeCall, isCalling, remoteUsername, initiateCall } = useMultiplex();
 
     /**
      * Parameter 'video' is true if it is a video call, otherwise false (only audio).
      */
     function callUser(video: boolean): void {
-        const remoteUsername: string | undefined = getSelectedRoom()?.name;
-        if (remoteUsername) {
-            initiateCall(user.username, remoteUsername, video);
-        }
-    }
-
-    /**
-     * It should not be possible to call users that are offline.
-     */
-    function isOnline(): boolean {
-        const username: string | undefined = getSelectedRoom()?.name;
-        if (username) {
-            try {
-                return getUserByUsername(username).online;
-            } catch (error) { }
-        }
-        
-        return false;
+        initiateCall(user.username, remoteUser.username, video);
     }
 
     /**
@@ -51,10 +36,17 @@ export function RoomHeader(): ReactElement {
         return false;
     }
 
+    /**
+     * It should not be possible to call users that are offline.
+     */
+    function isOnline(): boolean {
+        return getUserByUsername(getSelectedRoom()?.name as string).online;
+    }
+
     if (isInACall()) {
         return (
             <section id="dmRoom-header">
-                <p className="dmRoom-header__text"> {selectedRoom?.name} is in a call </p>
+                <p className="dmRoom-header__text"> {remoteUser.username} is in a call </p>
             </section>
         )
     }
@@ -65,7 +57,7 @@ export function RoomHeader(): ReactElement {
                 isOnline() ?
                     <section id="dmRoom-header">
                         {
-                            activeCall || isCalling ? <button className="app-button" onClick={() => hangup(user.username)}> Hangup </button> 
+                            activeCall || isCalling ? <p className="dmRoom-header__text"> In a call with {remoteUser.username} </p>
                             :
                             <section className="chat-buttons">
                                 <article className="communication-button" onClick={() => callUser(false)}>
@@ -94,7 +86,7 @@ export function RoomHeader(): ReactElement {
                     </section>
                 :
                     <section id="dmRoom-header">
-                        <p className="dmRoom-header__text"> {selectedRoom?.name} is not online </p>
+                        <p className="dmRoom-header__text"> {remoteUser.username} is not online </p>
                     </section>
             }
         </>

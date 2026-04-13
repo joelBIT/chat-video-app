@@ -1,7 +1,6 @@
 import { type ReactElement, useRef, useState } from "react";
 import { useMultiplex, useRoom, useUser } from "../../../hooks";
 import { Message, RoomHeader } from "../..";
-import { getSelectedRoom } from "../../../clientApplication/services/roomService";
 import type { Message as MessageType } from "../../../types";
 
 import "./DmRoom.css";
@@ -49,13 +48,13 @@ export function DmRoom(): ReactElement {
             {
                 activeCall ?
                     <section className="call-text__section">
-                        <p className="call__text"> In a call with {getSelectedRoom()?.name} </p>
+                        <p className="call__text"> In a call with {selectedRoom.name} </p>
                         <button className="app-button" onClick={() => hangup(user.username)}> Hangup </button> 
                     </section>
                 :
                 isCalling ?
                     <section className="call-text__section">
-                        <p className="call__text"> Calling {getSelectedRoom()?.name}... </p>
+                        <p className="call__text"> Calling {selectedRoom.name}... </p>
                         <button className="app-button" onClick={() => hangup(user.username)}> Hangup </button> 
                     </section>
                 :
