@@ -34,18 +34,24 @@
         display: none;
     }
 
+    & .call-text__section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        & .call__text {
+            font-family: "LINE Seed JP", sans-serif;
+            font-size: 1.2rem;
+            color: var(--color-white);
+        }
+    }
+
     & .select-room__text {
         height: 100%;
         align-content: center;
         align-self: center;
         font-family: "LINE Seed JP", sans-serif;
         font-size: 2rem;
-        color: var(--color-white);
-    }
-
-    & .audio-call__text {
-        font-family: "LINE Seed JP", sans-serif;
-        font-size: 1.2rem;
         color: var(--color-white);
     }
 

@@ -1,5 +1,5 @@
 import { type ReactElement, useRef, useState } from "react";
-import { useMultiplex, useRoom } from "../../../hooks";
+import { useMultiplex, useRoom, useUser } from "../../../hooks";
 import { Message, RoomHeader } from "../..";
 import { getSelectedRoom } from "../../../clientApplication/services/roomService";
 import type { Message as MessageType } from "../../../types";
@@ -15,7 +15,8 @@ export function DmRoom(): ReactElement {
     const localVideoRef = useRef<HTMLVideoElement>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const { selectedRoom, sendMessage } = useRoom();
-    const { activeCall, isCalling } = useMultiplex();
+    const { activeCall, isCalling, hangup } = useMultiplex();
+    const { user } = useUser();
 
     /**
      * Send a DM to another user.
@@ -47,12 +48,18 @@ export function DmRoom(): ReactElement {
 
             {
                 activeCall ?
-                    <p className="audio-call__text"> In a call with {getSelectedRoom()?.name} </p>
-                    :
-                    isCalling ?
-                        <p className="audio-call__text"> Calling {getSelectedRoom()?.name}... </p>
-                            :
-                            <></>
+                    <section className="call-text__section">
+                        <p className="call__text"> In a call with {getSelectedRoom()?.name} </p>
+                        <button className="app-button" onClick={() => hangup(user.username)}> Hangup </button> 
+                    </section>
+                :
+                isCalling ?
+                    <section className="call-text__section">
+                        <p className="call__text"> Calling {getSelectedRoom()?.name}... </p>
+                        <button className="app-button" onClick={() => hangup(user.username)}> Hangup </button> 
+                    </section>
+                :
+                <></>
             }
 
             <section id="message-area" className="scrollable">

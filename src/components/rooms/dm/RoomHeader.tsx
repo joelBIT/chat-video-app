@@ -51,14 +51,17 @@ export function RoomHeader(): ReactElement {
         return false;
     }
 
+    if (isInACall()) {
+        return (
+            <section id="dmRoom-header">
+                <p className="dmRoom-header__text"> {selectedRoom?.name} is in a call </p>
+            </section>
+        )
+    }
+
     return (
         <>
             {
-                isInACall() ? 
-                    <section id="dmRoom-header">
-                        <p className="dmRoom-header__text"> {selectedRoom?.name} is in a call </p>
-                    </section>
-                    :
                 isOnline() ?
                     <section id="dmRoom-header">
                         {
