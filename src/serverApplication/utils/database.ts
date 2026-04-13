@@ -3,6 +3,17 @@ import Room from "../schemas/roomSchema";
 import User from "../schemas/userSchema";
 import { NAMESPACE_DM_ENDPOINT, NAMESPACE_GAMES_ENDPOINT, NAMESPACE_HOME_ENDPOINT, NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME, ROOM_NAME_ANNOUNCEMENTS, ROOM_NAME_GENERAL, ROOM_NAME_LOBBY, ROOM_NAME_SUPPORT } from "./constants";
 
+
+
+
+
+/********************************************************************************************************
+ * This file contains functions (interacting with the database) that are executed on server startup. *
+ ********************************************************************************************************/
+
+
+
+
 /**
  * Create the 3 common namespaces and the 4 common rooms if they do not exist.
  */

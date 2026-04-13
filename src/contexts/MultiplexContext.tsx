@@ -182,7 +182,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
      */
     function denyCall(): void {
         setIncomingCall(false);
-        multiplexSockets[NAMESPACE_ID_DM].emit(DENY_CALL, offers[0].offererUserName, offers[0].answererUserName);
+        multiplexSockets[NAMESPACE_ID_DM].emit(DENY_CALL, offers[0].offererUserName);
         setOffers([]);
     }
 
@@ -201,6 +201,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         closeVideoCall();
         setIncomingCall(false);
         setActiveCall(false);
+        setIsCalling(false);
         setOffers([]);
         multiplexSockets[NAMESPACE_ID_DM].emit(END_CALL, username);
         setRemoteUsername('');
@@ -242,9 +243,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         setActiveCall(true);
     }
 
-    function onDeniedCall(denierUsername: string): void {
-        console.log("DENIED CALL")
-        console.log(denierUsername)
+    function onDeniedCall(): void {
         setOffers([]);
         setRemoteUsername('');
         closeVideoCall();

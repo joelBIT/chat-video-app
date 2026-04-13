@@ -17,8 +17,8 @@ const peerConfiguration = {
     ]
 }
 
-let localStream: MediaStream;            // Hold the local video stream
-let remoteStream: MediaStream;           // Hold the remote video stream
+let localStream: MediaStream;                   // Hold the local video stream
+let remoteStream: MediaStream;                  // Hold the remote video stream
 let peerConnection: RTCPeerConnection | null;   // The peer connection that the two clients use to talk
 let didIOffer: boolean = false;                 // True if you initiated the call
 
@@ -113,9 +113,7 @@ function createPeerConnection(username: string, offer?: Offer): Promise<void> {
             if (offer) {
                 // This won't be set when called from call();
                 // Will be set when we call from answerOffer()
-                // console.log(peerConnection.signalingState) should be stable because no setDesc has been run yet
                 await peerConnection.setRemoteDescription(offer.offer);
-                // console.log(peerConnection.signalingState) should be have-remote-offer, because client2 has setRemoteDesc on the offer
             }
 
             resolve();

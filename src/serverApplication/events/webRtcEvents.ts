@@ -34,9 +34,8 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
         });
 
         socket.on(NEW_OFFER_CANCELLED, async (callerUsername: string, recipientUsername: string) => {
-            await deleteOfferByOffererUsername(callerUsername);
-
             try {
+                await deleteOfferByOffererUsername(callerUsername);
                 const recipient: ChatUser = await findUserByUsername(recipientUsername);
                 socket.to(recipient.id).emit(NEW_OFFER_CANCELLED, callerUsername);
             } catch (error) {
@@ -50,12 +49,11 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
             updateUserStatus(io, username, false);
         });
 
-        socket.on(DENY_CALL, async (offererUsername: string, denierUsername: string) => {
-            await deleteOfferByOffererUsername(offererUsername);
-
+        socket.on(DENY_CALL, async (offererUsername: string) => {
             try {
+                await deleteOfferByOffererUsername(offererUsername);
                 const offerer: ChatUser = await findUserByUsername(offererUsername);
-                socket.to(offerer.id).emit(DENY_CALL, denierUsername);
+                socket.to(offerer.id).emit(DENY_CALL);
             } catch (error) {
                 console.log(error);
             }
@@ -87,11 +85,10 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
 
             if (didIOffer) {
                 try {
-                    // This ice candidate is coming from the offerer. Send to the answerer
                     const offer: Offer = await getOfferByOffererUsername(iceUserName);
                     offer.offerIceCandidates.push(iceCandidate);
 
-                    // 1. When the answerer answers, all existing ice candidates are sent
+                    // 1. When the remote user answers, all existing ice candidates are sent
                     // 2. Any candidates that come in after the offer has been answered, will be passed through
                     if (offer.answererUserName) {
                         await emitIceCandidate(socket, offer.answererUserName, iceCandidate);
@@ -101,7 +98,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
                 }
             } else {
                 try {
-                    // This ice candidate is coming from the answerer. Send to the offerer.
+                    // This ice candidate is coming from the remote user. Send to the offer initiator.
                     const offer: Offer = await getOfferByAnswererUsername(iceUserName);
                     if (offer) {
                         await emitIceCandidate(socket, offer.offererUserName, iceCandidate);
