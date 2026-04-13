@@ -1,5 +1,5 @@
 import type { Server } from "socket.io";
-import { ANSWER_RESPONSE, END_CALL, NAMESPACE_DM_ENDPOINT, NEW_ANSWER, NEW_OFFER, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, RECEIVED_ICE_CANDIDATE_FROM_SERVER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, USER_UPDATED } from "../utils";
+import { ANSWER_RESPONSE, END_CALL, DENY_CALL, NAMESPACE_DM_ENDPOINT, NEW_ANSWER, NEW_OFFER, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, RECEIVED_ICE_CANDIDATE_FROM_SERVER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, USER_UPDATED } from "../utils/constants";
 import type { Offer, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
 import { deleteOfferByOffererUsername, getOfferByAnswererUsername, getOfferByOffererUsername, saveOffer } from "../dao/webRtcDAO";
@@ -48,6 +48,19 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
 
         socket.on(END_CALL, (username: string) => {
             updateUserStatus(io, username, false);
+        });
+
+        socket.on(DENY_CALL, async (offererUsername: string, denierUsername: string) => {
+            await deleteOfferByOffererUsername(offererUsername);
+
+            try {
+                const offerer: ChatUser = await findUserByUsername(offererUsername);
+                socket.to(offerer.id).emit(DENY_CALL, denierUsername);
+            } catch (error) {
+                console.log(error);
+            }
+
+            updateUserStatus(io, offererUsername, false);
         });
 
         socket.on(NEW_ANSWER, async (sentOffer: Offer, ackFunction) => {

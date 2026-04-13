@@ -3,7 +3,7 @@ import { getAllNamespaces } from "../dao/namespaceDAO";
 import { findUserByUsername } from "../dao/userDAO";
 import type { Namespace, Room } from "../../types";
 import type { ISocket } from "../interfaces";
-import { isCommonRoom, USER_JOINED } from "../utils";
+import { isCommonRoom, USER_JOINED } from "../utils/constants";
 
 /**
  * Initializes common events for the namespaces (not the main namespace '/'). These custom namespaces are "Home", "DMs", and "Games".

@@ -6,17 +6,20 @@ import { getSelectedRoom, isSelectedRoom, removeRoom, saveRoom } from "../client
 import { addUserToRoom, getUsersInSelectedRoom, removeUserFromRoom } from "../clientApplication/services/userService";
 import { saveConversationMessage, saveMessage } from "../clientApplication/services/messageService";
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
-import { addAnswer, addNewIceCandidate, answerOffer, closeVideoCall } from "../clientApplication/services/webRtcService";
+import { addAnswer, addNewIceCandidate, answerOffer, call, closeVideoCall } from "../clientApplication/services/webRtcService";
 import type { Message, Namespace, Offer, Room } from "../types";
-import { ANSWER_RESPONSE, CHAT_MESSAGE, END_CALL, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../serverApplication/utils";
+import { ANSWER_RESPONSE, CHAT_MESSAGE, DENY_CALL, END_CALL, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../serverApplication/utils/constants";
 
 export interface MultiplexContextProvider {
     connectMultiplexSockets: (namespaces: Namespace[]) => void;
     incomingCall: boolean;
     activeCall: boolean;
-    recipientUsername: string;
+    isCalling: boolean;
+    remoteUsername: string;                 // Username of the remote user in a call/offer
     answerCall: () => Promise<void>;
-    hangup: (isCalling: boolean, callerUsername: string) => void;
+    denyCall: () => void;
+    hangup: (callerUsername: string) => void;
+    initiateCall: (callerUsername: string, remoteUsername: string, video: boolean) => void;
     disconnectMultiplexSockets: () => void;
 }
 
@@ -29,9 +32,10 @@ export const MultiplexContext = createContext<MultiplexContextProvider>({} as Mu
  */
 export function MultiplexProvider({ children }: { children: ReactNode }): ReactElement {
     const [incomingCall, setIncomingCall] = useState<boolean>(false);
+    const [isCalling, setIsCalling] = useState<boolean>(false);
     const [activeCall, setActiveCall] = useState<boolean>(false);
     const [offers, setOffers] = useState<Offer[]>([]);
-    const [recipientUsername, setRecipientUsername] = useState<string>('');
+    const [remoteUsername, setRemoteUsername] = useState<string>('');
     const { setRoomParticipants, changeNamespace, changeSelectedRoom } = useRoom();
 
     /**
@@ -67,6 +71,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         if (namespace.id === NAMESPACE_ID_DM) {
             socket.on(NEW_OFFER_AWAITING, onNewOfferAwaiting);
             socket.on(NEW_OFFER_CANCELLED, onNewOfferCancelled);
+            socket.on(DENY_CALL, onDeniedCall);
             socket.on(ANSWER_RESPONSE, onAnswerResponse);
             socket.on(RECEIVED_ICE_CANDIDATE_FROM_SERVER, onReceivedIceCandidateFromServer);
         }
@@ -160,53 +165,90 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         });
     }
 
+    /**
+     * Answer an offer (an invitation for a WebRTC call) by sending back an answer accepting the offer for a call.
+     */
     async function answerCall(): Promise<void> {
         setIncomingCall(false);
         await answerOffer(offers[0]);
-        setRecipientUsername(offers[0].offererUserName);
+        setRemoteUsername(offers[0].offererUserName);
         setActiveCall(true);
+        setOffers([]);
     }
 
     /**
-     * The 'isCalling' parameter is true if the call has not been answered yet. In this case, the remote user must be informed that
-     * the call has been cancelled so the remote user cannot answer a call that does not exist. The 'isCalling' parameter being false 
-     * means a user leaves an ongoing active call.
+     * Deny an incoming call (i.e., a user chooses to not answer an incoming call). Inform the offerer (remote username) that the call was denied.
      */
-    function hangup(isCalling: boolean, username: string): void {
+    function denyCall(): void {
+        setIncomingCall(false);
+        console.log("DENY")
+        console.log(offers[0].answererUserName)
+        multiplexSockets[NAMESPACE_ID_DM].emit(DENY_CALL, offers[0].offererUserName, offers[0].answererUserName);
+        setOffers([]);
+    }
+
+    /**
+     * Initiate a WebRTC call by creating and sending an offer to remoteUsername. The WebRTC call can either be a video call or an audio call.
+     */
+    function initiateCall(callerUsername: string, remoteUsername: string, video: boolean): void {
+        setIsCalling(true);
+        call(callerUsername, remoteUsername, video);
+    }
+
+    /**
+     * End a call or withdraw an offer (depending on the isCalling boolean).
+     */
+    function hangup(username: string): void {
         closeVideoCall();
         setIncomingCall(false);
+        setIsCalling(false);
         setActiveCall(false);
         setOffers([]);
         
         if (isCalling) {
-            multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER_CANCELLED, username, recipientUsername);
+            multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER_CANCELLED, username, remoteUsername);
         } else {
             multiplexSockets[NAMESPACE_ID_DM].emit(END_CALL, username);
         }
 
-        setRecipientUsername('');
+        setRemoteUsername('');
     }
 
     /**
-     * Receive an offer for a WebRTC call.
+     * You received an offer for a WebRTC call. You then choose if you want to answer the call or deny it.
      */
     function onNewOfferAwaiting(offer: Offer): void {
         setIncomingCall(true);
         setOffers([...offers, offer]);
-        setRecipientUsername(offer.offererUserName);
+        setRemoteUsername(offer.offererUserName);
     }
 
+    /**
+     * The user who created the offer (callerUsername) cancelled the offer before you answered the offer.
+     */
     function onNewOfferCancelled(callerUsername: string): void {
         const remainingOffers: Offer[] = offers.filter((offer: Offer) => offer.offererUserName !== callerUsername);
         setOffers([...remainingOffers]);
-        setRecipientUsername('');
+        setRemoteUsername('');
         setIncomingCall(false);
     }
 
+    /**
+     * You get an answer from another user when it was you who created the offer (initiated the call) for that user.
+     */
     function onAnswerResponse(answer: Offer): void {
         addAnswer(answer);
-        setRecipientUsername(answer.answererUserName)
+        setRemoteUsername(answer.answererUserName)
         setActiveCall(true);
+    }
+
+    function onDeniedCall(denierUsername: string): void {
+        console.log("DENIED CALL")
+        console.log(denierUsername)
+        setOffers([]);
+        setRemoteUsername('');
+        closeVideoCall();
+        setIsCalling(false);
     }
 
     function onReceivedIceCandidateFromServer(iceCandidate: RTCIceCandidate): void {
@@ -214,7 +256,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     }
 
     return (
-        <MultiplexContext.Provider value={{ incomingCall, activeCall, recipientUsername, connectMultiplexSockets, disconnectMultiplexSockets, answerCall, hangup }}>
+        <MultiplexContext.Provider value={{ incomingCall, activeCall, isCalling, remoteUsername, connectMultiplexSockets, disconnectMultiplexSockets, answerCall, denyCall, initiateCall, hangup }}>
             { children }
         </MultiplexContext.Provider>
     );

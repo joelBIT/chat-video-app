@@ -1,7 +1,7 @@
 import type { Room } from "../../types";
 import { getMessagesByRoomId } from "../dao/messageDAO";
 import { getRoomByID, getRoomByRoomName, updateRoomMembers } from "../dao/roomDAO";
-import { isCommonRoom } from "../utils";
+import { isCommonRoom } from "../utils/constants";
 
 /**
  * @returns     true if userID is member of room with ID roomID

@@ -2,7 +2,7 @@ import { type ReactElement } from "react";
 import { useRoom, useUser } from "../../hooks";
 import { isMember, isSelectedRoom } from "../../clientApplication/services/roomService";
 import type { Room } from "../../types";
-import { isCommonRoom, NAMESPACE_ID_GAMES, ROOM_NAME_LOBBY } from "../../serverApplication/utils";
+import { isCommonRoom, NAMESPACE_ID_GAMES, ROOM_NAME_LOBBY } from "../../serverApplication/utils/constants";
 
 import "./RoomCard.css";
 

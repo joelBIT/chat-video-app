@@ -5,7 +5,7 @@ import { clearSelectedRoom, getSelectedRoom, isSelectedRoom } from "../clientApp
 import { addAllUsers, getSignedOutUser, getUsersInSelectedRoom, saveUser } from "../clientApplication/services/userService";
 import { addNamespaces } from "../clientApplication/services/namespaceService";
 import type { ActionState, Namespace, ChatUser } from "../types";
-import { NAMESPACE_ID_HOME, NAMESPACES, ROOM_ID_NONE, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../serverApplication/utils";
+import { NAMESPACE_ID_HOME, NAMESPACES, ROOM_ID_NONE, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../serverApplication/utils/constants";
 
 export interface SocketContextProvider {
     isConnected: boolean;

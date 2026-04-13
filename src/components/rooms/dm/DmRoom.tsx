@@ -1,9 +1,6 @@
 import { type ReactElement, useRef, useState } from "react";
 import { useMultiplex, useRoom, useUser } from "../../../hooks";
-import { Message } from "../..";
-import { getSelectedRoom } from "../../../clientApplication/services/roomService";
-import { call } from "../../../clientApplication/services/webRtcService";
-import { getUserByUsername } from "../../../clientApplication/services/userService";
+import { Message, RoomHeader } from "../..";
 import type { Message as MessageType } from "../../../types";
 
 import "./DmRoom.css";
@@ -13,13 +10,12 @@ import "./DmRoom.css";
  * so that a user must stay in the room during the call.
  */
 export function DmRoom(): ReactElement {
-    const [isCalling, setIsCalling] = useState<boolean>(false);
     const [message, setMessage] = useState<string>('');
     const localVideoRef = useRef<HTMLVideoElement>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const { selectedRoom, sendMessage } = useRoom();
+    const { activeCall, isCalling, hangup } = useMultiplex();
     const { user } = useUser();
-    const { incomingCall, activeCall, answerCall, hangup } = useMultiplex();
 
     /**
      * Send a DM to another user.
@@ -29,38 +25,6 @@ export function DmRoom(): ReactElement {
             sendMessage(message);
             setMessage('');
         }
-    }
-
-    /**
-     * Parameter 'video' is true if it is a video call, otherwise false (only audio).
-     */
-    function callUser(video: boolean): void {
-        const remoteUsername: string | undefined = getSelectedRoom()?.name;
-        if (remoteUsername) {
-            call(user.username, remoteUsername, video);
-            setIsCalling(true);
-        }
-    }
-
-    function endCall(): void {
-        hangup(isCalling, user.username);
-        setIsCalling(false);
-    }
-
-    /**
-     * It should not be possible to call users that are offline.
-     * 
-     * @returns true if the remote user is online, false otherwise.
-     */
-    function isOnline(): boolean {
-        const username: string | undefined = getSelectedRoom()?.name;
-        if (username) {
-            try {
-                return getUserByUsername(username).online;
-            } catch (error) { }
-        }
-        
-        return false;
     }
 
     if (!selectedRoom) {
@@ -73,44 +37,7 @@ export function DmRoom(): ReactElement {
     
     return (
         <section id="dmRoom" className={activeCall || isCalling ? "inCall-lock-room" : ""}>
-            {
-                isOnline() ?
-                    <section id="dmRoom-header">
-                        {
-                            activeCall || isCalling ? <button className="app-button" onClick={endCall}> Hangup </button> 
-                            : 
-                            incomingCall ? <button className="app-button" onClick={answerCall}> Answer </button> // TODO: Make incoming call a modal -> Answer/Deny
-                            :
-                            <section className="chat-buttons">
-                                <article className="communication-button" onClick={() => callUser(false)}>
-                                    <img 
-                                        src="/audio.svg" 
-                                        alt="Audio chat icon" 
-                                        title="Call User" 
-                                        className="button__icon" 
-                                    />
-
-                                    <h2 className="button__label"> Audio </h2>
-                                </article>
-
-                                <article className="communication-button" onClick={() => callUser(true)}>
-                                    <img 
-                                        src="/video.svg" 
-                                        alt="Video chat icon" 
-                                        title="Video conference" 
-                                        className="button__icon" 
-                                    />
-
-                                    <h2 className="button__label"> Video </h2>
-                                </article>
-                            </section>
-                        }
-                    </section>
-                :
-                    <section id="dmRoom-header">
-                        <p className="dmRoom-header__text"> {selectedRoom.name} is not online </p>
-                    </section>
-            }
+            <RoomHeader />
 
             <section id="videos" className={isCalling || activeCall ? "show-videos" : "hide-videos"}>
                 <video id="local-video" className="video-player" ref={localVideoRef} autoPlay playsInline />
@@ -120,12 +47,18 @@ export function DmRoom(): ReactElement {
 
             {
                 activeCall ?
-                    <p className="audio-call__text"> In a call with {getSelectedRoom()?.name} </p>
-                    :
-                    isCalling ?
-                        <p className="audio-call__text"> Calling {getSelectedRoom()?.name}... </p>
-                            :
-                            <></>
+                    <section className="call-text__section">
+                        <p className="call__text"> In a call with {selectedRoom.name} </p>
+                        <button className="app-button" onClick={() => hangup(user.username)}> Hangup </button> 
+                    </section>
+                :
+                isCalling ?
+                    <section className="call-text__section">
+                        <p className="call__text"> Calling {selectedRoom.name}... </p>
+                        <button className="app-button" onClick={() => hangup(user.username)}> Hangup </button> 
+                    </section>
+                :
+                <></>
             }
 
             <section id="message-area" className="scrollable">

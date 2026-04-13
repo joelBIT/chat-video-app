@@ -3,9 +3,9 @@ import { type ReactElement, useEffect, useRef } from 'react';
 import "./AnswerCallModal.css";
 
 /**
- * Modal used to answer an incoming call.
+ * Modal used to answer an incoming call. A user can either hangup or take the call.
  */
-export function AnswerCallModal({ close }: { close: () => void }): ReactElement {
+export function AnswerCallModal({ answerCall, denyCall }: { answerCall: () => void, denyCall: () => void }): ReactElement {
     const dialogRef = useRef<HTMLDialogElement>(null);
 
     useEffect(() => {
@@ -19,8 +19,8 @@ export function AnswerCallModal({ close }: { close: () => void }): ReactElement 
             <h1 className='answerCallModal__title'> Incoming Call </h1>
 
             <section className='answerCallModal__buttons'>
-                <button onClick={close} className="app-button"> Hangup </button>
-                <button className="app-button"> Answer </button>
+                <button onClick={denyCall} className="app-button"> Hangup </button>
+                <button onClick={answerCall} className="app-button"> Answer </button>
             </section>
         </dialog>
     );

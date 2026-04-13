@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import { getDataForUser } from "../services/namespaceService";
 import type { ISocket } from "../interfaces";
-import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../utils";
+import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../utils/constants";
 import type { ChatUser, Namespace } from "../../types";
 import User from "../schemas/userSchema";
 import { findUserById, findUserByUsername, getAllUsers, updateOnlineStatus, updateUser } from "../dao/userDAO";
@@ -64,11 +64,11 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
 }
 
 /**
- * Set all users as offline if the server restarts for some reason.
+ * Set all users as offline and as not 'inCall' if the server restarts for some reason.
  */
 async function setAllUsersAsOffline(): Promise<void> {
     try {
-        await User.updateMany({}, { online: false });
+        await User.updateMany({}, { online: false, inCall: false });
     } catch (error) {
         console.log(error);
     }

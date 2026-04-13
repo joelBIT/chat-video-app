@@ -1,4 +1,4 @@
-import { NAMESPACE_ID_DM } from "../../serverApplication/utils";
+import { NAMESPACE_ID_DM } from "../../serverApplication/utils/constants";
 import namespaceStore from "../stores/NamespaceStore";
 import type { Message, Namespace, Room } from "../../types";
 

@@ -4,7 +4,7 @@ import { isSelectedNamespace } from "../../clientApplication/services/namespaceS
 import { getSelectedNamespaceRooms, memberGameRooms, nonMemberGameRooms } from "../../clientApplication/services/roomService";
 import { CommonRoomCard, CreateRoomModal, RoomCard } from "..";
 import type { Room } from "../../types";
-import { NAMESPACE_ID_GAMES } from "../../serverApplication/utils";
+import { NAMESPACE_ID_GAMES } from "../../serverApplication/utils/constants";
 
 import "./RoomList.css";
 
