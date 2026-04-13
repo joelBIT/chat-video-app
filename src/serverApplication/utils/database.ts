@@ -1,5 +1,6 @@
 import Namespace from "../schemas/namespaceSchema";
 import Room from "../schemas/roomSchema";
+import User from "../schemas/userSchema";
 import { NAMESPACE_DM_ENDPOINT, NAMESPACE_GAMES_ENDPOINT, NAMESPACE_HOME_ENDPOINT, NAMESPACE_ID_DM, NAMESPACE_ID_GAMES, NAMESPACE_ID_HOME, ROOM_NAME_ANNOUNCEMENTS, ROOM_NAME_GENERAL, ROOM_NAME_LOBBY, ROOM_NAME_SUPPORT } from "./constants";
 
 /**
@@ -68,6 +69,18 @@ export async function createDatabaseCollections(): Promise<void> {
                 namespaceId: NAMESPACE_ID_GAMES
             });
         }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+/**
+ * Set all users as offline and as not 'inCall' if the server restarts for some reason.
+ */
+export async function setAllUsersAsOffline(): Promise<void> {
+    try {
+        await User.updateMany({}, { online: false, inCall: false });
     } catch (error) {
         console.log(error);
     }

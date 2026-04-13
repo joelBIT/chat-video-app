@@ -3,8 +3,8 @@ import { getDataForUser } from "../services/namespaceService";
 import type { ISocket } from "../interfaces";
 import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../utils/constants";
 import type { ChatUser, Namespace } from "../../types";
-import User from "../schemas/userSchema";
 import { findUserById, findUserByUsername, getAllUsers, updateOnlineStatus, updateUser } from "../dao/userDAO";
+import { setAllUsersAsOffline } from "../utils/database";
 
 /**
  * Initializes events for the main namespace ('/') only. The connected client receives data via the "namespaces" event. This data consists of
@@ -61,15 +61,4 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
             }
         });
     });
-}
-
-/**
- * Set all users as offline and as not 'inCall' if the server restarts for some reason.
- */
-async function setAllUsersAsOffline(): Promise<void> {
-    try {
-        await User.updateMany({}, { online: false, inCall: false });
-    } catch (error) {
-        console.log(error);
-    }
 }
