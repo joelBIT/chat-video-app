@@ -1,5 +1,5 @@
 import { type ReactElement, useEffect, useRef, useState } from 'react';
-import { useRoom } from '../hooks';
+import { useRoom } from '../../hooks';
 
 import "./CreateRoomModal.css";
 

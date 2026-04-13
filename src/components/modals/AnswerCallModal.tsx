@@ -1,9 +1,9 @@
 import { type ReactElement, useEffect, useRef } from 'react';
 import { useNavigate } from "react-router";
-import { useMultiplex, useRoom } from '../hooks';
-import { NAMESPACE_ID_DM, ROOMS_URL } from '../serverApplication/utils/constants';
-import { setSelectedNamespaceId } from '../clientApplication/services/namespaceService';
-import { getSelectedNamespaceRooms } from '../clientApplication/services/roomService';
+import { useMultiplex, useRoom } from '../../hooks';
+import { NAMESPACE_ID_DM, ROOMS_URL } from '../../serverApplication/utils/constants';
+import { setSelectedNamespaceId } from '../../clientApplication/services/namespaceService';
+import { getSelectedNamespaceRooms } from '../../clientApplication/services/roomService';
 
 import "./AnswerCallModal.css";
 
