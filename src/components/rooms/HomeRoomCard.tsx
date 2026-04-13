@@ -9,11 +9,11 @@ import "./RoomCard.css";
 /**
  * This is the room card for the common rooms in namespace Home (id 0).
  */
-export function CommonRoomCard({room}: {room: Room}): ReactElement {
+export function HomeRoomCard({room}: {room: Room}): ReactElement {
     const { changeRoom } = useRoom();
 
     return (
-        <section className="namespace-room" onClick={() => changeRoom(room)} key={room.id}>
+        <section className="namespace-room" onClick={() => changeRoom(room)}>
             <section className="room-section">
                  {
                     room.name === ROOM_NAME_ANNOUNCEMENTS ?
