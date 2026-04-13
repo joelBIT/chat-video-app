@@ -1,15 +1,15 @@
 import { type ReactElement, useRef, useState } from "react";
 import { useMultiplex, useRoom, useUser } from "../../../hooks";
-import { Message, RoomHeader } from "../..";
+import { Message, ConversationHeader } from "../..";
 import type { Message as MessageType } from "../../../types";
 
-import "./DmRoom.css";
+import "./ConversationChat.css";
 
 /**
  * A DM room chat where a user may write messages to another user directly. An initiated or active WebRTC call locks the room by disabling menu links
  * so that a user must stay in the room during the call.
  */
-export function DmRoom(): ReactElement {
+export function DmRoomChat(): ReactElement {
     const [message, setMessage] = useState<string>('');
     const localVideoRef = useRef<HTMLVideoElement>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -29,15 +29,15 @@ export function DmRoom(): ReactElement {
 
     if (!selectedRoom) {
         return (
-            <main id="dmRoom">
+            <main id="conversationChat">
                 <h1 className="select-room__text"> Select a conversation </h1>
             </main>
         )
     }
     
     return (
-        <section id="dmRoom" className={activeCall || isCalling ? "inCall-lock-room" : ""}>
-            <RoomHeader />
+        <section id="conversationChat" className={activeCall || isCalling ? "inCall-lock-room" : ""}>
+            <ConversationHeader />
 
             <section id="videos" className={isCalling || activeCall ? "show-videos" : "hide-videos"}>
                 <video id="local-video" className="video-player" ref={localVideoRef} autoPlay playsInline />

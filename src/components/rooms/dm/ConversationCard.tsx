@@ -3,12 +3,12 @@ import { useRoom } from "../../../hooks";
 import { isSelectedRoom } from "../../../clientApplication/services/roomService";
 import type { Room } from "../../../types";
 
-import "./DmCard.css";
+import "./ConversationCard.css";
 
 /**
  * A DM Card showing the name of the other user in this conversation.
  */
-export function DmCard({room}: {room: Room}): ReactElement {
+export function ConversationCard({room}: {room: Room}): ReactElement {
     const { changeRoom, leaveRoom } = useRoom();
 
     function removeConversation(event: React.MouseEvent<HTMLHeadingElement>): void {
@@ -18,7 +18,7 @@ export function DmCard({room}: {room: Room}): ReactElement {
     }
 
     return (
-        <section className="dm-card" onClick={() => changeRoom(room)}>
+        <section className="conversationCard" onClick={() => changeRoom(room)}>
             <section className="dm-section">
                 <h2 className={isSelectedRoom(room.id) ? "active-dm" : "dm-name"}>
                     {room.name}
