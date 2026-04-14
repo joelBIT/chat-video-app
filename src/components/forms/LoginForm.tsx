@@ -30,6 +30,7 @@ export function LoginForm({close}: {close: () => void}): ReactElement {
             
             <button 
                 className="app-button" 
+                type="button"
                 onClick={() => connect(username, password)} 
                 disabled={username.length < 1 || password.length < 1}
             > 
