@@ -28,7 +28,7 @@ export function RegisterForm({close}: { close: () => void}): ReactElement {
 
     return (
         <form id="registerForm" method="post">
-            <p className="landing-text"> Registration </p>
+            <h1 className="registerForm-heading"> Registration </h1>
 
             <input 
                 className="register-input" 

@@ -6,11 +6,4 @@
     gap: 1rem;
     width: 100%;
     background-color: var(--color-background-light);
-
-    & .landing-text {
-        font-family: "LINE Seed JP", sans-serif;
-        font-size: 1.3rem;
-        color: var(--color-white);
-        text-align: center;
-    }
 }
