@@ -1,3 +1,5 @@
+export * from "./forms/LoginForm";
+export * from "./forms/RegisterForm";
 export * from "./Header";
 export * from "./Message";
 export * from "./modals/AnswerCallModal";
