@@ -126,3 +126,57 @@ main {
     scrollbar-width: thin;
     scrollbar-color: black #FFFFFF20;
 }
+
+
+
+
+
+/*************
+* Auth Forms *
+*************/
+
+#registerForm,
+#loginForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+
+    & .login-input,
+    & .register-input {
+        background-color: var(--color-chat-background);
+        padding: 0.3rem;
+        outline: none;
+        border: 1px solid #d7cdcd63;
+        border-radius: 4px;
+        color: var(--color-white);
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+
+    & > button {
+        margin-top: 0.5rem;
+        margin-bottom: 2rem;
+    }
+
+    & .register-text,
+    & .login-text {
+        display: flex;
+        font-family: LINE Seed JP, sans-serif;
+        font-size: 1rem;
+        font-weight: 100;
+        color: var(--color-white);
+
+        & .register-link,
+        & .login-link {
+            color: var(--color-username);
+            cursor: pointer;
+            padding-left: 0.3rem;
+            text-decoration: underline;
+
+            &:hover {
+                opacity: 0.8;
+            }
+        }
+    }
+}
