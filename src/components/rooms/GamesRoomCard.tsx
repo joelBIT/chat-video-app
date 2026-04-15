@@ -44,7 +44,7 @@ export function GamesRoomCard({room}: {room: Room}): ReactElement {
             </section>
 
             {
-                isRoomMember() ? <h1 className="leave-room__button" onClick={removeRoom}> &#x274c; </h1> : <></>
+                isRoomMember() ? <h1 className="leave-room__button" onClick={removeRoom} title="Leave Room"> &#x274c; </h1> : <></>
             }
         </section>
     )

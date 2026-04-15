@@ -50,6 +50,7 @@
         height: 100%;
         align-content: center;
         align-self: center;
+        text-align: center;
         font-family: "LINE Seed JP", sans-serif;
         font-size: 2rem;
         color: var(--color-white);
@@ -96,5 +97,17 @@
 #conversationChat:has(.show-videos) {
     & #message-area {
         max-height: 300px;
+    }
+}
+
+@media (max-width: 1150px) {
+    #conversationChat {
+        & #videos {
+            flex-direction: column;
+
+            & #remote-video {
+                width: 300px;
+            }
+        }
     }
 }

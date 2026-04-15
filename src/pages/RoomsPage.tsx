@@ -2,7 +2,7 @@ import { type ReactElement } from "react";
 import { redirect } from "react-router";
 import { useRoom, useSocket } from "../hooks";
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
-import { ConversationList, DmRoomChat, NamespaceMenu, RoomChat, RoomList, UserList } from "../components";
+import { ConversationList, DmRoomChat, MobileHeader, NamespaceMenu, RoomChat, RoomList, UserList } from "../components";
 import { HOME_URL, NAMESPACE_ID_DM } from "../serverApplication/utils/constants";
 
 import "./RoomsPage.css";
@@ -22,6 +22,9 @@ export default function RoomsPage(): ReactElement {
         return (
             <main id="roomsPage">
                 <NamespaceMenu />
+
+                <MobileHeader isDmNamespace={true} />
+                
                 <ConversationList />
                 <DmRoomChat />
             </main>
@@ -31,6 +34,9 @@ export default function RoomsPage(): ReactElement {
     return (
         <main id="roomsPage">
             <NamespaceMenu />
+
+            <MobileHeader isDmNamespace={false} />
+
             <RoomList />
             <RoomChat />
 
