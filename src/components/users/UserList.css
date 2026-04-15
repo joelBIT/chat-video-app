@@ -17,3 +17,11 @@
         color: lightgray;
     }
 }
+
+@media (max-width: 1050px) {
+    #userList {
+        & .userList-title {
+            width: 110px;
+        }
+    }
+}

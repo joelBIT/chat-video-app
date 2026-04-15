@@ -9,7 +9,7 @@ import "./ConversationChat.css";
  * A DM room chat where a user may write messages to another user directly. An initiated or active WebRTC call locks the room by disabling menu links
  * so that a user must stay in the room during the call.
  */
-export function DmRoomChat(): ReactElement {
+export function ConversationChat(): ReactElement {
     const [message, setMessage] = useState<string>('');
     const localVideoRef = useRef<HTMLVideoElement>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);

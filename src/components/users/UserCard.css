@@ -60,3 +60,9 @@
         background-color: transparent;
     }
 }
+
+@media (max-width: 1050px) {
+    .userCard {
+        width: 120px;
+    }
+}
