@@ -17,9 +17,17 @@ export function Tabs({titles, defaultTab, active, setActive}: {titles: string[],
         setActiveTab(active);
     }, [active])
 
+    /**
+     * No tab is selected (no tab is active) if the user clicks on an active tab.
+     */
     function changeActiveTab(tab: string) {
-        setActive(tab);         // Inform parent which tab has been clicked
-        setActiveTab(tab);      // Switch tab
+        if (tab === activeTab) {        // Tab is already active, so deactivate it so no tab is selected
+            setActive("");
+            setActiveTab("");
+        } else {
+            setActive(tab);         // Inform parent which tab has been clicked
+            setActiveTab(tab);      // Switch tab
+        }
     }
     
     return (

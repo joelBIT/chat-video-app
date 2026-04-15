@@ -17,8 +17,54 @@
     #roomsPage {
         & #conversationList,
         & #roomList,
-        & #namespaceMenu {
+        & #namespaceMenu,
+        & #userList {
             display: none;
+        }
+
+        &:has(.show-menu) {
+            #namespaceMenu {
+                display: flex;
+                padding-top: 6rem;
+                position: absolute;
+            }
+        }
+
+        &:has(.show-rooms) {
+            #roomList {
+                display: flex;
+                padding-top: 4rem;
+                position: absolute;
+            }
+        }
+
+        &:has(.show-conversations) {
+            #conversationList {
+                display: flex;
+                padding-top: 4rem;
+                position: absolute;
+            }
+        }
+
+        &:has(.show-members) {
+            #userList {
+                display: flex;
+                align-items: flex-end;
+                padding-top: 4rem;
+                position: absolute;
+                right: 0;
+                max-height: 50vh;
+                border-left: none;
+                
+                & .menu-modal {
+                    right: 140px;
+                    width: 10rem;
+                }
+
+                & .userCard {
+                    width: 100px;
+                }
+            }
         }
     }
 }

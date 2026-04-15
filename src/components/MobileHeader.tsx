@@ -9,10 +9,28 @@ import "./MobileHeader.css";
 export function MobileHeader({isDmNamespace}: {isDmNamespace: boolean}): ReactElement {
     const commonTabTitles = ["Menu", "Rooms", "Members"];
     const conversationTabTitles = ["Menu", "Conversations"];
-    const [active, setActive] = useState<string>(isDmNamespace ? conversationTabTitles[1] : commonTabTitles[1]);
+    const [active, setActive] = useState<string>("");
+
+    /**
+     * Set class on mobileHeader that corresponds to the selected menu option.
+     */
+    function selectedMenuOptions(activeTab: string): string {
+        switch(activeTab) {
+            case "Menu":
+                return "show-menu";
+            case "Rooms":
+                return "show-rooms";
+            case "Conversations":
+                return "show-conversations";
+            case "Members":
+                return "show-members"
+            default:
+                return "";
+        }
+    }
 
     return (
-        <section id="mobileHeader">
+        <section id="mobileHeader" className={selectedMenuOptions(active)}>
             {
                 isDmNamespace ?
                     <Tabs titles={conversationTabTitles} active={active} setActive={setActive} />
