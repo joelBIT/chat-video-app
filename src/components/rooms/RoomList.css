@@ -23,7 +23,6 @@
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        width: 337px;
         max-height: 38vh;
         overflow-x: hidden;
     }
@@ -43,5 +42,11 @@
             right: 0;
             cursor: pointer;
         }
+    }
+}
+
+@media (max-width: 1050px) {
+    #roomList {
+        width: 100%;
     }
 }

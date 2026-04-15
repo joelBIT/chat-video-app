@@ -50,6 +50,7 @@
         height: 100%;
         align-content: center;
         align-self: center;
+        text-align: center;
         font-family: "LINE Seed JP", sans-serif;
         font-size: 2rem;
         color: var(--color-white);

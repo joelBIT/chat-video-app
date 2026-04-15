@@ -1,4 +1,4 @@
-& .conversationCard {
+.conversationCard {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -29,5 +29,11 @@
         background-color: var(--color-highlight);
         border-radius: 4px;
         cursor: default;
+    }
+}
+
+@media (max-width: 1050px) {
+    .conversationCard {
+        width: 100%;
     }
 }

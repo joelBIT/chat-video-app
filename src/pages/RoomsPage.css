@@ -38,6 +38,7 @@
                 position: absolute;
                 border-bottom: 1px solid var(--color-border);
                 z-index: 5;
+                width: 100%;
             }
         }
 
@@ -48,6 +49,7 @@
                 position: absolute;
                 border-bottom: 1px solid var(--color-border);
                 z-index: 5;
+                width: 100%;
             }
         }
 
@@ -62,6 +64,7 @@
                 border-left: none;
                 border-bottom: 1px solid var(--color-border);
                 z-index: 5;
+                width: 100%;
                 
                 & .menu-modal {
                     right: 140px;
@@ -78,8 +81,6 @@
 
 @media (max-width: 500px) {
     #roomsPage {
-
-
         &:has(.show-menu) {
             #namespaceMenu {
                 display: flex;
@@ -89,21 +90,8 @@
             }
         }
 
-        &:has(.show-rooms) {
-            #roomList {
-                width: 100%;
-            }
-        }
-
-        &:has(.show-conversations) {
-            #conversationList {
-                width: 100%;
-            }
-        }
-
         &:has(.show-members) {
             #userList {
-                width: 100%;
                 background-color: var(--color-background-dark);
                 height: fit-content;
                 min-height: 20rem;
