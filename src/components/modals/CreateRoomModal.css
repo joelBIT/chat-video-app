@@ -27,7 +27,6 @@
             font-family: "LINE Seed JP", sans-serif;
             font-size: 1.2rem;
             padding: 0.5rem 1rem;
-            color: var(--color-username);
         }
 
         & .lock {
@@ -109,6 +108,7 @@
         & .roomName__input-label {
             align-self: center;
             font-size: 0.7rem;
+            color: var(--color-text);
         }
 
         & .roomName__input {

@@ -32,7 +32,14 @@ export function CreateRoomModal({ close }: { close: () => void }): ReactElement 
             <section className='create-room__header'>
                 <h1 className='createRoomModal__title'> Create Room </h1>
 
-                <input type="checkbox" name="private-room" role="switch" className="lock" onChange={() => setPrivateRoom(!privateRoom)} />
+                <input 
+                    type="checkbox" 
+                    name="private-room" 
+                    role="switch" 
+                    className="lock" 
+                    onChange={() => setPrivateRoom(!privateRoom)}
+                    title='Private room?'
+                />
             </section>
 
             <section id="roomName-input">
