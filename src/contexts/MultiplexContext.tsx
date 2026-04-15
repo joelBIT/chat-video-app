@@ -195,7 +195,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     }
 
     /**
-     * End a call or withdraw an offer (depending on the isCalling boolean).
+     * End an ongoing call.
      */
     function hangup(username: string): void {
         closeVideoCall();
@@ -207,6 +207,9 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         setRemoteUsername('');
     }
 
+    /**
+     * Withdraw the call offer you initiated.
+     */
     function cancelOffer(username: string, remoteUsername: string): void {
         closeVideoCall();
         setIsCalling(false);
@@ -243,6 +246,9 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         setActiveCall(true);
     }
 
+    /**
+     * The remote user denied the call you initiated.
+     */
     function onDeniedCall(): void {
         setOffers([]);
         setRemoteUsername('');

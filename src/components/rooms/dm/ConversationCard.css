@@ -5,6 +5,7 @@
     gap: 0.5rem;
     padding: 1rem;
     cursor: pointer;
+    width: 265px;
 
     & .dm-section {
         display: flex;
