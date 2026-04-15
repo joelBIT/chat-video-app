@@ -1,6 +1,7 @@
 #roomsPage {
     display: flex;
     flex-direction: row;
+    position: relative;
 }
 
 #roomsPage:has(.inCall-lock-room) {
@@ -9,5 +10,15 @@
     & #conversationList {
         filter: brightness(0.3);
         pointer-events: none;
+    }
+}
+
+@media (max-width: 1050px) {
+    #roomsPage {
+        & #conversationList,
+        & #roomList,
+        & #namespaceMenu {
+            display: none;
+        }
     }
 }

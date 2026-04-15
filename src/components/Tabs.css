@@ -1,0 +1,24 @@
+.tabs {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    & .tab {
+        font-family: 'LINE Seed JP', sans-serif;
+        width: fit-content;
+        padding-right: 10px;
+        padding-left: 10px;
+        padding-bottom: 7px;
+        border-bottom: 1px solid #eee;
+        font-family: Lato, sans-serif;
+        letter-spacing: 1px;
+        font-weight: 300;
+        cursor: pointer;
+        color: #aaa;
+    }
+
+    & .selected {
+        border-bottom: 1px solid #337ab7;
+        color: #444;
+    }
+}

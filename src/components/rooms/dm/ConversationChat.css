@@ -98,3 +98,15 @@
         max-height: 300px;
     }
 }
+
+@media (max-width: 1150px) {
+    #conversationChat {
+        & #videos {
+            flex-direction: column;
+
+            & #remote-video {
+                width: 300px;
+            }
+        }
+    }
+}
