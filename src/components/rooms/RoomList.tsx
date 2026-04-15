@@ -2,7 +2,7 @@ import { useState, type ReactElement } from "react";
 import { useUser } from "../../hooks";
 import { isSelectedNamespace } from "../../clientApplication/services/namespaceService";
 import { getSelectedNamespaceRooms, memberGameRooms, nonMemberGameRooms } from "../../clientApplication/services/roomService";
-import { HomeRoomCard, CreateRoomModal, RoomCard } from "..";
+import { HomeRoomCard, CreateRoomModal, GamesRoomCard } from "..";
 import type { Room } from "../../types";
 import { NAMESPACE_ID_GAMES } from "../../serverApplication/utils/constants";
 
@@ -30,7 +30,7 @@ export function RoomList(): ReactElement {
                 <h1 className="rooms-title">Rooms</h1>
                 <ul className="rooms-list scrollable">
                     {
-                        memberGameRooms(user.id).map((room: Room) => <RoomCard key={room.id} room={room} />)
+                        memberGameRooms(user.id).map((room: Room) => <GamesRoomCard key={room.id} room={room} />)
                     }
                 </ul>
 
@@ -50,7 +50,7 @@ export function RoomList(): ReactElement {
                 
                 <ul className="rooms-list scrollable">
                     {
-                        nonMemberGameRooms(user.id).map((room: Room) => <RoomCard key={room.id} room={room} />)
+                        nonMemberGameRooms(user.id).map((room: Room) => <GamesRoomCard key={room.id} room={room} />)
                     }
                 </ul>
             </section>

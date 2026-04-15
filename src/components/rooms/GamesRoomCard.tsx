@@ -10,7 +10,7 @@ import "./RoomCard.css";
  * These room cards are only used for rooms in the Games namespace (id 2).
  * It is only possible to leave Game rooms (namespace id 2).
  */
-export function RoomCard({room}: {room: Room}): ReactElement {
+export function GamesRoomCard({room}: {room: Room}): ReactElement {
     const { changeRoom, leaveRoom } = useRoom();
     const { user } = useUser();
 
