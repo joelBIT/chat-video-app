@@ -10,11 +10,13 @@ class InMemoryNamespaceStore {
     private namespaces: Map<number, Namespace>;                // <namespaceID, Namespace>
     private selectedNamespaceId: number;                       // The currently selected namespace ID
     private selectedRoomId: string;                            // The currently selected room ID
+    private lastVisited: Map<string, number>;                  // <roomID, datetime> Keep track of when a room was last visited
 
     constructor() {
         this.namespaces = new Map();
         this.selectedNamespaceId = NAMESPACE_ID_NONE;        // This application only uses 3 multiplex namespaces (with IDs 0, 1, and 2).
         this.selectedRoomId = ROOM_ID_NONE;                  // Room IDs are long random strings (except for default rooms "0", "1", "2", and "3").
+        this.lastVisited = new Map();
     }
 
     getNamespaces(): Namespace[] {
@@ -55,6 +57,7 @@ class InMemoryNamespaceStore {
     }
 
     setSelectedRoomId(roomID: string): void {
+        this.lastVisited.set(roomID, Date.now());       // Keep track of the user's most recent visit to the room
         this.selectedRoomId = roomID;
     }
 }

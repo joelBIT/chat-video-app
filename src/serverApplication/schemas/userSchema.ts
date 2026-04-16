@@ -26,7 +26,8 @@ export const userSchema = new mongoose.Schema({
     online: {
         type: Boolean,
         default: false
-    }
+    },
+    lastActive: Number,             // When the user was last active (datetime when logging in/logging out)
 }, { timestamps: true });
 
 userSchema.pre('save', async function() {

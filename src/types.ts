@@ -28,7 +28,8 @@ export type ChatUser = {
     username: string,
     avatar: string,
     inCall: boolean,
-    online: boolean
+    online: boolean,
+    lastActive: number      // When the user was last active (datetime when logging in/logging out)
 }
 
 export type ActionState = {
