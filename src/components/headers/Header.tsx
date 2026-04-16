@@ -1,6 +1,6 @@
 import { type ReactElement } from "react";
-import { useMultiplex, useSocket } from "../hooks";
-import { AnswerCallModal } from ".";
+import { useMultiplex, useSocket } from "../../hooks";
+import { AnswerCallModal } from "..";
 
 import "./Header.css";
 

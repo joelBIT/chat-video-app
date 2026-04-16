@@ -1,5 +1,5 @@
 import { useState, type ReactElement } from "react";
-import { Tabs } from ".";
+import { Tabs } from "..";
 
 import "./MobileHeader.css";
 
