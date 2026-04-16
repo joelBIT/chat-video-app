@@ -28,7 +28,7 @@ export default function ProfilePage(): ReactElement {
      * Only update the profile information if the server sends back "success" = true.
      */
     async function updateUserProfile(): Promise<void> {
-        const updatedUser: ChatUser = { username: user.username, id: user.id, avatar: selectedAvatar, online: user.online, inCall: user.inCall };
+        const updatedUser: ChatUser = { username: user.username, id: user.id, avatar: selectedAvatar, online: user.online, inCall: user.inCall, lastActive: user.lastActive };
         const response: ActionState = await updateUser(updatedUser);
         if (response.success) {
             setUserInformation(updatedUser);

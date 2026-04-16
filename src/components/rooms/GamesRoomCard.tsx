@@ -1,6 +1,6 @@
 import { type ReactElement } from "react";
 import { useRoom, useUser } from "../../hooks";
-import { isMember, isSelectedRoom } from "../../clientApplication/services/roomService";
+import { hasUnreadMessages, isMember, isSelectedRoom } from "../../clientApplication/services/roomService";
 import type { Room } from "../../types";
 import { isCommonRoom, NAMESPACE_ID_GAMES, ROOM_NAME_LOBBY } from "../../serverApplication/utils/constants";
 
@@ -19,6 +19,8 @@ export function GamesRoomCard({room}: {room: Room}): ReactElement {
         event.preventDefault();
         leaveRoom(room);
     }
+
+    const unreadMessages = hasUnreadMessages(room, user.id);
 
     /**
      * It should only be possible to remove a room from the room list if the client is a member of that room and that room is a Game room created
@@ -41,6 +43,10 @@ export function GamesRoomCard({room}: {room: Room}): ReactElement {
                 <h2 className={isSelectedRoom(room.id) ? "active-room" : "room-name"}>
                     {room.name}
                 </h2>
+
+                {
+                    unreadMessages > 0 ? <h1 className="unreadMessages"> {unreadMessages} </h1> : <></>
+                }
             </section>
 
             {

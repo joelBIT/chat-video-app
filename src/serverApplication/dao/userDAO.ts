@@ -47,8 +47,11 @@ export async function getAllUsers(): Promise<ChatUser[]> {
     return mappedUsers;
 }
 
+/**
+ * Online status is updated either when the user signs in or when the user signs out. Therefore, the lastActive property is also updated.
+ */
 export async function updateOnlineStatus(username: string, online: boolean): Promise<void> {
-    await User.updateOne({ username }, { online });
+    await User.updateOne({ username }, { online, lastActive: Date.now() });
 }
 
 export async function updateUser(updatedUser: ChatUser): Promise<void> {
@@ -68,6 +71,7 @@ function mapDatabaseUser(user: any): ChatUser {
         username: user.username,
         avatar: user.avatar,
         inCall: user.inCall,
-        online: user.online
+        online: user.online,
+        lastActive: user.lastActive
     }
 }

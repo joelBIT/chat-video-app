@@ -1,6 +1,7 @@
 import { NAMESPACE_ID_GAMES, ROOM_ID_NONE } from "../../serverApplication/utils/constants";
 import namespaceStore from "../stores/NamespaceStore";
-import type { Namespace, Room } from "../../types";
+import userStore from "../stores/UserStore";
+import type { Message, Namespace, Room } from "../../types";
 
 /**
  * A room may be "undefined" if the user is not active in a specific room at any given point in time.
@@ -75,6 +76,21 @@ export function removeRoom(roomID: string, namespaceID: number): void {
 
 export function isSelectedRoom(roomID: string): boolean {
     return roomID === namespaceStore.getSelectedRoomId();
+}
+
+/**
+ * Returns the number of unread messages (for the user) in the supplied room. If the supplied room is the selected room 0 is returned. This is because
+ * there are no unread messages in the room where the user is active.
+ */
+export function hasUnreadMessages(room: Room, userID: string): number {
+    const user = userStore.getUserById(userID);
+    const lastVisited: number = namespaceStore.getLastVisitedByRoomId(room.id) ?? user.lastActive;      // If user has not visited the room this session, use last login as the date instead
+    const matchingRoom: Room | undefined = getRoom(room.id, room.namespaceId);
+    if (matchingRoom && matchingRoom.id !== namespaceStore.getSelectedRoomId()) {
+        return matchingRoom.history.filter((message: Message) => message.date > lastVisited && message.date > user.lastActive).length;
+    }
+
+    return 0;
 }
 
 export function setSelectedRoomId(roomID: string): void {
