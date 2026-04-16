@@ -1,5 +1,5 @@
 import { NAMESPACE_ID_NONE, ROOM_ID_NONE } from "../../serverApplication/utils/constants";
-import type { Namespace } from "../../types";
+import type { Namespace, Room } from "../../types";
 
 /**
  * Handles client data received from the server (e.g, namespaces, rooms, users).
@@ -56,9 +56,17 @@ class InMemoryNamespaceStore {
         return this.selectedRoomId;
     }
 
+    getSelectedRoom(): Room | undefined {
+        return this.getSelectedNamespace()?.rooms.find((room: Room) => room.id === this.selectedRoomId);
+    }
+
     setSelectedRoomId(roomID: string): void {
         this.lastVisited.set(roomID, Date.now());       // Keep track of the user's most recent visit to the room
         this.selectedRoomId = roomID;
+    }
+
+    getLastVisitedByRoomId(roomID: string): number | undefined {
+        return this.lastVisited.get(roomID);
     }
 }
 
