@@ -34,6 +34,7 @@ export function RegisterForm({close}: { close: () => void}): ReactElement {
                 className="register-input" 
                 placeholder="Username" 
                 name="username"
+                maxLength={10}
                 value={username}
                 onChange={event => setUsername(event.target.value)} 
                 autoComplete="off"
