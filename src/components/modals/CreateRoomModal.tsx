@@ -43,10 +43,11 @@ export function CreateRoomModal({ close }: { close: () => void }): ReactElement 
             </section>
 
             <section id="roomName-input">
-                <h2 className='roomName__input-label'> Max 20 characters </h2>
+                <h2 className='roomName__input-label'> Between 3 - 20 characters </h2>
                 <input 
                     placeholder="Room Name" 
                     maxLength={20} 
+                    minLength={3}
                     onChange={event => setRoomName(event.target.value)} 
                     className='roomName__input' 
                 />
@@ -54,7 +55,7 @@ export function CreateRoomModal({ close }: { close: () => void }): ReactElement 
 
             <section className='createRoomModal__buttons'>
                 <button onClick={close} className="app-button"> Cancel </button>
-                <button onClick={createRoom} className="app-button" disabled={roomName.length === 0}> Create </button>
+                <button onClick={createRoom} className="app-button" disabled={roomName.length < 3}> Create </button>
             </section>
         </dialog>
     );
