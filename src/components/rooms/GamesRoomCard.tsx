@@ -24,8 +24,11 @@ export function GamesRoomCard({room}: {room: Room}): ReactElement {
 
     const unreadMessages = hasUnreadMessages(room, user.id);
 
+    /**
+     * If user is not a member of the room and the room is private, the correct password must be given to enter the room.
+     */
     function joinGameRoom(room: Room): void {
-        if (room.private) {
+        if (room.private && !isRoomMember()) {
             setShowPasswordModal(true);
         } else {
             changeRoom(room);
