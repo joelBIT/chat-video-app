@@ -7,6 +7,7 @@ export * from "./Message";
 export * from "./modals/AnswerCallModal";
 export * from "./modals/CreateRoomModal";
 export * from "./modals/MenuModal";
+export * from "./modals/RoomPasswordModal";
 export * from "./NamespaceMenu";
 export * from "./rooms/dm/ConversationList";
 export * from "./rooms/dm/ConversationCard";

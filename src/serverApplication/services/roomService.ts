@@ -1,7 +1,8 @@
 import type { Room } from "../../types";
 import { getMessagesByRoomId } from "../dao/messageDAO";
-import { getRoomByID, getRoomByRoomName, updateRoomMembers } from "../dao/roomDAO";
+import { getHashedPasswordForRoomName, getRoomByID, getRoomByRoomName, updateRoomMembers } from "../dao/roomDAO";
 import { isCommonRoom } from "../utils/constants";
+import { PasswordManager } from "../utils/passwordManager";
 
 /**
  * @returns     true if userID is member of room with ID roomID
@@ -69,4 +70,15 @@ export async function addMessageHistoryToRooms(rooms: Room[]): Promise<Room[]> {
     }
 
     return rooms;
+}
+
+export async function isCorrectPassword(roomName: string, password: string): Promise<boolean> {
+    try {
+        const hashedPassword = await getHashedPasswordForRoomName(roomName);
+        return await PasswordManager.compare(hashedPassword, password);
+    } catch (error) {
+        console.log(error);
+    }
+
+    return false;
 }

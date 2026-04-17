@@ -48,6 +48,10 @@ export async function getRoomByID(roomID: string): Promise<Room> {
     throw new AppError(`No room with ID ${roomID} found`, 404);
 }
 
+export async function getHashedPasswordForRoomName(roomName: string): Promise<string> {
+    return (await RoomSchema.findOne({name: roomName}))?.password ?? "";
+}
+
 export async function getRoomsInNamespace(namespaceId: number): Promise<Room[]> {
     const mappedRooms: Room[] = [];
     const rooms = await RoomSchema.find({ namespaceId });

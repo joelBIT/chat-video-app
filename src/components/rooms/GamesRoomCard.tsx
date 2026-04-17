@@ -1,8 +1,9 @@
-import { type ReactElement } from "react";
+import { useState, type ReactElement } from "react";
 import { useRoom, useUser } from "../../hooks";
 import { hasUnreadMessages, isMember, isSelectedRoom } from "../../clientApplication/services/roomService";
 import type { Room } from "../../types";
 import { isCommonRoom, NAMESPACE_ID_GAMES, ROOM_NAME_LOBBY } from "../../serverApplication/utils/constants";
+import { RoomPasswordModal } from "../modals/RoomPasswordModal";
 
 import "./RoomCard.css";
 
@@ -11,6 +12,7 @@ import "./RoomCard.css";
  * It is only possible to leave Game rooms (namespace id 2).
  */
 export function GamesRoomCard({room}: {room: Room}): ReactElement {
+    const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
     const { changeRoom, leaveRoom } = useRoom();
     const { user } = useUser();
 
@@ -22,6 +24,14 @@ export function GamesRoomCard({room}: {room: Room}): ReactElement {
 
     const unreadMessages = hasUnreadMessages(room, user.id);
 
+    function joinGameRoom(room: Room): void {
+        if (room.private) {
+            setShowPasswordModal(true);
+        } else {
+            changeRoom(room);
+        }
+    }
+
     /**
      * It should only be possible to remove a room from the room list if the client is a member of that room and that room is a Game room created
      * by a client (any client). 
@@ -32,26 +42,30 @@ export function GamesRoomCard({room}: {room: Room}): ReactElement {
     }
 
     return (
-        <section className="namespace-room" onClick={() => changeRoom(room)}>
-            <section className="room-section">
-                {
-                    room.name === ROOM_NAME_LOBBY ?
-                        <img src={"/grid.svg"} className="room-icon" />
-                        :
-                        <img src={room.private ? "/locked.svg" : "/unlocked.svg"} className="room-icon" />
-                }
-                <h2 className={isSelectedRoom(room.id) ? "active-room" : "room-name"}>
-                    {room.name}
-                </h2>
+        <>
+            <section className="namespace-room" onClick={() => joinGameRoom(room)}>
+                <section className="room-section">
+                    {
+                        room.name === ROOM_NAME_LOBBY ?
+                            <img src={"/grid.svg"} className="room-icon" />
+                            :
+                            <img src={room.private ? "/locked.svg" : "/unlocked.svg"} className="room-icon" />
+                    }
+                    <h2 className={isSelectedRoom(room.id) ? "active-room" : "room-name"}>
+                        {room.name}
+                    </h2>
+
+                    {
+                        unreadMessages > 0 ? <h1 className="unreadMessages"> {unreadMessages} </h1> : <></>
+                    }
+                </section>
 
                 {
-                    unreadMessages > 0 ? <h1 className="unreadMessages"> {unreadMessages} </h1> : <></>
+                    isRoomMember() ? <h1 className="leave-room__button" onClick={removeRoom} title="Leave Room"> &#x274c; </h1> : <></>
                 }
             </section>
 
-            {
-                isRoomMember() ? <h1 className="leave-room__button" onClick={removeRoom} title="Leave Room"> &#x274c; </h1> : <></>
-            }
-        </section>
+            { showPasswordModal ? <RoomPasswordModal roomName={room.name} close={() => setShowPasswordModal(false)} onSuccess={() => changeRoom(room)} /> : <></> }
+        </>
     )
 }
