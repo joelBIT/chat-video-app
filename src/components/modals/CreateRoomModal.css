@@ -8,7 +8,7 @@
     top: 50%;
     transform: translate(-50%, -50%);
     width: 300px;
-    height: 180px;
+    height: 250px;
     border-radius: 8px;
     background-color: var(--color-black);
     color: var(--color-white);
@@ -100,7 +100,7 @@
         }
     }
 
-    & #roomName-input {
+    & #room-input {
         display: flex;
         flex-direction: column;
         gap: 0.1rem;
@@ -111,7 +111,8 @@
             color: var(--color-text);
         }
 
-        & .roomName__input {
+        & .roomName__input,
+        & .password__input {
             background-color: var(--color-chat-background);
             padding: 0.3rem;
             outline: none;
@@ -120,6 +121,14 @@
             color: var(--color-white);
             margin-left: 1rem;
             margin-right: 1rem;
+        }
+
+        & .password__input {
+            margin-top: 2rem;
+
+            &:disabled {
+                opacity: 0.5;
+            }
         }
     }
 

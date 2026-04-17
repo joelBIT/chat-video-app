@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { PasswordManager } from '../utils/passwordManager';
 
 export const roomSchema = new mongoose.Schema({ 
     name: { 
@@ -18,7 +19,18 @@ export const roomSchema = new mongoose.Schema({
         required: [true, "A room is either public or private"],
         default: false
     },
+    password: {
+        type: String,
+        required: [false, "A private room has a password"],
+        default: ""
+    },
     members: [String]                  // A member string is a user ID
+});
+
+roomSchema.pre('save', async function() {
+    if (this.isModified('password') && this.get('password').length > 0) {
+        this.password = await PasswordManager.toHash(this.get('password'));
+    }
 });
 
 const Room = mongoose.model('Room', roomSchema);
