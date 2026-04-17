@@ -125,6 +125,10 @@
 
         & .password__input {
             margin-top: 2rem;
+
+            &:disabled {
+                opacity: 0.5;
+            }
         }
     }
 
