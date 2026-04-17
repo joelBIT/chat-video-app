@@ -17,7 +17,7 @@ export interface RoomContextProvider {
     changeNamespace: (namespaceID: number) => void;
     changeSelectedRoom: (room: Room | undefined) => void;
     createPrivateRoom: (recipient: ChatUser) => void;
-    createGameRoom: (roomName: string, privateRoom: boolean) => void;
+    createGameRoom: (roomName: string, privateRoom: boolean, password: string) => void;
 }
 
 export const RoomContext = createContext<RoomContextProvider>({} as RoomContextProvider);
@@ -94,9 +94,9 @@ export function RoomProvider({ children }: { children: ReactNode }): ReactElemen
     /**
      * Create a new room in the "Games" namespace (id 2). The room ID is not set because the room will get a unique ID on the server when persisted.
      */
-    function createGameRoom(roomName: string, isPrivateRoom: boolean): void {
+    function createGameRoom(roomName: string, isPrivateRoom: boolean, password: string): void {
         const room: Room = {id: "", name: roomName, namespaceId: NAMESPACE_ID_GAMES, private: isPrivateRoom, members: [], history: []};
-        multiplexSockets[NAMESPACE_ID_GAMES].emit(CREATE_ROOM, room, user.id);
+        multiplexSockets[NAMESPACE_ID_GAMES].emit(CREATE_ROOM, room, user.id, password);
     }
 
     /**

@@ -12,11 +12,11 @@ import { saveMessage } from "../dao/messageDAO";
 export async function initializeGamesEvents(io: Server): Promise<void> {
     
     io.of(NAMESPACE_GAMES_ENDPOINT).on("connection", async (socket: ISocket) => {
-        socket.on(CREATE_ROOM, async (room: Room, userID: string) => {
+        socket.on(CREATE_ROOM, async (room: Room, userID: string, password: string) => {
             try {
                 room.members = [];
                 room.members.push(userID);
-                const persistedRoom: Room = await saveRoom(room);
+                const persistedRoom: Room = await saveRoom(room, password);
                 socket.join(persistedRoom.id);
                 
                 // Send created room to clients so that the room appears in the room list in "Games".

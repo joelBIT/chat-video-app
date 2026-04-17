@@ -3,18 +3,19 @@ import RoomSchema from "../schemas/roomSchema";
 import { AppError } from "../errors/AppError";
 
 /**
- * Add a newly created room, if it does not already exist.
+ * Add a newly created room, if it does not already exist. A private Game Room has a password that is stored as a hash.
  *
  * @param room      the room to be persisted
  * @returns         the room with its new ID
  */
-export async function saveRoom(room: Room): Promise<Room> {
+export async function saveRoom(room: Room, password: string): Promise<Room> {
     const exists = await RoomSchema.exists({ name: room.name });
     if (!exists) {
         const result = await RoomSchema.create({
             name: room.name,
             namespaceId: room.namespaceId,
-            private: room.private
+            private: room.private,
+            password
         });
 
         return mapDatabaseRoom(result);
