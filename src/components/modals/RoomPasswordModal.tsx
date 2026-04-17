@@ -37,7 +37,7 @@ export function RoomPasswordModal({ roomName, close, onSuccess }: { roomName: st
     return (
         <dialog id="roomPasswordModal" ref={dialogRef}>
             <section className='password-room__header'>
-                <h1 className='roomPasswordModal__title'> Enter Room Password </h1>
+                <h1 className='roomPasswordModal__title'> Enter password for room <i>{roomName}</i> </h1>
 
                 <input 
                     placeholder="Password" 
