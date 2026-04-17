@@ -5,7 +5,6 @@ import "./ErrorPage.css";
 
 export function ErrorPage(): ReactNode {
     const error = useRouteError();
-    console.log(error);
 
     if (isRouteErrorResponse(error)) {
         return (

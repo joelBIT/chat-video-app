@@ -23,6 +23,7 @@ export function NamespaceMenu(): ReactElement {
         if (!isSelectedNamespace(namespace.id)) {
             changeNamespace(namespace.id);
         }
+        
         if (location.pathname !== ROOMS_URL) {
             navigate(ROOMS_URL);
         }

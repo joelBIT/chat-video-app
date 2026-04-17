@@ -20,7 +20,7 @@ export function ConversationChat(): ReactElement {
     /**
      * Send a DM to another user.
      */
-    function sendDmMessage(event: React.KeyboardEvent): void {
+    function sendDm(event: React.KeyboardEvent): void {
         if (event.key ==="Enter" && message.length > 0 && selectedRoom) {
             sendMessage(message);
             setMessage('');
@@ -76,7 +76,7 @@ export function ConversationChat(): ReactElement {
                     placeholder={`Message @${selectedRoom.name}`}
                     value={message}
                     onChange={e => setMessage(e.target.value)} 
-                    onKeyUp={sendDmMessage} 
+                    onKeyUp={sendDm} 
                     autoComplete="off"
                 />
             </section>

@@ -1,7 +1,7 @@
 export type Room = {
-    id: string,                 // the ID of the room is the recipient's ID if private conversation (private = true)
-    name: string,               // the name of the room is the recipient's username if private conversation (private = true)
-    namespaceId: number,   // the namespace ID of the room is 1 if private conversation (private = true)
+    id: string,
+    name: string,
+    namespaceId: number,
     private: boolean,
     members: string[],          // List of userIDs for each member of the room
     history: Message[]

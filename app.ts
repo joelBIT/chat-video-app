@@ -23,7 +23,7 @@ app.all('/{*path}', async (req, res) => {
     res.redirect(`https://${req.get('host')}`);
 });
 
-app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {      // Global error handling
     console.log(err.stack);
     err.statusCode = err.statusCode || 500;
 

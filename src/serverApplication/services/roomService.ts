@@ -11,7 +11,6 @@ export async function isMember(userID: string, roomID: string): Promise<boolean>
 
     try {
         const room: Room = await getRoomByID(roomID);
-
         if (room.id === roomID && room.members.includes(userID)) {
             isMember = true;
         }

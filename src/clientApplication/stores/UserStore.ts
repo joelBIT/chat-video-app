@@ -6,7 +6,7 @@ import type { ChatUser } from "../../types";
  * The server sends updates when something of importance happens. Then the client updates this data.
  */
 class InMemoryUserStore {
-    private users: Map<string, ChatUser>;                       // <userID, TriviaUser>
+    private users: Map<string, ChatUser>;                       // <userID, ChatUser>
 
     constructor() {
         this.users = new Map();
