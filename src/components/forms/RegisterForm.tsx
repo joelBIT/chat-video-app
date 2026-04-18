@@ -1,5 +1,6 @@
 import { useState, type ReactElement } from "react";
 import type { ActionState } from "../../types";
+import { REGISTER_ENDPOINT } from "../../serverApplication/utils/constants";
 
 /**
  * Form used to create a new user in the database.
@@ -11,7 +12,7 @@ export function RegisterForm({close}: { close: () => void}): ReactElement {
     const [response, setResponse] = useState<ActionState>({message: '', success: false});
 
     async function register(): Promise<void> {
-        const response = await fetch('https://localhost:8181/register', {
+        const response = await fetch(REGISTER_ENDPOINT, {
             method: 'post',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify({ username, password, passwordRepeat })

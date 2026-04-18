@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import type { ActionState } from "../../types";
+import { ROOM_PASSWORD_ENDPOINT } from "../../serverApplication/utils/constants";
 
 import "./RoomPasswordModal.css";
 
@@ -18,7 +19,7 @@ export function RoomPasswordModal({ roomName, close, onSuccess }: { roomName: st
     }, []);
 
     async function joinRoom(): Promise<void> {
-        const response = await fetch('https://localhost:8181/checkRoomPassword', {
+        const response = await fetch(ROOM_PASSWORD_ENDPOINT, {
             method: 'post',
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify({ name: roomName, password })

@@ -41,7 +41,6 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 });
 
 const key: string = Buffer.from(process.env.PRIVATE_KEY as string, 'base64').toString('ascii');
-
 const expressServer = createServer({key, cert: readFileSync('certificate/cert.crt')}, app);
 
 const ORIGIN: string = process.env.NODE_ENV === 'production' ? process.env.URL as string : "https://localhost";
