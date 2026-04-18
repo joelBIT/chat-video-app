@@ -8,7 +8,7 @@
         "build": "tsc -b && vite build",
         "lint": "eslint .",
         "preview": "vite preview",
-        "production": "NODE_ENV=production PORT=8181 URL=https://172.26.10.137 nodemon"
+        "production": "NODE_ENV=production PORT=8181 nodemon"
     },
     "dependencies": {
         "dotenv": "^17.3.1",

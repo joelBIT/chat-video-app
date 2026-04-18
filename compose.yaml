@@ -1,0 +1,12 @@
+services:
+  node:
+    image: "node:24"
+    user: "node"
+    working_dir: /home/node/chat-app
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./:/home/node/chat-app
+    ports:
+      - "8181:8181"
+    command: ["npm", "run", "production"]
