@@ -2,6 +2,7 @@ import { createServer } from 'node:https';
 import { readFileSync } from 'node:fs';
 import express from 'express';
 import { Server } from 'socket.io';
+import dotenv from 'dotenv';
 import {login} from "./src/serverApplication/middleware/auth.ts";
 import {initializeHomeEvents} from "./src/serverApplication/events/homeEvents.ts";
 import {initializeDmEvents} from "./src/serverApplication/events/dmEvents.ts";
@@ -12,6 +13,8 @@ import {initializeWebRtcEvents} from "./src/serverApplication/events/webRtcEvent
 import userRouter from "./src/serverApplication/routes/userRoutes.ts";
 import gameRouter from "./src/serverApplication/routes/gameRoutes.ts";
 import type { ActionState } from './src/types.ts';
+
+dotenv.config({ path: './config.env' });
 
 const app = express();
 app.use(express.static(import.meta.dirname + "/dist/"));
@@ -37,9 +40,9 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
     res.status(err.statusCode).json(response);
 });
 
-const key = readFileSync('cert.key');
-const cert = readFileSync('cert.crt');
-const expressServer = createServer({key, cert}, app);
+const key: string = Buffer.from(process.env.PRIVATE_KEY as string, 'base64').toString('ascii');
+
+const expressServer = createServer({key, cert: readFileSync('certificate/cert.crt')}, app);
 
 const ORIGIN: string = process.env.NODE_ENV === 'production' ? process.env.URL as string : "https://localhost";
 
