@@ -5,6 +5,12 @@
 Chat application using WebRTC for audio and video streaming. It is possible to join, leave, and create rooms (both private and public). Passwords are set on private rooms, so a user that wants to join a private room must supply the correct password. Socket.io is used for real-time text chat.
 Users can send DMs to each other. A user is informed when there are unread messages in rooms and conversations. Data (e.g., rooms, users, messages) is stored in MongoDB. React.js is used for the frontend, and Express.js for the backend.
 
+<br />
+
+The chat application can be tested at [chat-application.joel-rollny.eu](https://chat-application.joel-rollny.eu:8181/). No email is necessary for registration.
+
+<br />
+
 
 ## Screenshots
 
