@@ -12,5 +12,5 @@ Users can send DMs to each other. A user is informed when there are unread messa
 
 <br>
 
-<img width="1476" height="965" alt="chat-app" src="https://github.com/user-attachments/assets/1258c6e7-9442-4881-95ec-437974937e63" />
+<img width="1375" height="953" alt="chat-app" src="https://github.com/user-attachments/assets/430d5c72-212c-411b-aa50-376f2dea860d" />
 
