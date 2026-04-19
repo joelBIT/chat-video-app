@@ -4,6 +4,7 @@
     align-items: center;
     height: 2rem;
     background-color: var(--color-background-dark);
+    position: relative;
 
     & .status-lamp {
         display: flex;
@@ -14,13 +15,13 @@
         & .red,
         & .green {
             border-radius: 100%;
-            border: 1px solid black;
+            border: 1px solid var(--color-black);
             height: 1rem;
             width: 1rem;
         }
 
         & .red {
-            background-color: red;
+            background-color: var(--color-warning);
         }
 
         & .green {
@@ -29,13 +30,23 @@
 
         & .status-text {
             font-family: "LINE Seed JP", sans-serif;
-            color: white;
+            color: var(--color-white);
         }
     }
 
     & .app-title {
         font-family: "LINE Seed JP", sans-serif;
         font-size: 1rem;
-        color: white;
+        color: var(--color-white);
+        position: absolute;
+        right: 47%;
+    }
+}
+
+@media (max-width: 500px) {
+    #header {
+        & .app-title {
+            right: 5%;
+        }
     }
 }
