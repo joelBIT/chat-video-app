@@ -1,9 +1,11 @@
-FROM node:24
-WORKDIR /home/node/chat-app
-COPY package.json .
-RUN npm install --quiet
+FROM node:24 as base
+WORKDIR /chat-app
 
+COPY package*.json ./
 COPY . .
+
+RUN npm install --quiet
+RUN npm run build
 
 EXPOSE 8181
 

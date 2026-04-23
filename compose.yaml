@@ -1,10 +1,7 @@
 services:
   chat:
     build: .
-    working_dir: /home/node/chat-app
     environment:
       - NODE_ENV=production
-    volumes:
-      - ./:/home/node/chat-app
     ports:
       - "8181:8181"
