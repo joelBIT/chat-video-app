@@ -16,7 +16,3 @@ The chat application can be tested at [chat-application.joel-rollny.eu](https://
 
 <img width="1837" height="965" alt="chat-app1" src="https://github.com/user-attachments/assets/633a127c-2c81-4477-a702-98c81d6dc446" />
 
-<br>
-
-<img width="1375" height="953" alt="chat-app" src="https://github.com/user-attachments/assets/430d5c72-212c-411b-aa50-376f2dea860d" />
-
