@@ -1,8 +1,8 @@
 FROM node:24-alpine
-WORKDIR /chat-app
+WORKDIR /usr/chat-app
 
 COPY . .
-RUN npm install --quiet && npm run build && npm prune --omit=dev
+RUN npm ci && npm run build && npm prune --omit=dev
 
 EXPOSE 8181
 
