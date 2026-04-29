@@ -7,7 +7,7 @@ Users can send DMs to each other. A user is informed when there are unread messa
 
 <br />
 
-The chat application can be tested at [chat-application.joel-rollny.eu](https://chat-application.joel-rollny.eu:8181/). No email is necessary for registration.
+The chat application can be tested at [chat-application.joel-rollny.eu](https://chat-application.joel-rollny.eu). No email is necessary for registration.
 
 <br />
 
