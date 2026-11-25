@@ -76,9 +76,22 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
             socket.on(DENY_CALL, onDeniedCall);
             socket.on(ANSWER_RESPONSE, onAnswerResponse);
             socket.on(RECEIVED_ICE_CANDIDATE_FROM_SERVER, onReceivedIceCandidateFromServer);
+            socket.on(END_CALL, onCallEnded);
         }
 
         return socket;
+    }
+
+    /**
+     * The other party hung up (or lost the connection).
+     */
+    function onCallEnded(): void {
+        closeVideoCall();
+        setIncomingCall(false);
+        setActiveCall(false);
+        setIsCalling(false);
+        setOffers([]);
+        setRemoteUsername('');
     }
 
     /**

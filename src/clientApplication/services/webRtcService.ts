@@ -17,10 +17,27 @@ const peerConfiguration = {
     ]
 }
 
-let localStream: MediaStream;                   // Hold the local video stream
-let remoteStream: MediaStream;                  // Hold the remote video stream
-let peerConnection: RTCPeerConnection | null;   // The peer connection that the two clients use to talk
-let didIOffer: boolean = false;                 // True if you initiated the call
+let pendingCandidates: RTCIceCandidateInit[] = [];      // Candidates that arrived before the remote description was set
+let localStream: MediaStream;                           // Hold the local video stream
+let remoteStream: MediaStream;                          // Hold the remote video stream
+let peerConnection: RTCPeerConnection | null;           // The peer connection that the two clients use to talk
+let didIOffer: boolean = false;                         // True if you initiated the call
+
+async function addIceCandidates(candidates: RTCIceCandidateInit[] = []): Promise<void> {
+    for (const candidate of candidates) {
+        try {
+            await peerConnection?.addIceCandidate(candidate);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+}
+
+async function flushPendingCandidates(): Promise<void> {
+    const candidates = pendingCandidates;
+    pendingCandidates = [];
+    await addIceCandidates(candidates);
+}
 
 /**
  * A user must approve that the application uses media devices. 
@@ -63,6 +80,8 @@ function fetchUserMedia(video: boolean): Promise<void> {
 export async function addAnswer(offer: Offer) {
     if (offer && offer.answer && peerConnection) {
         await peerConnection.setRemoteDescription(offer.answer);
+        await addIceCandidates(offer.answererIceCandidates);      // The callee's candidates collected before the answer
+        await flushPendingCandidates();
     }
 }
 
@@ -114,6 +133,7 @@ function createPeerConnection(username: string, offer?: Offer): Promise<void> {
                 // This won't be set when called from call();
                 // Will be set when we call from answerOffer()
                 await peerConnection.setRemoteDescription(offer.offer);
+                await flushPendingCandidates();
             }
 
             resolve();
@@ -123,9 +143,14 @@ function createPeerConnection(username: string, offer?: Offer): Promise<void> {
     });
 }
 
-export function addNewIceCandidate(iceCandidate: RTCIceCandidateInit) {
-    if (peerConnection) {
-        peerConnection.addIceCandidate(iceCandidate);
+/**
+ * addIceCandidate() fails before the remote description is set, so such candidates wait in a queue.
+ */
+export function addNewIceCandidate(iceCandidate: RTCIceCandidateInit): void {
+    if (peerConnection?.remoteDescription) {
+        addIceCandidates([iceCandidate]);
+    } else {
+        pendingCandidates.push(iceCandidate);
     }
 }
 
@@ -142,9 +167,7 @@ export async function answerOffer(offer: Offer): Promise<void> {
         // Emit the answer to the signaling server, so it can emit to CLIENT1
         // Expect a response from the server with the already existing ICE candidates
         const offerIceCandidates = await multiplexSockets[NAMESPACE_ID_DM].emitWithAck(NEW_ANSWER, offer);
-        offerIceCandidates.forEach((candidate: RTCIceCandidateInit) => {
-            peerConnection?.addIceCandidate(candidate);
-        });
+        await addIceCandidates(offerIceCandidates);
 
         const localVideoEl: HTMLVideoElement | null = document.querySelector('#local-video');
         if (localVideoEl) {
@@ -180,6 +203,10 @@ export async function call(fromUsername: string, toUsername: string, video: bool
 }
 
 export function closeVideoCall(): void {
+    localStream?.getTracks().forEach((track: MediaStreamTrack) => track.stop());    // Camera/mic off even if the <video> element is gone
+    didIOffer = false;                                                              // Otherwise a later answerer tags its candidates as the caller's
+    pendingCandidates = [];
+
     if (peerConnection) {
         peerConnection.ontrack = null;
         peerConnection.onicecandidate = null;
