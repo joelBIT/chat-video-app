@@ -17,7 +17,7 @@ export interface SocketContextProvider {
     updateUser: (updatedUser: ChatUser) => Promise<ActionState>;
 }
 
-export const SocketContext = createContext<SocketContextProvider>({} as SocketContextProvider);
+export const SocketContext = createContext<SocketContextProvider | undefined>(undefined);
 
 /**
  * This provider handles the interaction with the socket (the main application socket, not the multiplex sockets).

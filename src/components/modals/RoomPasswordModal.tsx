@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState, type ReactElement } from "react";
-import type { ActionState } from "../../types";
-import { ROOM_PASSWORD_ENDPOINT } from "../../serverApplication/utils/constants";
+import { useRoom } from "../../hooks";
+import type { ActionState, Room } from "../../types";
 
 import "./RoomPasswordModal.css";
 
 /**
  * Modal used to check if a password is correct for a private room. It is not possible to join a private room without entering the correct password.
  */
-export function RoomPasswordModal({ roomName, close, onSuccess }: { roomName: string, close: () => void, onSuccess: () => void }): ReactElement {
+export function RoomPasswordModal({ room, close }: { room: Room, close: () => void }): ReactElement {
     const [password, setPassword] = useState<string>('');
     const [response, setResponse] = useState<ActionState>({message: '', success: false});
     const dialogRef = useRef<HTMLDialogElement>(null);
+    const { joinPrivateRoom } = useRoom();
 
      useEffect(() => {
         if (!dialogRef.current?.open) {
@@ -19,26 +20,19 @@ export function RoomPasswordModal({ roomName, close, onSuccess }: { roomName: st
     }, []);
 
     async function joinRoom(): Promise<void> {
-        const response = await fetch(ROOM_PASSWORD_ENDPOINT, {
-            method: 'post',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({ name: roomName, password })
-        });
-
-        const data: ActionState = await response.json();
+        const data: ActionState = await joinPrivateRoom(room, password);
         setResponse(data);
-        if (!data.success) {
-            setPassword('');
-        } else {
-            onSuccess();
+        if (data.success) {
             close();
+        } else {
+            setPassword('');
         }
     }
     
     return (
         <dialog id="roomPasswordModal" ref={dialogRef}>
             <section className='password-room__header'>
-                <h1 className='roomPasswordModal__title'> Enter password for room <i className="room-name">{roomName}</i> </h1>
+                <h1 className='roomPasswordModal__title'> Enter password for room <i className="room-name">{room.name}</i> </h1>
 
                 <input 
                     placeholder="Password" 

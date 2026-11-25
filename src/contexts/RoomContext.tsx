@@ -1,5 +1,5 @@
 import { createContext, type ReactElement, type ReactNode, useState } from "react";
-import type { Message, Room, ChatUser } from "../types";
+import type { Message, Room, ChatUser, ActionState } from "../types";
 import { multiplexSockets } from "../socket-client";
 import { useUser } from "../hooks";
 import { getUsersInRoom } from "../clientApplication/services/userService";
@@ -18,9 +18,10 @@ export interface RoomContextProvider {
     changeSelectedRoom: (room: Room | undefined) => void;
     createPrivateRoom: (recipient: ChatUser) => void;
     createGameRoom: (roomName: string, privateRoom: boolean, password: string) => void;
+    joinPrivateRoom: (room: Room, password: string) => Promise<ActionState>;
 }
 
-export const RoomContext = createContext<RoomContextProvider>({} as RoomContextProvider);
+export const RoomContext = createContext<RoomContextProvider | undefined>(undefined);
 
 /**
  * Keep track of selected room and its namespace. Each room belongs to a namespace. This provider sends namespace data to the socket server 
@@ -58,7 +59,7 @@ export function RoomProvider({ children }: { children: ReactNode }): ReactElemen
      */
     function changeRoom(room: Room): void {
         if (!isSelectedRoom(room.id)) {
-            multiplexSockets[room.namespaceId].emit(CHANGE_ROOM, room.id, user.id);
+            multiplexSockets[room.namespaceId].emit(CHANGE_ROOM, room.id);
             setRoomParticipants(getUsersInRoom(room.id, room.namespaceId));
             changeSelectedRoom(getRoom(room.id, room.namespaceId));
         }
@@ -118,8 +119,21 @@ export function RoomProvider({ children }: { children: ReactNode }): ReactElemen
         }
     }
 
+    async function joinPrivateRoom(room: Room, password: string): Promise<ActionState> {
+        try {
+            const response: ActionState = await multiplexSockets[room.namespaceId].timeout(5000).emitWithAck(CHANGE_ROOM, room.id, password);
+            if (response.success) {
+                setRoomParticipants(getUsersInRoom(room.id, room.namespaceId));
+                changeSelectedRoom(getRoom(room.id, room.namespaceId));
+            }
+            return response;
+        } catch {
+            return { success: false, message: "The server did not respond." };
+        }
+    }
+
     return (
-        <RoomContext.Provider value={{ selectedRoom, roomParticipants, createGameRoom, createPrivateRoom, sendMessage, changeRoom, leaveRoom, changeSelectedRoom, setRoomParticipants, changeNamespace }}>
+        <RoomContext.Provider value={{ selectedRoom, roomParticipants, createGameRoom, createPrivateRoom, sendMessage, joinPrivateRoom, changeRoom, leaveRoom, changeSelectedRoom, setRoomParticipants, changeNamespace }}>
             { children }
         </RoomContext.Provider>
     );

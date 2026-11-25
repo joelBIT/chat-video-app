@@ -7,7 +7,7 @@ export interface UserContextProvider {
     setUserInformation: (user: ChatUser) => void;
 }
 
-export const UserContext = createContext<UserContextProvider>({} as UserContextProvider);
+export const UserContext = createContext<UserContextProvider | undefined>(undefined);
 
 /**
  * The businessman-avatar.svg icon is the default avatar. A user that is not logged in has an empty username.

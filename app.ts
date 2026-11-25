@@ -11,7 +11,6 @@ import {initializeCommonEvents} from "./src/serverApplication/events/commonEvent
 import {initializeMainNamespaceEvents} from "./src/serverApplication/events/mainEvents.ts";
 import {initializeWebRtcEvents} from "./src/serverApplication/events/webRtcEvents.ts";
 import userRouter from "./src/serverApplication/routes/userRoutes.ts";
-import gameRouter from "./src/serverApplication/routes/gameRoutes.ts";
 import type { ActionState } from './src/types.ts';
 
 dotenv.config({ path: './config.env' });
@@ -25,7 +24,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
 
 app.use('/register', userRouter);
-app.use('/checkRoomPassword', gameRouter);
 
 app.all('/{*path}', async (req, res) => {
     res.redirect(`https://${req.get('host')}`);

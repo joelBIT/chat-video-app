@@ -24,7 +24,7 @@ export interface MultiplexContextProvider {
     disconnectMultiplexSockets: () => void;
 }
 
-export const MultiplexContext = createContext<MultiplexContextProvider>({} as MultiplexContextProvider);
+export const MultiplexContext = createContext<MultiplexContextProvider | undefined>(undefined);
 
 /**
  * This provider handles the connection/disconnection of the namespaces (except the main namespace "/", see SocketContext) and related interactions.

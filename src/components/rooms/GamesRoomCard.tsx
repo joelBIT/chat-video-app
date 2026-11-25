@@ -68,7 +68,7 @@ export function GamesRoomCard({room}: {room: Room}): ReactElement {
                 }
             </section>
 
-            { showPasswordModal ? <RoomPasswordModal roomName={room.name} close={() => setShowPasswordModal(false)} onSuccess={() => changeRoom(room)} /> : <></> }
+            { showPasswordModal ? <RoomPasswordModal room={room} close={() => setShowPasswordModal(false)} /> : <></> }
         </>
     )
 }

@@ -63,4 +63,3 @@ export const ALLOWED_AVATARS = ["mario.png", "wario.png", "mushroom.png"];
 const BASE_URL = "https://chat-application.joel-rollny.eu:8181/";
 const BASE_URL_DEVELOPMENT = 'https://localhost:8181/';
 export const REGISTER_ENDPOINT = process.env.NODE_ENV === "development" ? `${BASE_URL_DEVELOPMENT}register` : `${BASE_URL}register`;
-export const ROOM_PASSWORD_ENDPOINT = process.env.NODE_ENV === "development" ? `${BASE_URL_DEVELOPMENT}checkRoomPassword` : `${BASE_URL}checkRoomPassword`;
