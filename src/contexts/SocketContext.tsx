@@ -1,5 +1,5 @@
 import { createContext, type ReactElement, type ReactNode, useEffect, useState } from "react";
-import { socket } from "../socket-client";
+import { session, socket } from "../socket-client";
 import { useMultiplex, useRoom, useUser } from "../hooks";
 import { clearSelectedRoom, getSelectedRoom, isSelectedRoom } from "../clientApplication/services/roomService";
 import { addAllUsers, getSignedOutUser, getUsersInSelectedRoom, saveUser } from "../clientApplication/services/userService";
@@ -67,7 +67,8 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
      * Get available namespaces from the server. This function is only invoked when the client
      * connects to the server. A multiplex socket is created for each namespace received from the server.
      */
-    async function onNamespaces(namespaces: Namespace[], user: ChatUser, members: ChatUser[]): Promise<void> {
+    async function onNamespaces(namespaces: Namespace[], user: ChatUser, members: ChatUser[], token: string): Promise<void> {
+        session.token = token;                  // Must be set before the multiplex sockets connect
         setUserInformation(user);
         addAllUsers(members);
         addNamespaces(namespaces);
@@ -92,6 +93,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
      * Selected room is cleared so user must select room when signing in again.
      */
     function logout(): void {
+        session.token = "";
         setUserInformation(getSignedOutUser());
         clearSelectedRoom();
         changeSelectedRoom(getSelectedRoom());
@@ -105,7 +107,6 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
      */
     function connect(username: string, password: string): void {
         socket.auth = { username, password };
-        socket.io.opts.query = { username };
 
         socket.connect();
         setErrorMessage('');

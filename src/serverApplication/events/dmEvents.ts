@@ -3,7 +3,6 @@ import { getPrivateConversation } from "../services/messageService";
 import type { Message, Room, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
 import { CREATE_ROOM, NAMESPACE_DM_ENDPOINT, NAMESPACE_ID_DM, PRIVATE_MESSAGE, UPDATE_ROOMS } from "../utils/constants";
-import { findUserByUsername } from "../dao/userDAO";
 import { saveMessage } from "../dao/messageDAO";
 
 /**
@@ -39,17 +38,10 @@ export async function initializeDmEvents(io: Server): Promise<void> {
 }
 
 /**
- * Join personal DM room (used for private 1on1 conversations).
+ * Join personal DM room (used for private 1on1 conversations). The ID was verified by the namespace middleware.
  */
-async function joinPersonalRoom(socket: ISocket): Promise<void> {
-    const username = socket.handshake.query.username;
-
-    if (username && (typeof username === "string")) {
-        try {
-            const user: ChatUser = await findUserByUsername(username);
-            socket.join(user.id);
-        } catch (error) {
-            console.log(error);
-        }
+function joinPersonalRoom(socket: ISocket): void {
+    if (socket.userID) {
+        socket.join(socket.userID);
     }
 }

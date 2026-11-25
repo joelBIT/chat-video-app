@@ -5,6 +5,7 @@ import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../
 import type { ChatUser, Namespace } from "../../types";
 import { findUserById, findUserByUsername, getAllUsers, updateOnlineStatus, updateUser } from "../dao/userDAO";
 import { setAllUsersAsOffline } from "../utils/database";
+import { issueToken } from "../utils/sessionToken";
 
 /**
  * Initializes events for the main namespace ('/') only. The connected client receives data via the "namespaces" event. This data consists of
@@ -22,8 +23,8 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
             const user: ChatUser = await findUserById(userID);
             const users: ChatUser[] = await getAllUsers();
             const namespaces: Namespace[] = await getDataForUser(user.id);
-            socket.emit(NAMESPACES, namespaces, user, users);                   // Send back data to the connected client
-            io.except(socket.id).emit(USER_CONNECTED, user);                    // Inform other clients that the user is online
+            socket.emit(NAMESPACES, namespaces, user, users, issueToken(user.id));      // Send back data to the connected client
+            io.except(socket.id).emit(USER_CONNECTED, user);                            // Inform other clients that the user is online
         } catch (error) {
             console.log(error);
         }

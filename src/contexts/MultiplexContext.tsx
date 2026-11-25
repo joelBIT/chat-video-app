@@ -1,6 +1,6 @@
 import { createContext, useState, type ReactElement, type ReactNode } from "react";
 import { io, Socket } from "socket.io-client";
-import { multiplexSockets } from "../socket-client";
+import { multiplexSockets, session } from "../socket-client";
 import { useRoom } from "../hooks";
 import { getSelectedRoom, isSelectedRoom, removeRoom, saveRoom } from "../clientApplication/services/roomService";
 import { addUserToRoom, getUsersInSelectedRoom, removeUserFromRoom } from "../clientApplication/services/userService";
@@ -60,7 +60,8 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
      * Create a connected socket (for multiplexing) for the supplied namespace.
      */
     function createMultiplexSocket(namespace: Namespace): Socket {
-        const socket = io(namespace.endpoint);
+        // The auth callback runs on every (re)connect, so it always sends the latest token.
+        const socket = io(namespace.endpoint, { auth: (cb) => cb({ token: session.token }) });
         socket.connect();
         socket.on(CHAT_MESSAGE, onChatMessage);
         socket.on(PRIVATE_MESSAGE, onPrivateMessage);

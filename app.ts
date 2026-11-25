@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import express from 'express';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
-import {login} from "./src/serverApplication/middleware/auth.ts";
+import {authenticateNamespaces, login} from "./src/serverApplication/middleware/auth.ts";
 import {initializeHomeEvents} from "./src/serverApplication/events/homeEvents.ts";
 import {initializeDmEvents} from "./src/serverApplication/events/dmEvents.ts";
 import {initializeGamesEvents} from "./src/serverApplication/events/gamesEvents.ts";
@@ -15,6 +15,9 @@ import gameRouter from "./src/serverApplication/routes/gameRoutes.ts";
 import type { ActionState } from './src/types.ts';
 
 dotenv.config({ path: './config.env' });
+if (!process.env.SESSION_SECRET) {
+    throw new Error("SESSION_SECRET must be set");     // Fail fast instead of at the first login
+}
 
 const app = express();
 app.use(express.static(import.meta.dirname + "/dist/"));
@@ -58,6 +61,7 @@ const io = new Server(expressServer, {
 });
 
 login(io);
+authenticateNamespaces(io);
 initializeMainNamespaceEvents(io);
 initializeCommonEvents(io);
 initializeHomeEvents(io);

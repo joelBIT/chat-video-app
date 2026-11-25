@@ -3,8 +3,34 @@ import express from 'express';
 import type { ISocket } from "../interfaces";
 import { AppError } from "../errors/AppError";
 import { isCorrectPassword } from "../services/userService";
-import { findUserByUsername, updateOnlineStatus } from "../dao/userDAO";
+import { verifyToken } from "../utils/sessionToken";
+import { findUserById, findUserByUsername, updateOnlineStatus } from "../dao/userDAO";
 import type { ChatUser } from "../../types";
+import { NAMESPACE_DM_ENDPOINT, NAMESPACE_GAMES_ENDPOINT, NAMESPACE_HOME_ENDPOINT } from "../utils/constants";
+
+/**
+ * Every custom namespace requires the signed token that the server sent to the client after a successful login.
+ * The user ID comes from the token, never from anything the client claims (e.g. the query string).
+ */
+export function authenticateNamespaces(io: Server): void {
+    [NAMESPACE_HOME_ENDPOINT, NAMESPACE_DM_ENDPOINT, NAMESPACE_GAMES_ENDPOINT].forEach((endpoint: string) => {
+        io.of(endpoint).use(async (socket: ISocket, next) => {
+            const userID = verifyToken(socket.handshake.auth?.token);
+            if (!userID) {
+                return next(new Error("Not authenticated."));
+            }
+
+            try {
+                await findUserById(userID);         // The user must still exist
+            } catch {
+                return next(new Error("Not authenticated."));
+            }
+
+            socket.userID = userID;
+            next();
+        });
+    });
+}
 
 /**
  * Check if password matches username. Return an error if that is not the case. Connected usernames must be unique.
@@ -15,7 +41,6 @@ export function login(io: Server): void {
     io.use(async (socket: ISocket, next) => {
         const username = socket.handshake.auth.username;
         const password = socket.handshake.auth.password;
-        socket.handshake.query.username = username;
 
         const isValidCredentials: boolean = await isCorrectPassword(username, password);
         if (!isValidCredentials) {
