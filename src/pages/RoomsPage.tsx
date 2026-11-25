@@ -1,5 +1,5 @@
 import { type ReactElement } from "react";
-import { redirect } from "react-router";
+import { Navigate } from "react-router";
 import { useRoom, useSocket } from "../hooks";
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
 import { ConversationList, ConversationChat, MobileHeader, NamespaceMenu, RoomChat, RoomList, UserList } from "../components";
@@ -11,11 +11,11 @@ import "./RoomsPage.css";
  * Page containing the namespace menu and list of rooms (including the chat of the selected room).
  */
 export default function RoomsPage(): ReactElement {
-    const { isConnected } = useSocket();
+    const { isReady } = useSocket();
     const { roomParticipants } = useRoom();
 
-    if (!isConnected) {
-        redirect(HOME_URL);
+    if (!isReady) {
+        return <Navigate to={HOME_URL} replace />;
     }
 
     if (isSelectedNamespace(NAMESPACE_ID_DM)) {

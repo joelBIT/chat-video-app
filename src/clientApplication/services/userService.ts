@@ -73,3 +73,7 @@ export function getUserByID(userID: string): ChatUser {
 export function getUserByUsername(username: string): ChatUser {
     return userStore.getUserByUsername(username);
 }
+
+export function resetUsers(): void {
+    userStore.reset();
+}

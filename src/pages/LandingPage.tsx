@@ -1,5 +1,5 @@
 import { type ReactElement, useState } from "react";
-import { useNavigate } from "react-router";
+import { Navigate } from "react-router";
 import { useSocket } from "../hooks";
 import { LoginForm, RegisterForm } from "../components";
 import { ROOMS_URL } from "../serverApplication/utils/constants";
@@ -11,11 +11,10 @@ import "./LandingPage.css";
  */
 export default function LandingPage(): ReactElement {
     const [showRegisterForm, setShowRegisterForm] = useState<boolean>(false);
-    const navigate = useNavigate();
-    const { isConnected } = useSocket();
+    const { isReady } = useSocket();
 
-    if (isConnected) {
-        navigate(ROOMS_URL, { replace: true });
+    if (isReady) {
+        return <Navigate to={ROOMS_URL} replace />;
     }
     
     return (

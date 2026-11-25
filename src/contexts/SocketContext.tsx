@@ -1,15 +1,17 @@
 import { createContext, type ReactElement, type ReactNode, useEffect, useState } from "react";
 import { session, socket } from "../socket-client";
 import { useMultiplex, useRoom, useUser } from "../hooks";
-import { clearSelectedRoom, getSelectedRoom, isSelectedRoom } from "../clientApplication/services/roomService";
-import { addAllUsers, getSignedOutUser, getUsersInSelectedRoom, saveUser } from "../clientApplication/services/userService";
+import { isSelectedRoom } from "../clientApplication/services/roomService";
+import { addAllUsers, getSignedOutUser, getUsersInSelectedRoom, resetUsers, saveUser } from "../clientApplication/services/userService";
 import { addNamespaces } from "../clientApplication/services/namespaceService";
+import { resetNamespaces } from "../clientApplication/services/namespaceService";
 import type { ActionState, Namespace, ChatUser } from "../types";
 import { NAMESPACE_ID_HOME, NAMESPACES, ROOM_ID_NONE, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../serverApplication/utils/constants";
 
 export interface SocketContextProvider {
     isConnected: boolean;
     errorMessage: string;
+    isReady: boolean;               // Namespaces, users and the signed-in user have been received
     logout: () => void;
     connect: (username: string, password: string) => void;
     updateUser: (updatedUser: ChatUser) => Promise<ActionState>;
@@ -24,6 +26,7 @@ export const SocketContext = createContext<SocketContextProvider>({} as SocketCo
  */
 export function SocketProvider({ children }: { children: ReactNode }): ReactElement {
     const [isConnected, setIsConnected] = useState<boolean>(false);
+    const [isReady, setIsReady] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const { setUserInformation } = useUser();
     const { setRoomParticipants, changeNamespace, changeSelectedRoom } = useRoom();
@@ -40,6 +43,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
 
         function onDisconnect(): void {
             setIsConnected(false);
+            setIsReady(false);
         }
 
         socket.on("connect", onConnect);                        // You connect
@@ -75,6 +79,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
 
         connectMultiplexSockets(namespaces);
         changeNamespace(NAMESPACE_ID_HOME);              // Set namespace Home (id 0) as default so that these rooms get listed for the client
+        setIsReady(true);
     }
 
     /**
@@ -94,12 +99,16 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
      */
     function logout(): void {
         session.token = "";
-        setUserInformation(getSignedOutUser());
-        clearSelectedRoom();
-        changeSelectedRoom(getSelectedRoom());
+        setIsReady(false);
 
         disconnectMultiplexSockets();
         socket.disconnect();            // close connection
+
+        resetNamespaces();
+        resetUsers();
+        setUserInformation(getSignedOutUser());
+        changeSelectedRoom(undefined);
+        setRoomParticipants([]);
     }
 
     /**
@@ -148,7 +157,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
     }
 
     return (
-        <SocketContext.Provider value={{ isConnected, errorMessage, logout, connect, updateUser }}>
+        <SocketContext.Provider value={{ isConnected, errorMessage, isReady, logout, connect, updateUser }}>
             { children }
         </SocketContext.Provider>
     );

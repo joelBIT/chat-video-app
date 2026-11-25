@@ -1,5 +1,5 @@
 import { type ReactElement, useState } from "react";
-import { useNavigate } from "react-router";
+import { Navigate } from "react-router";
 import { useRoom, useSocket, useUser } from "../hooks";
 import { getUsersInSelectedRoom, saveUser } from "../clientApplication/services/userService";
 import { NamespaceMenu } from "../components";
@@ -12,15 +12,14 @@ import "./ProfilePage.css";
  * Page for viewing and updating profile information.
  */
 export default function ProfilePage(): ReactElement {
-    const navigate = useNavigate();
     const { user, setUserInformation } = useUser();
-    const { isConnected, updateUser } = useSocket();
+    const { isReady, updateUser } = useSocket();
     const { setRoomParticipants } = useRoom();
     const [selectedAvatar, setSelectedAvatar] = useState<string>(user.avatar);
     const [updatedResponse, setUpdatedResponse] = useState<ActionState>({message: '', success: false});
 
-    if (!isConnected) {
-        navigate(HOME_URL);
+    if (!isReady) {
+        return <Navigate to={HOME_URL} replace />;
     }
 
     /**

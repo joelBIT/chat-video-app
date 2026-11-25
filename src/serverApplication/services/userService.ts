@@ -6,6 +6,7 @@ import { addUserToRoom } from './roomService';
 export async function isCorrectPassword(username: string, password: string): Promise<boolean> {
     try {
         const hashedPassword = await getHashedPasswordForUsername(username);
+console.log(JSON.stringify(username), hashedPassword.length, hashedPassword.includes('.'));
         return await PasswordManager.compare(hashedPassword, password);
     } catch (error) {
         console.log(error);

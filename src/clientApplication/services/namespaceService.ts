@@ -22,3 +22,7 @@ export function isSelectedNamespace(namespaceID: number): boolean {
 export function setSelectedNamespaceId(namespaceID: number): void {
     namespaceStore.setSelectedNamespaceId(namespaceID);
 }
+
+export function resetNamespaces(): void {
+    namespaceStore.reset();
+}

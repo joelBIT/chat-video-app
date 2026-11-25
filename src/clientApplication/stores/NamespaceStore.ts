@@ -68,6 +68,13 @@ class InMemoryNamespaceStore {
     getLastVisitedByRoomId(roomID: string): number | undefined {
         return this.lastVisited.get(roomID);
     }
+
+    reset(): void {
+        this.namespaces.clear();
+        this.selectedNamespaceId = NAMESPACE_ID_NONE;
+        this.selectedRoomId = ROOM_ID_NONE;
+        this.lastVisited.clear();
+    }
 }
 
 const namespaceStore = new InMemoryNamespaceStore();

@@ -16,6 +16,10 @@ class InMemoryUserStore {
         this.users.set(user.id, user);
     };
 
+    findUserById(userID: string): ChatUser | undefined {
+        return this.users.get(userID);
+    }
+
     getUserById(userID: string): ChatUser {
         const user: ChatUser | undefined = this.users.get(userID);
         if (user) {
@@ -52,6 +56,10 @@ class InMemoryUserStore {
      */
     getSignedOutUser(): ChatUser {
         return {username: '', avatar: "mario.png", online: false, id: "", inCall: false, lastActive: Date.now()};
+    }
+
+    reset(): void {
+        this.users.clear();
     }
 }
 

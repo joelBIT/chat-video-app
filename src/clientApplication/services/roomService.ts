@@ -83,14 +83,13 @@ export function isSelectedRoom(roomID: string): boolean {
  * there are no unread messages in the room where the user is active.
  */
 export function hasUnreadMessages(room: Room, userID: string): number {
-    const user = userStore.getUserById(userID);
-    const lastVisited: number = namespaceStore.getLastVisitedByRoomId(room.id) ?? user.lastActive;      // If user has not visited the room this session, use last login as the date instead
-    const matchingRoom: Room | undefined = getRoom(room.id, room.namespaceId);
-    if (matchingRoom && matchingRoom.id !== namespaceStore.getSelectedRoomId()) {
-        return matchingRoom.history.filter((message: Message) => message.date > lastVisited && message.date > user.lastActive).length;
+    const user = userStore.findUserById(userID);
+    if (!user || room.id === namespaceStore.getSelectedRoomId()) {
+        return 0;
     }
 
-    return 0;
+    const lastVisited: number = namespaceStore.getLastVisitedByRoomId(room.id) ?? user.lastActive;
+    return room.history.filter((message: Message) => message.date > lastVisited && message.date > user.lastActive).length;
 }
 
 export function setSelectedRoomId(roomID: string): void {
