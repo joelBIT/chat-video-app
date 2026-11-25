@@ -54,12 +54,22 @@ export async function updateOnlineStatus(username: string, online: boolean): Pro
     await User.updateOne({ username }, { online, lastActive: Date.now() });
 }
 
-export async function updateUser(updatedUser: ChatUser): Promise<void> {
-    await User.findOneAndUpdate({_id: updatedUser.id}, updatedUser);
-}
 
 export async function getHashedPasswordForUsername(username: string): Promise<string> {
     return (await User.findOne({username}))?.password ?? "";
+}
+
+export async function updateInCallStatus(userID: string, inCall: boolean): Promise<void> {
+    await User.updateOne({ _id: userID }, { inCall });
+}
+
+export async function updateAvatar(userID: string, avatar: string): Promise<ChatUser> {
+    const user = await User.findByIdAndUpdate(userID, { avatar }, { new: true });
+    if (!user) {
+        throw new Error(`Could not find user with ID ${userID}`);
+    }
+
+    return mapDatabaseUser(user);
 }
 
 /**

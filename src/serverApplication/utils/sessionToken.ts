@@ -1,5 +1,10 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
+/**
+ * After the main socket logs in, the server hands the client a short-lived signed token. 
+ * Each namespace socket must present it, and the server takes the user ID from the token.
+ */
+
 const TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 
 // Read lazily: app.ts calls dotenv.config() after the imports have been evaluated.

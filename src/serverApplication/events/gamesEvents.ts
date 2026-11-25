@@ -1,59 +1,86 @@
 import { Server } from "socket.io";
 import { addUserToRoom, isMember, removeUserFromRoom } from "../services/roomService";
-import type { Message, Room } from "../../types";
+import type { Room } from "../../types";
 import type { ISocket } from "../interfaces";
 import { CHANGE_ROOM, CHAT_MESSAGE, CREATE_ROOM, isCommonRoom, LEAVE_ROOM, NAMESPACE_GAMES_ENDPOINT, NAMESPACE_ID_GAMES, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../utils/constants";
 import { getRoomByID, saveRoom } from "../dao/roomDAO";
 import { saveMessage } from "../dao/messageDAO";
+import { buildMessage } from "../utils/messages";
 
 /**
  * Initialize events that are specific to the "Games" namespace (id 2).
  */
 export async function initializeGamesEvents(io: Server): Promise<void> {
     
-    io.of(NAMESPACE_GAMES_ENDPOINT).on("connection", async (socket: ISocket) => {
-        socket.on(CREATE_ROOM, async (room: Room, userID: string, password: string) => {
+    io.of(NAMESPACE_GAMES_ENDPOINT).on("connection", (socket: ISocket) => {
+        const userID = socket.userID;
+        if (!userID) {
+            socket.disconnect(true);
+            return;
+        }
+
+        socket.on(CREATE_ROOM, async (room: Room, password: unknown) => {
+            if (typeof room?.name !== "string" || typeof room.private !== "boolean" || typeof password !== "string") {
+                return;
+            }
+            if (room.private && password.length === 0) {
+                return;
+            }
+
             try {
-                room.members = [];
-                room.members.push(userID);
-                const persistedRoom: Room = await saveRoom(room, password);
+                // The namespace is forced; the client cannot create rooms elsewhere.
+                const persistedRoom: Room = await saveRoom({ ...room, namespaceId: NAMESPACE_ID_GAMES }, password);
+                await addUserToRoom(userID, persistedRoom.name);        // The creator is the first member
+                persistedRoom.members = [userID];
+
                 socket.join(persistedRoom.id);
-                
-                // Send created room to clients so that the room appears in the room list in "Games".
                 io.of(NAMESPACE_GAMES_ENDPOINT).emit(UPDATE_ROOMS, persistedRoom);
             } catch (error) {
                 console.log(error);
             }
         });
 
-        socket.on(CHAT_MESSAGE, (message: Message) => {
-            if ([...socket.rooms].find((roomID: string) => roomID === message.to)) {     // Check if socket is member of room
-                saveMessage(message);
-                io.of(NAMESPACE_GAMES_ENDPOINT).to(message.to).emit(CHAT_MESSAGE, message);
+        socket.on(CHAT_MESSAGE, (message: unknown) => {
+            const trusted = buildMessage(userID, message, true);
+            if (!trusted || !socket.rooms.has(trusted.to)) {
+                return;
             }
+
+            saveMessage(trusted);
+            io.of(NAMESPACE_GAMES_ENDPOINT).to(trusted.to).emit(CHAT_MESSAGE, trusted);
         });
 
-        socket.on(CHANGE_ROOM, async (roomID: string, userID: string) => {
+        socket.on(CHANGE_ROOM, async (roomID: unknown) => {
+            if (typeof roomID !== "string") {
+                return;
+            }
+
             try {
                 const room: Room = await getRoomByID(roomID);
+                if (room.namespaceId !== NAMESPACE_ID_GAMES) {
+                    return;
+                }
+
                 const isRoomMember: boolean = await isMember(userID, roomID);
                 if (!isCommonRoom(room.name) && !isRoomMember) {
-                    // If changing to a custom game room that the client is not a member of, send back the room containing its message history.
                     io.of(NAMESPACE_GAMES_ENDPOINT).to(socket.id).emit(UPDATE_CUSTOM_GAME_ROOM, room);
                 }
 
                 socket.join(roomID);
                 await addUserToRoom(userID, room.name);
                 io.of(NAMESPACE_GAMES_ENDPOINT).emit(USER_JOINED, roomID, userID, NAMESPACE_ID_GAMES);
-            } catch (error: any) {
+            } catch (error) {
                 console.log(error);
             }
         });
 
-        socket.on(LEAVE_ROOM, async (roomID: string, userID: string) => {
+        socket.on(LEAVE_ROOM, async (roomID: unknown) => {
+            if (typeof roomID !== "string") {
+                return;
+            }
+
             socket.leave(roomID);
             await removeUserFromRoom(userID, roomID);
-
             io.of(NAMESPACE_GAMES_ENDPOINT).emit(USER_LEFT, roomID, userID, NAMESPACE_ID_GAMES);
         });
     });

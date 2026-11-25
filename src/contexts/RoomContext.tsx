@@ -81,7 +81,11 @@ export function RoomProvider({ children }: { children: ReactNode }): ReactElemen
      * Create a new private room in the "DMs" namespace (id 1).
      */
     async function createPrivateRoom(recipient: ChatUser): Promise<void> {
-        const response = await multiplexSockets[NAMESPACE_ID_DM].emitWithAck(CREATE_ROOM, user, recipient);
+        const response = await multiplexSockets[NAMESPACE_ID_DM].emitWithAck(CREATE_ROOM, recipient.id);
+        if (!response.room) {
+            return;
+        }
+
         saveRoom(response.room);
         setSelectedRoomId(response.room.id);
         changeSelectedRoom(response.room);
@@ -96,7 +100,7 @@ export function RoomProvider({ children }: { children: ReactNode }): ReactElemen
      */
     function createGameRoom(roomName: string, isPrivateRoom: boolean, password: string): void {
         const room: Room = {id: "", name: roomName, namespaceId: NAMESPACE_ID_GAMES, private: isPrivateRoom, members: [], history: []};
-        multiplexSockets[NAMESPACE_ID_GAMES].emit(CREATE_ROOM, room, user.id, password);
+        multiplexSockets[NAMESPACE_ID_GAMES].emit(CREATE_ROOM, room, password);
     }
 
     /**

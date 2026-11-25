@@ -21,12 +21,12 @@ export function authenticateNamespaces(io: Server): void {
             }
 
             try {
-                await findUserById(userID);         // The user must still exist
+                const user = await findUserById(userID);         // The user must still exist
+                socket.userID = user.id;
+                socket.username = user.username;
             } catch {
                 return next(new Error("Not authenticated."));
             }
-
-            socket.userID = userID;
             next();
         });
     });

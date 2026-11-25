@@ -172,7 +172,7 @@ export async function call(fromUsername: string, toUsername: string, video: bool
             const offer: RTCSessionDescriptionInit = await peerConnection.createOffer();
             peerConnection.setLocalDescription(offer);
             didIOffer = true;
-            multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER, fromUsername, toUsername, video, offer);             // Send offer to signalingServer
+            multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER, toUsername, video, offer);            // Send offer to signalingServer
         } catch (error) {
             console.log(error);
         }

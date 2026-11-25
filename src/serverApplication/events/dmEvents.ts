@@ -4,6 +4,8 @@ import type { Message, Room, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
 import { CREATE_ROOM, NAMESPACE_DM_ENDPOINT, NAMESPACE_ID_DM, PRIVATE_MESSAGE, UPDATE_ROOMS } from "../utils/constants";
 import { saveMessage } from "../dao/messageDAO";
+import { buildMessage } from "../utils/messages";
+import { findUserById } from "../dao/userDAO";
 
 /**
  * Initialize events that are specific to the "DMs" namespace (id 1).
@@ -11,37 +13,54 @@ import { saveMessage } from "../dao/messageDAO";
  */
 export async function initializeDmEvents(io: Server): Promise<void> {
 
-    io.of(NAMESPACE_DM_ENDPOINT).on("connection", async (socket: ISocket) => {
-        joinPersonalRoom(socket);
+  io.of(NAMESPACE_DM_ENDPOINT).on("connection", (socket: ISocket) => {
+        const userID = socket.userID;
+        if (!userID) {
+            socket.disconnect(true);
+            return;
+        }
 
-        socket.on(CREATE_ROOM, async (sender: ChatUser, recipient: ChatUser, ackCallback) => {
-            const messages: Message[] = await getPrivateConversation(sender.id, recipient.id);    // Get messages if conversation already exist
-            const remoteRoom: Room = {id: sender.id, name: sender.username, namespaceId: NAMESPACE_ID_DM, private: true, members: [sender.id, recipient.id], history: [...messages]};
-            io.of(NAMESPACE_DM_ENDPOINT).to(recipient.id).emit(UPDATE_ROOMS, remoteRoom);
+        socket.join(userID);            // Personal room
 
-            const room: Room = {id: recipient.id, name: recipient.username, namespaceId: NAMESPACE_ID_DM, private: true, members: [sender.id, recipient.id], history: [...messages]};
-            ackCallback({ room });      // Return the conversation (as a room) to the client.
+        socket.on(CREATE_ROOM, async (recipientID: unknown, ackCallback: unknown) => {
+            if (typeof recipientID !== "string" || typeof ackCallback !== "function") {
+                return;
+            }
+
+            try {
+                const sender: ChatUser = await findUserById(userID);
+                const recipient: ChatUser = await findUserById(recipientID);
+                if (sender.id === recipient.id) {
+                    return ackCallback({ room: null });
+                }
+
+                const messages: Message[] = await getPrivateConversation(sender.id, recipient.id);
+                const members = [sender.id, recipient.id];
+
+                const remoteRoom: Room = { id: sender.id, name: sender.username, namespaceId: NAMESPACE_ID_DM, private: true, members, history: [...messages] };
+                io.of(NAMESPACE_DM_ENDPOINT).to(recipient.id).emit(UPDATE_ROOMS, remoteRoom);
+
+                const room: Room = { id: recipient.id, name: recipient.username, namespaceId: NAMESPACE_ID_DM, private: true, members, history: [...messages] };
+                ackCallback({ room });
+            } catch (error) {
+                console.log(error);
+                ackCallback({ room: null });
+            }
         });
 
-        /**
-         * Check if this is the first message in a conversation between sender and recipient. In that case: send room to the recipient to inform
-         * the recipient that a message has arrived.
-         * If messages already exists, send the message to the recipient and return it to the sender.
-         */
-        socket.on(PRIVATE_MESSAGE, (message: Message) => {
-            saveMessage(message);
-            
-            const messageCopy: Message = JSON.parse(JSON.stringify(message));          // Create deep copy of the message
-            io.of(NAMESPACE_DM_ENDPOINT).to(message.to).to(message.from).emit(PRIVATE_MESSAGE, messageCopy);
+        socket.on(PRIVATE_MESSAGE, async (message: unknown) => {
+            const trusted = buildMessage(userID, message, false);
+            if (!trusted || trusted.to === userID) {
+                return;
+            }
+
+            try {
+                await findUserById(trusted.to);         // The recipient must exist
+                saveMessage(trusted);
+                io.of(NAMESPACE_DM_ENDPOINT).to(trusted.to).to(trusted.from).emit(PRIVATE_MESSAGE, trusted);
+            } catch (error) {
+                console.log(error);
+            }
         });
     });
-}
-
-/**
- * Join personal DM room (used for private 1on1 conversations). The ID was verified by the namespace middleware.
- */
-function joinPersonalRoom(socket: ISocket): void {
-    if (socket.userID) {
-        socket.join(socket.userID);
-    }
 }

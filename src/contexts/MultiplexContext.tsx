@@ -19,7 +19,7 @@ export interface MultiplexContextProvider {
     answerCall: () => Promise<void>;
     denyCall: () => void;
     hangup: (username: string) => void;
-    cancelOffer: (callerUsername: string, remoteUsername: string) => void;
+    cancelOffer: (remoteUsername: string) => void;
     initiateCall: (callerUsername: string, remoteUsername: string, video: boolean) => void;
     disconnectMultiplexSockets: () => void;
 }
@@ -216,11 +216,11 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     /**
      * Withdraw the call offer you initiated.
      */
-    function cancelOffer(username: string, remoteUsername: string): void {
+    function cancelOffer(remoteUsername: string): void {
         closeVideoCall();
         setIsCalling(false);
         setOffers([]);
-        multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER_CANCELLED, username, remoteUsername);
+        multiplexSockets[NAMESPACE_ID_DM].emit(NEW_OFFER_CANCELLED, remoteUsername);
         setRemoteUsername('');
     }
 

@@ -55,7 +55,7 @@ export function ConversationChat(): ReactElement {
                 isCalling ?
                     <section className="call-text__section">
                         <p className="call__text"> Calling {selectedRoom.name}... </p>
-                        <button className="app-button" onClick={() => cancelOffer(user.username, selectedRoom.name)}> Hangup </button> 
+                        <button className="app-button" onClick={() => cancelOffer(selectedRoom.name)}> Hangup </button> 
                     </section>
                 :
                 <></>

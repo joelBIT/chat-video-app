@@ -1,9 +1,9 @@
 import { Server } from "socket.io";
 import { getDataForUser } from "../services/namespaceService";
 import type { ISocket } from "../interfaces";
-import { NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../utils/constants";
+import { ALLOWED_AVATARS, NAMESPACES, USER_CONNECTED, USER_DISCONNECTED, USER_UPDATED } from "../utils/constants";
 import type { ChatUser, Namespace } from "../../types";
-import { findUserById, findUserByUsername, getAllUsers, updateOnlineStatus, updateUser } from "../dao/userDAO";
+import { findUserById, getAllUsers, updateAvatar, updateOnlineStatus} from "../dao/userDAO";
 import { setAllUsersAsOffline } from "../utils/database";
 import { issueToken } from "../utils/sessionToken";
 
@@ -29,22 +29,24 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
             console.log(error);
         }
 
-        socket.on(USER_UPDATED, async (updatedUser: ChatUser, ackCallback) => {
-            try {
-                const user: ChatUser = await findUserByUsername(updatedUser.username);
+        socket.on(USER_UPDATED, async (updatedUser: unknown, ackCallback: unknown) => {
+            if (typeof ackCallback !== "function") {
+                return;
+            }
 
-                if (user.id !== updatedUser.id) {
-                    ackCallback({ message: 'Username is already taken', success: false });      // Updated user may have a new username that already exists
-                } else {
-                    updateUser(updatedUser);
-                    io.except(socket.id).emit(USER_UPDATED, updatedUser);
-                    ackCallback({ message: 'Profile updated', success: true });
-                }
+            const avatar = (updatedUser as { avatar?: unknown } | null)?.avatar;
+            if (typeof avatar !== "string" || !ALLOWED_AVATARS.includes(avatar)) {
+                return ackCallback({ message: "Invalid avatar", success: false });
+            }
+
+            try {
+                const user: ChatUser = await updateAvatar(userID, avatar);
+                io.except(socket.id).emit(USER_UPDATED, user);
+                ackCallback({ message: "Profile updated", success: true });
             } catch (error) {
                 console.log(error);
+                ackCallback({ message: "Could not update profile", success: false });
             }
-            
-            ackCallback({ message: `User ${updatedUser.username} not found`, success: false });
         });
 
         socket.on("disconnect", async reason => {

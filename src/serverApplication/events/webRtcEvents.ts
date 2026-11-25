@@ -3,111 +3,132 @@ import { ANSWER_RESPONSE, END_CALL, DENY_CALL, NAMESPACE_DM_ENDPOINT, NEW_ANSWER
 import type { Offer, ChatUser } from "../../types";
 import type { ISocket } from "../interfaces";
 import { deleteOfferByOffererUsername, getOfferByAnswererUsername, getOfferByOffererUsername, saveOffer } from "../dao/webRtcDAO";
-import { findUserByUsername, updateUser } from "../dao/userDAO";
+import { findUserByUsername, updateInCallStatus } from "../dao/userDAO";
 
 /**
  * Initializes events related to WebRTC. WebRTC is only used in namespace 1 (DMs).
  */
 export async function initializeWebRtcEvents(io: Server): Promise<void> {
 
-    io.of(NAMESPACE_DM_ENDPOINT).on("connection", async (socket: ISocket) => {
-        socket.on(NEW_OFFER, async (fromUsername: string, toUsername: string, video: boolean, newOffer: RTCSessionDescriptionInit) => {
-            const offer: Offer = {
-                offererUserName: fromUsername,
-                offer: newOffer,
-                offerIceCandidates: [],
-                answererUserName: toUsername,
-                answer: null,
-                answererIceCandidates: [],
-                video
-            };
-            saveOffer(offer);
+   io.of(NAMESPACE_DM_ENDPOINT).on("connection", (socket: ISocket) => {
+        const username = socket.username;
+        if (!username) {
+            socket.disconnect(true);
+            return;
+        }
 
-            updateUserStatus(io, fromUsername, true);
+        socket.on(NEW_OFFER, async (toUsername: unknown, video: unknown, newOffer: unknown) => {
+            if (typeof toUsername !== "string" || typeof video !== "boolean" || typeof newOffer !== "object" || newOffer === null || toUsername === username) {
+                return;
+            }
 
             try {
-                const user: ChatUser = await findUserByUsername(toUsername);
-                socket.to(user.id).emit(NEW_OFFER_AWAITING, offer);
+                const callee: ChatUser = await findUserByUsername(toUsername);
+                await deleteOfferByOffererUsername(username);           // Drop a stale offer from an earlier call
+                const offer: Offer = {
+                    offererUserName: username,
+                    offer: newOffer as RTCSessionDescriptionInit,
+                    offerIceCandidates: [],
+                    answererUserName: callee.username,
+                    answer: null,
+                    answererIceCandidates: [],
+                    video
+                };
+                await saveOffer(offer);
+
+                updateUserStatus(io, username, true);
+                socket.to(callee.id).emit(NEW_OFFER_AWAITING, offer);
             } catch (error) {
                 console.log(error);
             }
         });
 
-        socket.on(NEW_OFFER_CANCELLED, async (callerUsername: string, recipientUsername: string) => {
+        socket.on(NEW_OFFER_CANCELLED, async (recipientUsername: unknown) => {
+            if (typeof recipientUsername !== "string") {
+                return;
+            }
+
             try {
-                await deleteOfferByOffererUsername(callerUsername);
+                await deleteOfferByOffererUsername(username);
                 const recipient: ChatUser = await findUserByUsername(recipientUsername);
-                socket.to(recipient.id).emit(NEW_OFFER_CANCELLED, callerUsername);
+                socket.to(recipient.id).emit(NEW_OFFER_CANCELLED, username);
             } catch (error) {
                 console.log(error);
             }
-            
-            updateUserStatus(io, callerUsername, false);
-        });
 
-        socket.on(END_CALL, (username: string) => {
             updateUserStatus(io, username, false);
         });
 
-        socket.on(DENY_CALL, async (offererUsername: string) => {
+        socket.on(END_CALL, () => {
+            updateUserStatus(io, username, false);
+        });
+
+        socket.on(DENY_CALL, async (offererUsername: unknown) => {
+            if (typeof offererUsername !== "string") {
+                return;
+            }
+
             try {
+                const offer: Offer = await getOfferByOffererUsername(offererUsername);
+                if (offer.answererUserName !== username) {
+                    return;                                             // Only the callee can deny a call
+                }
+
                 await deleteOfferByOffererUsername(offererUsername);
                 const offerer: ChatUser = await findUserByUsername(offererUsername);
                 socket.to(offerer.id).emit(DENY_CALL);
+                updateUserStatus(io, offererUsername, false);
             } catch (error) {
                 console.log(error);
             }
-
-            updateUserStatus(io, offererUsername, false);
         });
 
-        socket.on(NEW_ANSWER, async (sentOffer: Offer, ackFunction) => {
-            // Emit this answer (sentOffer) back to CLIENT1. In order to do that, we need CLIENT1's id.
-            try {
-                const offer: Offer = await getOfferByOffererUsername(sentOffer.offererUserName);
-                const user: ChatUser = await findUserByUsername(sentOffer.offererUserName);
-                const socketIdToAnswer: string = user.id;
+        socket.on(NEW_ANSWER, async (sentOffer: Offer, ackFunction: unknown) => {
+            if (typeof ackFunction !== "function") {
+                return;
+            }
 
-                // Send back to the answerer all the iceCandidates we have already collected
+            try {
+                if (typeof sentOffer?.offererUserName !== "string") {
+                    return ackFunction([]);
+                }
+
+                const offer: Offer = await getOfferByOffererUsername(sentOffer.offererUserName);
+                if (offer.answererUserName !== username) {
+                    return ackFunction([]);                             // This offer is not addressed to this user
+                }
+
+                const offerer: ChatUser = await findUserByUsername(offer.offererUserName);
                 ackFunction(offer.offerIceCandidates);
 
-                // We find the offer to update so we can emit it
                 offer.answer = sentOffer.answer;
-                socket.to(socketIdToAnswer).emit(ANSWER_RESPONSE, offer);
-                updateUserStatus(io, offer.answererUserName, true);
+                socket.to(offerer.id).emit(ANSWER_RESPONSE, offer);
+                updateUserStatus(io, username, true);
+            } catch (error) {
+                console.log(error);
+                ackFunction([]);
+            }
+        });
+
+        socket.on(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, async (payload: { didIOffer?: boolean, iceCandidate?: RTCIceCandidate }) => {
+            const { didIOffer, iceCandidate } = payload ?? {};
+            if (!iceCandidate) {
+                return;
+            }
+
+            try {
+                if (didIOffer) {
+                    const offer: Offer = await getOfferByOffererUsername(username);
+                    offer.offerIceCandidates.push(iceCandidate);
+                    await emitIceCandidate(socket, offer.answererUserName, iceCandidate);
+                } else {
+                    const offer: Offer = await getOfferByAnswererUsername(username);
+                    await emitIceCandidate(socket, offer.offererUserName, iceCandidate);
+                }
             } catch (error) {
                 console.log(error);
             }
         });
-
-        socket.on(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, async iceCandidateObject => {
-            const { didIOffer, iceUserName, iceCandidate } = iceCandidateObject;
-
-            if (didIOffer) {
-                try {
-                    const offer: Offer = await getOfferByOffererUsername(iceUserName);
-                    offer.offerIceCandidates.push(iceCandidate);
-
-                    // 1. When the remote user answers, all existing ice candidates are sent
-                    // 2. Any candidates that come in after the offer has been answered, will be passed through
-                    if (offer.answererUserName) {
-                        await emitIceCandidate(socket, offer.answererUserName, iceCandidate);
-                    }
-                } catch (error) {
-                    console.log(error);
-                }
-            } else {
-                try {
-                    // This ice candidate is coming from the remote user. Send to the offer initiator.
-                    const offer: Offer = await getOfferByAnswererUsername(iceUserName);
-                    if (offer) {
-                        await emitIceCandidate(socket, offer.offererUserName, iceCandidate);
-                    }
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-        })
     });
 }
 
@@ -126,9 +147,9 @@ async function emitIceCandidate(socket: ISocket, username: string, iceCandidate:
 async function updateUserStatus(io: Server, username: string, inCall: boolean): Promise<void> {
     try {
         const user: ChatUser = await findUserByUsername(username);
+        await updateInCallStatus(user.id, inCall);
         user.inCall = inCall;
-        updateUser(user);
-        io.emit(USER_UPDATED, user);      // Inform users that this user is in a call.
+        io.emit(USER_UPDATED, user);
     } catch (error) {
         console.log(error);
     }
