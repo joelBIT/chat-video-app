@@ -1,5 +1,6 @@
 import User from '../schemas/userSchema';
 import type { ChatUser } from '../../types';
+import { assertString } from '../utils/validate';
 
 interface Credentials {
     username: string,
@@ -15,6 +16,7 @@ export async function createUser(credentials: Credentials): Promise<ChatUser> {
 }
 
 export async function findUserByUsername(username: string): Promise<ChatUser> {
+    assertString(username, "username");
     const user = await User.findOne({username});
     if (!user) {
         throw new Error(`Could not find user with username ${username}`);
@@ -24,6 +26,7 @@ export async function findUserByUsername(username: string): Promise<ChatUser> {
 }
 
 export async function findUserById(userID: string): Promise<ChatUser> {
+    assertString(userID, "userID");
     const user = await User.findById(userID);
     if (!user) {
         throw new Error(`Could not find user with ID ${userID}`);
@@ -33,6 +36,7 @@ export async function findUserById(userID: string): Promise<ChatUser> {
 }
 
 export async function usernameExists(username: string): Promise<boolean> {
+    assertString(username, "username");
     return (await User.exists({ username })) !== null;
 }
 
@@ -60,6 +64,7 @@ export async function updateOnlineStatus(username: string, online: boolean): Pro
 
 
 export async function getHashedPasswordForUsername(username: string): Promise<string> {
+    assertString(username, "username");
     return (await User.findOne({username}))?.password ?? "";
 }
 

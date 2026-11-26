@@ -1,6 +1,7 @@
 import OfferSchema from "../schemas/offerSchema";
 import type { Offer } from "../../types";
 import { AppError } from "../errors/AppError";
+import { assertString } from "../utils/validate";
 
 const NEWEST_FIRST = { createdAt: -1 } as const;
 
@@ -9,6 +10,7 @@ export async function saveOffer(offer: Offer): Promise<void> {
 }
 
 export async function getOfferByOffererUsername(offererUserName: string): Promise<Offer> {
+    assertString(offererUserName, "offererUserName");
     const offer = await OfferSchema.findOne({ offererUserName }).sort(NEWEST_FIRST);
     if (offer) {
         return mapOffer(offer);
@@ -21,6 +23,7 @@ export async function getOfferByOffererUsername(offererUserName: string): Promis
  * The newest offer where the user is either the caller or the callee.
  */
 export async function findOfferByParticipant(username: string): Promise<Offer | null> {
+    assertString(username, "username");
     const offer = await OfferSchema.findOne({
         $or: [{ offererUserName: username }, { answererUserName: username }]
     }).sort(NEWEST_FIRST);
@@ -29,6 +32,7 @@ export async function findOfferByParticipant(username: string): Promise<Offer | 
 }
 
 export async function deleteOffersByParticipant(username: string): Promise<void> {
+    assertString(username, "username");
     await OfferSchema.deleteMany({
         $or: [{ offererUserName: username }, { answererUserName: username }]
     });
@@ -40,6 +44,8 @@ export async function deleteOffersByParticipant(username: string): Promise<void>
  * Candidates pushed afterwards see the answer and are forwarded live instead.
  */
 export async function saveAnswer(offererUserName: string, answererUserName: string, answer: RTCSessionDescriptionInit): Promise<Offer | null> {
+    assertString(offererUserName, "offererUserName");
+    assertString(answererUserName, "answererUserName");
     const previous = await OfferSchema.findOneAndUpdate(
         { offererUserName, answererUserName, answer: null },
         { $set: { answer } },
@@ -53,6 +59,7 @@ export async function saveAnswer(offererUserName: string, answererUserName: stri
  * Atomically appends a candidate from the caller. Returns the offer after the update (null if none exists).
  */
 export async function addOfferIceCandidate(offererUserName: string, candidate: RTCIceCandidateInit): Promise<Offer | null> {
+    assertString(offererUserName, "offererUserName");
     const updated = await OfferSchema.findOneAndUpdate(
         { offererUserName },
         { $push: { offerIceCandidates: candidate } },
@@ -63,6 +70,7 @@ export async function addOfferIceCandidate(offererUserName: string, candidate: R
 }
 
 export async function addAnswererIceCandidate(answererUserName: string, candidate: RTCIceCandidateInit): Promise<Offer | null> {
+    assertString(answererUserName, "answererUserName");
     const updated = await OfferSchema.findOneAndUpdate(
         { answererUserName },
         { $push: { answererIceCandidates: candidate } },

@@ -1,6 +1,7 @@
 import type { Room } from "../../types";
 import RoomSchema from "../schemas/roomSchema";
 import { AppError } from "../errors/AppError";
+import { assertString } from "../utils/validate";
 
 /**
  * Add a newly created room, if it does not already exist. A private Game Room has a password that is stored as a hash.
@@ -9,6 +10,7 @@ import { AppError } from "../errors/AppError";
  * @returns         the room with its new ID
  */
 export async function saveRoom(room: Room, password: string): Promise<Room> {
+    assertString(room.name, "room.name");
     const exists = await RoomSchema.exists({ name: room.name });
     if (!exists) {
         const result = await RoomSchema.create({
@@ -29,6 +31,7 @@ export async function updateRoomMembers(roomName: string, roomMembers: string[])
 }
 
 export async function getRoomByRoomName(roomName: string): Promise<Room> {
+    assertString(roomName, "roomName");
     const room: Room | null = await RoomSchema.findOne({name: roomName});
 
     if (room) {
@@ -39,6 +42,7 @@ export async function getRoomByRoomName(roomName: string): Promise<Room> {
 }
 
 export async function getRoomByID(roomID: string): Promise<Room> {
+    assertString(roomID, "roomID");
     const room: Room | null = await RoomSchema.findById(roomID);
 
     if (room) {
@@ -49,6 +53,7 @@ export async function getRoomByID(roomID: string): Promise<Room> {
 }
 
 export async function getHashedPasswordForRoomName(roomName: string): Promise<string> {
+    assertString(roomName, "roomName");
     return (await RoomSchema.findOne({name: roomName}))?.password ?? "";
 }
 

@@ -1,19 +1,12 @@
 import type { Server } from "socket.io";
-import { ANSWER_RESPONSE, DENY_CALL, END_CALL, NAMESPACE_DM_ENDPOINT, NEW_ANSWER, NEW_OFFER, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, RECEIVED_ICE_CANDIDATE_FROM_SERVER, SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, USER_UPDATED } from "../utils/constants";
+import { ANSWER_RESPONSE, DENY_CALL, END_CALL, NAMESPACE_DM_ENDPOINT, NEW_ANSWER, NEW_OFFER, 
+    NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, RECEIVED_ICE_CANDIDATE_FROM_SERVER, 
+    SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, USER_UPDATED } from "../utils/constants";
 import type { ChatUser, Offer } from "../../types";
 import type { ISocket } from "../interfaces";
-import { addAnswererIceCandidate, addOfferIceCandidate, deleteOffersByParticipant, findOfferByParticipant, getOfferByOffererUsername, saveAnswer, saveOffer } from "../dao/webRtcDAO";
+import { addAnswererIceCandidate, addOfferIceCandidate, deleteOffersByParticipant, 
+    findOfferByParticipant, getOfferByOffererUsername, saveAnswer, saveOffer } from "../dao/webRtcDAO";
 import { findUserByUsername, updateInCallStatus } from "../dao/userDAO";
-
-function isIceCandidate(value: unknown): value is RTCIceCandidateInit {
-    const candidate = (value as RTCIceCandidateInit | null)?.candidate;
-    return typeof candidate === "string" && candidate.length < 2000;
-}
-
-function isSessionDescription(value: unknown, type: "offer" | "answer"): value is RTCSessionDescriptionInit {
-    const description = value as RTCSessionDescriptionInit | null;
-    return description?.type === type && typeof description.sdp === "string";
-}
 
 /**
  * Initializes events related to WebRTC. WebRTC is only used in namespace 1 (DMs).
@@ -36,7 +29,8 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
         }
 
         on(NEW_OFFER, async (toUsername: unknown, video: unknown, newOffer: unknown) => {
-            if (typeof toUsername !== "string" || typeof video !== "boolean" || !isSessionDescription(newOffer, "offer") || toUsername === username) {
+            const description = toSessionDescription(newOffer, "offer");
+            if (typeof toUsername !== "string" || typeof video !== "boolean" || !description || toUsername === username) {
                 return;
             }
 
@@ -45,7 +39,7 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
 
             const offer: Offer = {
                 offererUserName: username,
-                offer: newOffer,
+                offer: description,
                 offerIceCandidates: [],
                 answererUserName: callee.username,
                 answer: null,
@@ -93,8 +87,9 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
                 return;
             }
 
-            const { offererUserName, answer } = (sentOffer ?? {}) as Partial<Offer>;
-            if (typeof offererUserName !== "string" || !isSessionDescription(answer, "answer")) {
+            const { offererUserName, answer: sentAnswer } = (sentOffer ?? {}) as Partial<Offer>;
+            const answer = toSessionDescription(sentAnswer, "answer");
+            if (typeof offererUserName !== "string" || !answer) {
                 return ackFunction([]);
             }
 
@@ -114,8 +109,9 @@ export async function initializeWebRtcEvents(io: Server): Promise<void> {
         });
 
         on(SEND_ICE_CANDIDATE_TO_SIGNALING_SERVER, async (payload: unknown) => {
-            const { didIOffer, iceCandidate } = (payload ?? {}) as { didIOffer?: unknown, iceCandidate?: unknown };
-            if (!isIceCandidate(iceCandidate)) {
+            const { didIOffer, iceCandidate: rawCandidate } = (payload ?? {}) as { didIOffer?: unknown, iceCandidate?: unknown };
+            const iceCandidate = toIceCandidate(rawCandidate);
+            if (!iceCandidate) {
                 return;
             }
 
@@ -182,4 +178,35 @@ async function updateUserStatus(io: Server, username: string, inCall: boolean): 
     } catch (error) {
         console.log(error);
     }
+}
+
+function toIceCandidate(value: unknown): RTCIceCandidateInit | null {
+    if (typeof value !== "object" || value === null) {
+        return null;
+    }
+
+    const { candidate, sdpMid, sdpMLineIndex, usernameFragment } = value as Record<string, unknown>;
+    if (typeof candidate !== "string" || candidate.length >= 2000) {
+        return null;
+    }
+
+    return {
+        candidate,
+        sdpMid: typeof sdpMid === "string" ? sdpMid : null,
+        sdpMLineIndex: typeof sdpMLineIndex === "number" ? sdpMLineIndex : null,
+        usernameFragment: typeof usernameFragment === "string" ? usernameFragment : null
+    };
+}
+
+function toSessionDescription(value: unknown, type: "offer" | "answer"): RTCSessionDescriptionInit | null {
+    if (typeof value !== "object" || value === null) {
+        return null;
+    }
+
+    const { type: actualType, sdp } = value as Record<string, unknown>;
+    if (actualType !== type || typeof sdp !== "string" || sdp.length > 20_000) {
+        return null;
+    }
+
+    return { type, sdp };
 }
