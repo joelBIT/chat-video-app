@@ -8,7 +8,9 @@ import { saveConversationMessage, saveMessage } from "../clientApplication/servi
 import { isSelectedNamespace } from "../clientApplication/services/namespaceService";
 import { addAnswer, addNewIceCandidate, answerOffer, call, closeVideoCall } from "../clientApplication/services/webRtcService";
 import type { Message, Namespace, Offer, Room } from "../types";
-import { ANSWER_RESPONSE, CHAT_MESSAGE, DENY_CALL, END_CALL, isValidNamespace, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, NEW_OFFER_CANCELLED, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../serverApplication/utils/constants";
+import { ANSWER_RESPONSE, CHAT_MESSAGE, DENY_CALL, END_CALL, NAMESPACE_ID_DM, NEW_OFFER_AWAITING, 
+    NEW_OFFER_CANCELLED, PRIVATE_MESSAGE, RECEIVED_ICE_CANDIDATE_FROM_SERVER, ROOM_ID_NONE, 
+    UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../serverApplication/utils/constants";
 
 export interface MultiplexContextProvider {
     connectMultiplexSockets: (namespaces: Namespace[]) => void;
@@ -63,7 +65,7 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
         // The auth callback runs on every (re)connect, so it always sends the latest token.
         const socket = io(namespace.endpoint, { auth: (cb) => cb({ token: session.token }) });
         socket.connect();
-        socket.on(CHAT_MESSAGE, onChatMessage);
+        socket.on(CHAT_MESSAGE, (message: Message) => onChatMessage(message, namespace.id));        // A closure per socket
         socket.on(PRIVATE_MESSAGE, onPrivateMessage);
         socket.on(USER_JOINED, onUserJoined);
         socket.on(USER_LEFT, onUserLeft);
@@ -146,18 +148,16 @@ export function MultiplexProvider({ children }: { children: ReactNode }): ReactE
     }
 
     /**
-     * The room is only updated with the incoming message if the user is active in that room. Otherwise, the user
-     * will get the message history later when changing to that room.
+     * The message is stored in the namespace of the socket that received it. The room is only re-rendered if the user is
+     * active in it; other rooms show their unread count next time the list renders.
      */
-    function onChatMessage(message: Message): void {
-        saveMessage(message);
-        if (isSelectedRoom(message.to)) {       // Update current room with the new message
+    function onChatMessage(message: Message, namespaceID: number): void {
+        saveMessage(message, namespaceID);
+
+        if (isSelectedRoom(message.to)) {
             changeSelectedRoom(JSON.parse(JSON.stringify(getSelectedRoom())));
-        } else {                                // Update UI so the user may see that unread messages exist in other rooms
-            const namespaceId: number = getSelectedRoom()?.namespaceId ?? -1;
-            if (isValidNamespace(namespaceId)) {
-                updateUI(namespaceId);
-            }
+        } else {
+            updateUI(namespaceID);          // Only redraws if that namespace is the visible one
         }
     }
 

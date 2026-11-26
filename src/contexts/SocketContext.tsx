@@ -2,7 +2,7 @@ import { createContext, type ReactElement, type ReactNode, useEffect, useState }
 import { session, socket } from "../socket-client";
 import { useMultiplex, useRoom, useUser } from "../hooks";
 import { isSelectedRoom } from "../clientApplication/services/roomService";
-import { addAllUsers, getSignedOutUser, getUsersInSelectedRoom, resetUsers, saveUser } from "../clientApplication/services/userService";
+import { addAllUsers, getSignedOutUser, getUsersInSelectedRoom, resetUsers, saveUser, setCurrentUserID } from "../clientApplication/services/userService";
 import { addNamespaces } from "../clientApplication/services/namespaceService";
 import { resetNamespaces } from "../clientApplication/services/namespaceService";
 import type { ActionState, Namespace, ChatUser } from "../types";
@@ -73,6 +73,7 @@ export function SocketProvider({ children }: { children: ReactNode }): ReactElem
      */
     async function onNamespaces(namespaces: Namespace[], user: ChatUser, members: ChatUser[], token: string): Promise<void> {
         session.token = token;                  // Must be set before the multiplex sockets connect
+        setCurrentUserID(user.id);
         setUserInformation(user);
         addAllUsers(members);
         addNamespaces(namespaces);

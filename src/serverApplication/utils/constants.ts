@@ -50,10 +50,6 @@ export function isCommonRoom(roomName: string): boolean {
     return [ROOM_NAME_GENERAL, ROOM_NAME_SUPPORT, ROOM_NAME_ANNOUNCEMENTS, ROOM_NAME_LOBBY].includes(roomName);
 }
 
-export function isValidNamespace(namespaceID: number): boolean {
-    return [0, 1, 2].includes(namespaceID);
-}
-
 export const HOME_URL = "/";
 export const PROFILE_URL = "/profile";
 export const ROOMS_URL = "/rooms";

@@ -14,28 +14,33 @@ export async function getMessagesByRoomId(roomID: string, limit: number = 50): P
     assertString(roomID, "roomID");
     const messages = await MessageModel.find({ to: roomID }).sort({ date: -1 }).limit(limit);
 
-    return messages.reverse().map((message): Message => ({
-        from: message.from,
-        to: message.to,
-        public: message.public,
-        text: message.text,
-        date: message.date
-    }));
+    return messages.reverse().map(toMessage);
+}
+
+function toMessage(message: any): Message {
+    return { from: message.from, to: message.to, public: message.public, text: message.text, date: message.date };
 }
 
 /**
- * Return all messages from 'fromUserID' to 'toUserID'. These are messages from a private conversation between users 'fromUserID' and 'toUserID'.
- */
-export async function getConversationMessages(fromUserID: string, toUserID: string) : Promise<Message[]> {
-    assertString(fromUserID, "fromUserID");
-    assertString(toUserID, "toUserID");
-    return await MessageModel.find({ "from": fromUserID, "to": toUserID, "public": false });
-}
-
-/**
- * Returns a list of usernames of those users that userID has had a conversation with (sent messages to).
+ * IDs of all users that userID has exchanged private messages with, in either direction.
  */
 export async function getConversationsByUserID(userID: string): Promise<string[]> {
-    assertString(userID, "userID");
-    return await MessageModel.find({ "from": userID, "public": false }).distinct("to");
+    const [sentTo, receivedFrom] = await Promise.all([
+        MessageModel.find({ from: userID, public: false }).distinct("to"),
+        MessageModel.find({ to: userID, public: false }).distinct("from")
+    ]);
+
+    return [...new Set<string>([...sentTo, ...receivedFrom])].filter((id: string) => id !== userID);
+}
+
+/**
+ * The newest `limit` private messages between two users (either direction), oldest first.
+ */
+export async function getConversationMessages(userA: string, userB: string, limit: number = 100): Promise<Message[]> {
+    const messages = await MessageModel.find({
+        public: false,
+        $or: [{ from: userA, to: userB }, { from: userB, to: userA }]
+    }).sort({ date: -1 }).limit(limit);
+
+    return messages.reverse().map(toMessage);
 }

@@ -7,16 +7,10 @@ import { getConversationMessages } from "../dao/messageDAO";
  * sender and receiver (in any order) will be retrieved.
  */
 export async function getPrivateConversation(user1ID: string, user2ID: string): Promise<Message[]> {
-    const conversations: Message[] = [];
-
     try {
-        const conversations1: Message[] = await getConversationMessages(user1ID, user2ID);
-        const conversations2: Message[] = await getConversationMessages(user2ID, user1ID);
-        conversations.push(...conversations1);
-        conversations.push(...conversations2);
+        return await getConversationMessages(user1ID, user2ID);
     } catch (error) {
         console.log(error);
+        return [];
     }
-
-    return conversations;
 }

@@ -2,8 +2,9 @@ import { type ReactElement, useEffect, useRef } from 'react';
 import { useNavigate } from "react-router";
 import { useMultiplex, useRoom } from '../../hooks';
 import { NAMESPACE_ID_DM, ROOMS_URL } from '../../serverApplication/utils/constants';
-import { setSelectedNamespaceId } from '../../clientApplication/services/namespaceService';
 import { getSelectedNamespaceRooms } from '../../clientApplication/services/roomService';
+import { getUserByUsername } from '../../clientApplication/services/userService';
+import type { Room } from '../../types';
 
 import "./AnswerCallModal.css";
 
@@ -13,7 +14,7 @@ import "./AnswerCallModal.css";
 export function AnswerCallModal({ answerCall, denyCall }: { answerCall: () => void, denyCall: () => void }): ReactElement {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const navigate = useNavigate();
-    const { changeRoom } = useRoom();
+    const { changeRoom, changeNamespace, createPrivateRoom } = useRoom();
     const { remoteUsername } = useMultiplex();
 
     useEffect(() => {
@@ -23,18 +24,25 @@ export function AnswerCallModal({ answerCall, denyCall }: { answerCall: () => vo
     }, []);
 
     /**
-     * If the user accepts the invite; navigate to the room (conversation) of the caller and start streaming the call.
+     * Go to the conversation with the caller (creating it if this is the first contact) and answer the call.
      */
-    function acceptCall(): void {
-        setSelectedNamespaceId(NAMESPACE_ID_DM);
-        const conversations = getSelectedNamespaceRooms();
-        for (let i = 0; i < conversations.length; i++) {
-            if (conversations[i].name === remoteUsername) {
-                changeRoom(conversations[i]);
-                navigate(ROOMS_URL, { replace: true });
-                answerCall();
+    async function acceptCall(): Promise<void> {
+        changeNamespace(NAMESPACE_ID_DM);
+
+        try {
+            const conversation: Room | undefined = getSelectedNamespaceRooms().find((room: Room) => room.name === remoteUsername);
+            if (conversation) {
+                changeRoom(conversation);
+            } else {
+                await createPrivateRoom(getUserByUsername(remoteUsername));
             }
+        } catch (error) {
+            console.log(error);
+            return;
         }
+
+        navigate(ROOMS_URL, { replace: true });
+        answerCall();
     }
 
     return (

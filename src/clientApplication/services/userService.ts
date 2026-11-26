@@ -77,3 +77,7 @@ export function getUserByUsername(username: string): ChatUser {
 export function resetUsers(): void {
     userStore.reset();
 }
+
+export function setCurrentUserID(userID: string): void {
+    userStore.setCurrentUserId(userID);
+}

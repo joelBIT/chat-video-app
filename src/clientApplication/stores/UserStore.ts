@@ -7,6 +7,7 @@ import type { ChatUser } from "../../types";
  */
 class InMemoryUserStore {
     private users: Map<string, ChatUser>;                       // <userID, ChatUser>
+    private currentUserId: string = "";
 
     constructor() {
         this.users = new Map();
@@ -18,6 +19,14 @@ class InMemoryUserStore {
 
     findUserById(userID: string): ChatUser | undefined {
         return this.users.get(userID);
+    }
+
+    setCurrentUserId(userID: string): void {
+        this.currentUserId = userID;
+    }
+
+    getCurrentUserId(): string {
+        return this.currentUserId;
     }
 
     getUserById(userID: string): ChatUser {
@@ -60,6 +69,7 @@ class InMemoryUserStore {
 
     reset(): void {
         this.users.clear();
+        this.currentUserId = "";
     }
 }
 

@@ -16,7 +16,7 @@ export interface RoomContextProvider {
     setRoomParticipants: (participants: ChatUser[]) => void;
     changeNamespace: (namespaceID: number) => void;
     changeSelectedRoom: (room: Room | undefined) => void;
-    createPrivateRoom: (recipient: ChatUser) => void;
+    createPrivateRoom: (recipient: ChatUser) => Promise<void>;
     createGameRoom: (roomName: string, privateRoom: boolean, password: string) => void;
     joinPrivateRoom: (room: Room, password: string) => Promise<ActionState>;
 }
