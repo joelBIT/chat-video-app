@@ -50,6 +50,7 @@ const ORIGIN: string = process.env.NODE_ENV === 'production' ? process.env.URL a
 
 // Create our socket.io server... it will listen to our express port
 const io = new Server(expressServer, {
+    maxHttpBufferSize: 1e5,     // maximum message size 100 KB
     cors: {
         origin: [
             ORIGIN

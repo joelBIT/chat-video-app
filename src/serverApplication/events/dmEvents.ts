@@ -6,6 +6,7 @@ import { CREATE_ROOM, NAMESPACE_DM_ENDPOINT, NAMESPACE_ID_DM, PRIVATE_MESSAGE, U
 import { saveMessage } from "../dao/messageDAO";
 import { buildMessage } from "../utils/messages";
 import { findUserById } from "../dao/userDAO";
+import { safeOn } from "../utils/safeSocket";
 
 /**
  * Initialize events that are specific to the "DMs" namespace (id 1).
@@ -22,7 +23,7 @@ export async function initializeDmEvents(io: Server): Promise<void> {
 
         socket.join(userID);            // Personal room
 
-        socket.on(CREATE_ROOM, async (recipientID: unknown, ackCallback: unknown) => {
+        safeOn(socket, CREATE_ROOM, async (recipientID: unknown, ackCallback: unknown) => {
             if (typeof recipientID !== "string" || typeof ackCallback !== "function") {
                 return;
             }
@@ -48,7 +49,7 @@ export async function initializeDmEvents(io: Server): Promise<void> {
             }
         });
 
-        socket.on(PRIVATE_MESSAGE, async (message: unknown) => {
+        safeOn(socket, PRIVATE_MESSAGE, async (message: unknown) => {
             const trusted = buildMessage(userID, message, false);
             if (!trusted || trusted.to === userID) {
                 return;

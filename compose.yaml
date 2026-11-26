@@ -1,6 +1,7 @@
 services:
   chat:
     build: .
+    restart: unless-stopped
     environment:
       - NODE_ENV=production
     ports:

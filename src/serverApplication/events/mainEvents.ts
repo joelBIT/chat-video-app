@@ -6,6 +6,7 @@ import type { ChatUser, Namespace } from "../../types";
 import { findUserById, getAllUsers, updateAvatar, updateOnlineStatus} from "../dao/userDAO";
 import { setAllUsersAsOffline } from "../utils/database";
 import { issueToken } from "../utils/sessionToken";
+import { safeOn } from "../utils/safeSocket";
 
 /**
  * Initializes events for the main namespace ('/') only. The connected client receives data via the "namespaces" event. This data consists of
@@ -29,7 +30,7 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
             console.log(error);
         }
 
-        socket.on(USER_UPDATED, async (updatedUser: unknown, ackCallback: unknown) => {
+        safeOn(socket, USER_UPDATED, async (updatedUser: unknown, ackCallback: unknown) => {
             if (typeof ackCallback !== "function") {
                 return;
             }
@@ -49,7 +50,7 @@ export async function initializeMainNamespaceEvents(io: Server): Promise<void> {
             }
         });
 
-        socket.on("disconnect", async reason => {
+        safeOn(socket, "disconnect", async reason => {
             console.log(`disconnect ${userID} due to ${reason}`);
             
             if (userID) {

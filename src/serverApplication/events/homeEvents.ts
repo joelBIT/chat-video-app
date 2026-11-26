@@ -4,6 +4,7 @@ import { CHANGE_ROOM, CHAT_MESSAGE, NAMESPACE_HOME_ENDPOINT, NAMESPACE_ID_HOME, 
 import { saveMessage } from "../dao/messageDAO";
 import { getRoomByID } from "../dao/roomDAO";
 import { buildMessage } from "../utils/messages";
+import { safeOn } from "../utils/safeSocket";
 
 /**
  * Initialize events that are specific to the "Home" namespace.
@@ -17,7 +18,7 @@ export async function initializeHomeEvents(io: Server): Promise<void> {
             return;
         }
 
-        socket.on(CHANGE_ROOM, async (roomID: unknown) => {
+        safeOn(socket, CHANGE_ROOM, async (roomID: unknown) => {
             if (typeof roomID !== "string") {
                 return;
             }
@@ -35,9 +36,9 @@ export async function initializeHomeEvents(io: Server): Promise<void> {
             }
         });
 
-        socket.on(CHAT_MESSAGE, (message: unknown) => {
+        safeOn(socket, CHAT_MESSAGE, (message: unknown) => {
             const trusted = buildMessage(userID, message, true);
-            if (!trusted || !socket.rooms.has(trusted.to)) {        // Must be in the room it writes to
+                        if (!trusted || !socket.rooms.has(trusted.to)) {        // Must be in the room it writes to
                 return;
             }
 

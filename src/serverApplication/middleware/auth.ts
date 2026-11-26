@@ -7,6 +7,7 @@ import { verifyToken } from "../utils/sessionToken";
 import { findUserById, findUserByUsername, updateOnlineStatus } from "../dao/userDAO";
 import type { ChatUser } from "../../types";
 import { NAMESPACE_DM_ENDPOINT, NAMESPACE_GAMES_ENDPOINT, NAMESPACE_HOME_ENDPOINT } from "../utils/constants";
+import { limitEvents } from "../utils/safeSocket";
 
 /**
  * Every custom namespace requires the signed token that the server sent to the client after a successful login.
@@ -15,6 +16,7 @@ import { NAMESPACE_DM_ENDPOINT, NAMESPACE_GAMES_ENDPOINT, NAMESPACE_HOME_ENDPOIN
 export function authenticateNamespaces(io: Server): void {
     [NAMESPACE_HOME_ENDPOINT, NAMESPACE_DM_ENDPOINT, NAMESPACE_GAMES_ENDPOINT].forEach((endpoint: string) => {
         io.of(endpoint).use(async (socket: ISocket, next) => {
+            limitEvents(socket);
             const userID = verifyToken(socket.handshake.auth?.token);
             if (!userID) {
                 return next(new Error("Not authenticated."));
@@ -39,8 +41,12 @@ export function authenticateNamespaces(io: Server): void {
  */
 export function login(io: Server): void {
     io.use(async (socket: ISocket, next) => {
-        const username = socket.handshake.auth.username;
-        const password = socket.handshake.auth.password;
+        limitEvents(socket, 10);
+
+        const { username, password } = socket.handshake.auth ?? {};
+        if (typeof username !== "string" || typeof password !== "string" || !username || !password) {
+            return next(new Error("Invalid credentials."));
+        }
 
         const isValidCredentials: boolean = await isCorrectPassword(username, password);
         if (!isValidCredentials) {
@@ -68,8 +74,9 @@ export function login(io: Server): void {
  * Check if POST body contains required username and password properties. Only execute the registerUser function if properties exist.
  */
 export function checkBody(req: express.Request, _res: express.Response, next: express.NextFunction): void {
-    if (!req.body.username || !req.body.password) {
-        next(new AppError("Username and password must be supplied.", 400));
+    const { username, password, passwordRepeat } = req.body ?? {};
+    if (typeof username !== "string" || typeof password !== "string" || typeof passwordRepeat !== "string" || !username || !password) {
+        return next(new AppError("Username and password must be supplied.", 400));
     }
 
     next();

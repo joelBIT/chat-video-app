@@ -7,6 +7,7 @@ import { getRoomByID, saveRoom } from "../dao/roomDAO";
 import { getMessagesByRoomId, saveMessage } from "../dao/messageDAO";
 import { buildMessage } from "../utils/messages";
 import { isLockedOut, registerFailure } from "../utils/rateLimit";
+import { safeOn } from "../utils/safeSocket";
 
 /**
  * Initialize events that are specific to the "Games" namespace (id 2).
@@ -20,7 +21,7 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
             return;
         }
 
-        socket.on(CREATE_ROOM, async (room: Room, password: unknown) => {
+        safeOn(socket, CREATE_ROOM, async (room: Room, password: unknown) => {
             if (typeof room?.name !== "string" || typeof room.private !== "boolean" || typeof password !== "string") {
                 return;
             }
@@ -41,7 +42,7 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
             }
         });
 
-        socket.on(CHAT_MESSAGE, (message: unknown) => {
+        safeOn(socket, CHAT_MESSAGE, (message: unknown) => {
             const trusted = buildMessage(userID, message, true);
             if (!trusted || !socket.rooms.has(trusted.to)) {
                 return;
@@ -51,7 +52,7 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
             io.of(NAMESPACE_GAMES_ENDPOINT).to(trusted.to).emit(CHAT_MESSAGE, trusted);
         });
 
-        socket.on(CHANGE_ROOM, async (roomID: unknown, password: unknown, ackCallback: unknown) => {
+        safeOn(socket, CHANGE_ROOM, async (roomID: unknown, password: unknown, ackCallback: unknown) => {
             const reply = (response: ActionState): void => {
                 if (typeof ackCallback === "function") {
                     ackCallback(response);
@@ -95,7 +96,7 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
             }
         });
 
-        socket.on(LEAVE_ROOM, async (roomID: unknown) => {
+        safeOn(socket, LEAVE_ROOM, async (roomID: unknown) => {
             if (typeof roomID !== "string") {
                 return;
             }
