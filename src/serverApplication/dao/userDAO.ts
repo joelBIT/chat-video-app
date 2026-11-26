@@ -32,6 +32,10 @@ export async function findUserById(userID: string): Promise<ChatUser> {
     return mapDatabaseUser(user);
 }
 
+export async function usernameExists(username: string): Promise<boolean> {
+    return (await User.exists({ username })) !== null;
+}
+
 export async function getAllUsers(): Promise<ChatUser[]> {
     const mappedUsers: ChatUser[] = [];
 

@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 config.env
+.env*
+*.pem
 
 # Editor directories and files
 .vscode/*
@@ -23,6 +25,3 @@ config.env
 *.njsproj
 *.sln
 *.sw?
-
-fullchain.pem
-privkey.pem

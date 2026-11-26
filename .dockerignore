@@ -39,3 +39,9 @@ compose.yaml
 !tailwind.config.js
 !postcss.config.js
 !tsconfig.json
+
+.dockerignore
+config.env
+*.pem
+compose.yaml
+Dockerfile

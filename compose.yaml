@@ -2,7 +2,10 @@ services:
   chat:
     build: .
     restart: unless-stopped
+    env_file: ./config.env
     environment:
       - NODE_ENV=production
     ports:
       - "443:8181"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro        # after each Let's Encrypt renewal run docker compose restart chat

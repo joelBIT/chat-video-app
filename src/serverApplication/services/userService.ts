@@ -20,8 +20,10 @@ console.log(JSON.stringify(username), hashedPassword.length, hashedPassword.incl
  * must be added as member of these rooms.
  */
 export async function addUserToCommonRooms(userID: string): Promise<void> {
-    addUserToRoom(userID, ROOM_NAME_GENERAL);
-    addUserToRoom(userID, ROOM_NAME_SUPPORT);
-    addUserToRoom(userID, ROOM_NAME_ANNOUNCEMENTS);
-    addUserToRoom(userID, ROOM_NAME_LOBBY);
+    await Promise.all([
+        addUserToRoom(userID, ROOM_NAME_GENERAL),
+        addUserToRoom(userID, ROOM_NAME_SUPPORT),
+        addUserToRoom(userID, ROOM_NAME_ANNOUNCEMENTS),
+        addUserToRoom(userID, ROOM_NAME_LOBBY)
+    ]);
 }

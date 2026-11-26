@@ -41,9 +41,11 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
     res.status(err.statusCode).json(response);
 });
 
+const CERT_DIR: string = process.env.CERTIFICATE_LOCATION ?? '.';
+
 const expressServer = createServer({
-    key: readFileSync('./privkey.pem'), 
-    cert: readFileSync('./fullchain.pem')
+    key: readFileSync(`${CERT_DIR}/privkey.pem`), 
+    cert: readFileSync(`${CERT_DIR}/fullchain.pem`)
 }, app);
 
 const ORIGIN: string = process.env.NODE_ENV === 'production' ? process.env.URL as string : "https://localhost";
