@@ -4,7 +4,7 @@ import type { ActionState, Room } from "../../types";
 import type { ISocket } from "../interfaces";
 import { CHANGE_ROOM, CHAT_MESSAGE, CREATE_ROOM, isCommonRoom, LEAVE_ROOM, NAMESPACE_GAMES_ENDPOINT, NAMESPACE_ID_GAMES, UPDATE_CUSTOM_GAME_ROOM, UPDATE_ROOMS, USER_JOINED, USER_LEFT } from "../utils/constants";
 import { getRoomByID, saveRoom } from "../dao/roomDAO";
-import { saveMessage } from "../dao/messageDAO";
+import { getMessagesByRoomId, saveMessage } from "../dao/messageDAO";
 import { buildMessage } from "../utils/messages";
 import { isLockedOut, registerFailure } from "../utils/rateLimit";
 
@@ -81,6 +81,7 @@ export async function initializeGamesEvents(io: Server): Promise<void> {
                 }
 
                 if (!isCommonRoom(room.name) && !isRoomMember) {
+                    room.history = await getMessagesByRoomId(roomID);       // Password already verified above
                     io.of(NAMESPACE_GAMES_ENDPOINT).to(socket.id).emit(UPDATE_CUSTOM_GAME_ROOM, room);
                 }
 

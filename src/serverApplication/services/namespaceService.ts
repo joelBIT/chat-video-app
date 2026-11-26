@@ -14,7 +14,7 @@ export async function getDataForUser(userID: string): Promise<Namespace[]> {
 
     try {
         const homeNamespace: Namespace = await findNamespaceById(NAMESPACE_ID_HOME);
-        let roomsWithHistory = await addMessageHistoryToRooms(homeNamespace.rooms);
+        let roomsWithHistory = await addMessageHistoryToRooms(homeNamespace.rooms, userID);
         homeNamespace.rooms = [];
         homeNamespace.rooms.push(...roomsWithHistory);
         namespaces.push(homeNamespace);
@@ -46,7 +46,7 @@ export async function getDataForUser(userID: string): Promise<Namespace[]> {
         namespaces.push(dmNamespace);
 
         const gamesNamespace: Namespace = await findNamespaceById(NAMESPACE_ID_GAMES);
-        roomsWithHistory = await addMessageHistoryToRooms(gamesNamespace.rooms);
+        roomsWithHistory = await addMessageHistoryToRooms(gamesNamespace.rooms, userID);
         gamesNamespace.rooms = [];
         gamesNamespace.rooms.push(...roomsWithHistory);
         namespaces.push(gamesNamespace);

@@ -9,8 +9,16 @@ export async function saveMessage(message: Message): Promise<void> {
     }
 }
 
-export async function getMessagesByRoomId(roomID: string): Promise<Message[]> {
-    return await MessageModel.find({ "to": roomID }).limit(50);
+export async function getMessagesByRoomId(roomID: string, limit: number = 50): Promise<Message[]> {
+    const messages = await MessageModel.find({ to: roomID }).sort({ date: -1 }).limit(limit);
+
+    return messages.reverse().map((message): Message => ({
+        from: message.from,
+        to: message.to,
+        public: message.public,
+        text: message.text,
+        date: message.date
+    }));
 }
 
 /**

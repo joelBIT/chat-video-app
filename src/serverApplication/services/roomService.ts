@@ -55,14 +55,13 @@ export async function removeUserFromRoom(userID: string, roomID: string): Promis
 }
 
 /**
- * Adds message history to supplied rooms.
+ * Adds message history to the rooms the user may read: the common rooms and the rooms the user is a member of.
  */
-export async function addMessageHistoryToRooms(rooms: Room[]): Promise<Room[]> {
-    for (let i = 0; i < rooms.length; i++) {
-        if (isCommonRoom(rooms[i].name)) {          // Only retrieve message history for the common rooms
+export async function addMessageHistoryToRooms(rooms: Room[], userID: string): Promise<Room[]> {
+    for (const room of rooms) {
+        if (isCommonRoom(room.name) || room.members.includes(userID)) {
             try {
-                const roomMessages = await getMessagesByRoomId(rooms[i].id);
-                rooms[i].history.push(...roomMessages);
+                room.history = await getMessagesByRoomId(room.id);
             } catch (error) {
                 console.log(error);
             }

@@ -28,6 +28,6 @@ export const messageSchema = new mongoose.Schema({
         type: Number,
         required: [true, "Must know when the message was sent from the client"]
     }
-}, { timestamps: true });
+}, { timestamps: true }).index({ to: 1, date: -1 });
 
 export const MessageModel = mongoose.model('Message', messageSchema);

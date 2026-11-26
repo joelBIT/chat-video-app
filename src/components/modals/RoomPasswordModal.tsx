@@ -5,7 +5,7 @@ import type { ActionState, Room } from "../../types";
 import "./RoomPasswordModal.css";
 
 /**
- * Modal used to check if a password is correct for a private room. It is not possible to join a private room without entering the correct password.
+ * Modal used to join a private room. The server checks the password; it is not possible to join without the correct one.
  */
 export function RoomPasswordModal({ room, close }: { room: Room, close: () => void }): ReactElement {
     const [password, setPassword] = useState<string>('');
@@ -13,7 +13,7 @@ export function RoomPasswordModal({ room, close }: { room: Room, close: () => vo
     const dialogRef = useRef<HTMLDialogElement>(null);
     const { joinPrivateRoom } = useRoom();
 
-     useEffect(() => {
+    useEffect(() => {
         if (!dialogRef.current?.open) {
             dialogRef.current?.showModal();
         }
@@ -28,19 +28,19 @@ export function RoomPasswordModal({ room, close }: { room: Room, close: () => vo
             setPassword('');
         }
     }
-    
+
     return (
         <dialog id="roomPasswordModal" ref={dialogRef}>
             <section className='password-room__header'>
                 <h1 className='roomPasswordModal__title'> Enter password for room <i className="room-name">{room.name}</i> </h1>
 
-                <input 
-                    placeholder="Password" 
-                    maxLength={20} 
+                <input
+                    placeholder="Password"
+                    maxLength={20}
                     minLength={1}
                     value={password}
-                    onChange={event => setPassword(event.target.value)} 
-                    className='password__input' 
+                    onChange={event => setPassword(event.target.value)}
+                    className='password__input'
                 />
             </section>
 
